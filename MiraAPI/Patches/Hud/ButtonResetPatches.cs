@@ -5,7 +5,7 @@ using Reactor.Utilities;
 namespace MiraAPI.Patches.Hud;
 
 [HarmonyPatch(typeof(MeetingHud), nameof(MeetingHud.Start))]
-[HarmonyPatch(typeof(ExileController), nameof(ExileController.ReEnableGameplay))]
+[HarmonyPatch(typeof(ExileController), nameof(ExileController.WrapUp))]
 public static class ButtonResetPatches
 {
     public static void Postfix()
