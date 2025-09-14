@@ -30,9 +30,9 @@ public static class IntroCutscenePatches
     }
 
     [HarmonyPostfix]
-    [HarmonyPatch(typeof(IntroCutscene._ShowRole_d__41), nameof(IntroCutscene._ShowRole_d__41.MoveNext))]
+    [HarmonyPatch(typeof(IntroCutscene._ShowRole_d__40), nameof(IntroCutscene._ShowRole_d__40.MoveNext))]
     [HarmonyPriority(Priority.Last)]
-    public static void ShowRolePatch(IntroCutscene._ShowRole_d__41 __instance)
+    public static void ShowRolePatch(IntroCutscene._ShowRole_d__40 __instance)
     {
         var realInstance = __instance.__4__this;
         var @event = new IntroRoleRevealEvent(realInstance);
