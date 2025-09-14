@@ -6,6 +6,7 @@ using HarmonyLib;
 using MiraAPI.PluginLoading;
 using MiraAPI.Presets;
 using MiraAPI.Roles;
+using MiraAPI.Utilities;
 using MiraAPI.Utilities.Assets;
 using Reactor.Utilities;
 using Reactor.Utilities.Extensions;
@@ -27,22 +28,6 @@ internal static class GamePresetsTabPatches
     private static GridArrange _arrange = null!;
 
     private static readonly object Lock = new();
-
-    public static void DivideSize(GameObject obj, float amount)
-    {
-        foreach (var collider in obj.GetComponentsInChildren<Collider2D>(true))
-        {
-            if (collider.TryCast<BoxCollider2D>() is { } col)
-            {
-                col.size = new Vector2(col.size.x / amount, col.size.y);
-            }
-        }
-
-        foreach (var rend in obj.GetComponentsInChildren<SpriteRenderer>(true))
-        {
-            rend.size = new Vector2(rend.size.x / amount, rend.size.y);
-        }
-    }
 
     [HarmonyPatch(typeof(GamePresetsTab), nameof(GamePresetsTab.OnEnable))]
     public static class GamePresetsOnEnablePatch
@@ -207,7 +192,7 @@ internal static class GamePresetsTabPatches
                 saveText.transform.parent.localPosition.y,
                 saveText.transform.parent.localPosition.z);
 
-            DivideSize(saveButton.gameObject, 2f);
+            Helpers.DivideSize(saveButton.gameObject, 2f);
 
             saveButton.OnClick = new Button.ButtonClickedEvent();
             saveButton.OnClick.AddListener(
@@ -276,7 +261,7 @@ internal static class GamePresetsTabPatches
             var iconSpriteRend = icon.AddComponent<SpriteRenderer>();
             iconSpriteRend.sprite = MiraAssets.RefreshIcon.LoadAsset();
 
-            DivideSize(refreshButton.gameObject, 2f);
+            Helpers.DivideSize(refreshButton.gameObject, 2f);
             refreshButton.buttonText.gameObject.Destroy();
 
             refreshButton.OnClick = new Button.ButtonClickedEvent();

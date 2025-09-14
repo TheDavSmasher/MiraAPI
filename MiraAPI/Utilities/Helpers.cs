@@ -3,8 +3,9 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
-using Il2CppSystem.IO;
+using Il2CppInterop.Runtime.InteropTypes.Arrays;
 using MiraAPI.Keybinds;
+using MiraAPI.Utilities.Assets;
 using Rewired;
 using TMPro;
 using UnityEngine;
@@ -24,6 +25,76 @@ public static class Helpers
     public static List<PlayerControl> GetAlivePlayers()
     {
         return [.. GameData.Instance.AllPlayers.ToArray().Where(x => !x.IsDead && !x.Disconnected && x.Object).Select(x => x.Object)];
+    }
+
+    internal static GameObject CreateKeybindIcon(GameObject button, KeyboardKeyCode keyCode, Vector3 localPos)
+    {
+        var keybindIcon = Object.Instantiate(HudManager.Instance.AbilityButton.usesRemainingSprite.gameObject, button.transform);
+        keybindIcon.GetComponent<SpriteRenderer>().sprite = MiraAssets.KeybindButton.LoadAsset();
+        keybindIcon.transform.GetComponentInChildren<TextMeshPro>().text = keyCode.ToString();
+        keybindIcon.name = "KeybindIcon";
+        keybindIcon.transform.localPosition = localPos;
+        return keybindIcon;
+    }
+
+    /// <summary>
+    /// Creates a draggable scroller. Add items into the scroller.Inner transform. This does not automatically position children.
+    /// </summary>
+    /// <param name="parent">Where the scroller should be parented to.</param>
+    /// <param name="hitBoxCollider">The collider of the scroller. Used to drag.</param>
+    /// <returns>The created scroller object.</returns>
+    public static Scroller CreateScroller(Transform parent, BoxCollider2D hitBoxCollider)
+    {
+        var scrollObj = new GameObject("Scroller");
+        scrollObj.transform.SetParent(parent);
+        scrollObj.transform.localScale = new Vector3(1, 1, 1);
+
+        var inner = new GameObject("Inner");
+        inner.transform.SetParent(scrollObj.transform);
+        inner.transform.localScale = new Vector3(1, 1, 1);
+        inner.transform.localPosition = new Vector3(0, 0, 2);
+
+        var scroller = scrollObj.AddComponent<Scroller>();
+        scroller.allowX = false;
+        scroller.allowY = true;
+        scroller.DragScrollSpeed = 1f;
+        scroller.Colliders = new Il2CppReferenceArray<Collider2D>([hitBoxCollider]);
+        scroller.Inner = inner.transform;
+
+        return scroller;
+    }
+
+    /// <summary>
+    /// Divides a button/etc by a certain amount by resizing colliders and renderer sizes.
+    /// </summary>
+    /// <param name="obj">The object you want to divide.</param>
+    /// <param name="amount">How much you want to divide by.</param>
+    public static void DivideSize(GameObject obj, float amount)
+    {
+        foreach (var collider in obj.GetComponentsInChildren<Collider2D>(true))
+        {
+            if (collider.TryCast<BoxCollider2D>() is { } col)
+            {
+                col.size = new Vector2(col.size.x / amount, col.size.y);
+            }
+        }
+
+        foreach (var rend in obj.GetComponentsInChildren<SpriteRenderer>(true))
+        {
+            rend.size = new Vector2(rend.size.x / amount, rend.size.y);
+        }
+    }
+
+    /// <summary>
+    /// Gets the keybind for an action with ReInput.
+    /// </summary>
+    /// <param name="actionId">The action ID.</param>
+    /// <returns>The keyboard key code.</returns>
+    public static KeyboardKeyCode GetKeybindByActionId(int actionId)
+    {
+        var player = ReInput.players.GetPlayer(0);
+        return player.controllers.maps.GetFirstElementMapWithAction(ControllerType.Keyboard, actionId, false)
+            .keyboardKeyCode;
     }
 
     /// <summary>
@@ -406,21 +477,22 @@ public static class Helpers
     }
 
     /// <summary>
-    /// Finds and returns an unused KeyCode that is not equal to the excluded key.
+    /// Returns the formated value using the specified suffix and format string.
     /// </summary>
-    /// <param name="exclude">The KeyCode to skip during the search.</param>
-    /// <returns>
-    /// The first available KeyCode not currently used by any registered keybind,
-    /// or KeyCode.None if none are available.
-    /// </returns>
-    public static KeyboardKeyCode FindAvailableKey(KeyboardKeyCode exclude)
+    /// <param name="value">The value to format.</param>
+    /// <param name="suffix">The suffix to add.</param>
+    /// <param name="formatString">The format string to use to format.</param>
+    /// <returns>The formated value.</returns>
+    public static string FormatValue(float value, MiraNumberSuffixes suffix = MiraNumberSuffixes.None, string formatString = "0.0")
     {
-        foreach (KeyboardKeyCode key in Enum.GetValues(typeof(KeyboardKeyCode)))
+        return suffix switch
         {
-            if (key == exclude) continue;
-            bool used = KeybindManager.GetEntries().Exists(e => e.Key == key);
-            if (!used) return key;
-        }
-        return KeyboardKeyCode.None;
+            MiraNumberSuffixes.None => value.ToString(formatString, NumberFormatInfo.InvariantInfo),
+            MiraNumberSuffixes.Multiplier => value.ToString(formatString, NumberFormatInfo.InvariantInfo) + "x",
+            MiraNumberSuffixes.Percent => value.ToString(formatString, NumberFormatInfo.InvariantInfo) + "%",
+            _ => TranslationController.Instance.GetString(
+                StringNames.GameSecondsAbbrev,
+                (Il2CppSystem.Object[])[value.ToString(formatString, CultureInfo.InvariantCulture)]),
+        };
     }
 }

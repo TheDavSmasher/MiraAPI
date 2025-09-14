@@ -4,6 +4,7 @@ using System.Collections.Immutable;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using Il2CppInterop.Runtime.Attributes;
+using MiraAPI.LocalSettings;
 using MiraAPI.Modifiers.ModifierDisplay;
 using MiraAPI.Modifiers.Types;
 using MiraAPI.Patches.Roles;
@@ -129,7 +130,7 @@ public class ModifierComponent(IntPtr cppPtr) : MonoBehaviour(cppPtr)
         {
             var taskPanelOpen = HudManager.Instance.TaskPanel.open;
             var roleTabOpen = HudManagerPatches.RoleTab != null && HudManagerPatches.RoleTab.open;
-            var leftSideHud = PluginSingleton<MiraApiPlugin>.Instance.MiraConfig!.ModifiersHudLeftSide.Value;
+            var leftSideHud = LocalSettingsTabSingleton<MiraApiSettings>.Instance.ModifiersHudLeftSide.Value;
 
             if (leftSideHud && (taskPanelOpen || roleTabOpen))
             {

@@ -4,7 +4,6 @@ using System.Linq;
 using System.Text;
 using AmongUs.GameOptions;
 using MiraAPI.Utilities.Assets;
-using Reactor.Utilities;
 using UnityEngine;
 
 namespace MiraAPI.Roles;
@@ -56,7 +55,7 @@ public static class CustomRoleUtils
     /// <returns>The intro sound.</returns>
     public static LoadableAsset<AudioClip>? GetIntroSound(RoleTypes roleType)
     {
-        var role = RoleManager.Instance.AllRoles.FirstOrDefault(role => role.Role == roleType);
+        var role = CustomRoleManager.AllRoles.FirstOrDefault(role => role.Role == roleType);
         if (role is ICustomRole customRole)
         {
             return customRole.Configuration.IntroSound;

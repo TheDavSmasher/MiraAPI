@@ -1,11 +1,14 @@
-﻿using System;
-using System.Collections;
+﻿using System.Collections.Generic;
+using System.Linq;
 using HarmonyLib;
 using MiraAPI.Hud;
 using MiraAPI.Keybinds;
+using MiraAPI.LocalSettings;
+using MiraAPI.Utilities;
 using Reactor.Utilities;
 using Reactor.Utilities.Extensions;
 using Rewired;
+using TMPro;
 using UnityEngine;
 using Object = UnityEngine.Object;
 
@@ -21,6 +24,8 @@ public static class HudManagerPatches
     public static GameObject? BottomLeft { get; private set; }
     public static Transform? BottomRight { get; private set; }
     public static Transform? Buttons { get; private set; }
+
+    private static Dictionary<TextMeshPro, int> vanillaKeybindIcons = new();
 
     /*
     /// <summary>
@@ -106,8 +111,35 @@ public static class HudManagerPatches
 
         gridArrange.Start();
         gridArrange.ArrangeChilds();
-
         aspectPosition.AdjustPosition();
+
+        vanillaKeybindIcons = [];
+        var keybindIconPos = new Vector3(-0.4f, 0.4f, -9.5f);
+        var vanillaButtons = new Dictionary<GameObject, int>
+        {
+            { __instance.KillButton.gameObject, 8 },
+            { __instance.UseButton.gameObject, 6 },
+            { __instance.ReportButton.gameObject, 7 },
+            { __instance.ImpostorVentButton.gameObject, 50 },
+            { __instance.SabotageButton.gameObject, 4 },
+            { __instance.AbilityButton.gameObject, 49 },
+        };
+
+        foreach (var kvp in vanillaButtons)
+        {
+            var buttonObj = kvp.Key;
+            var actionId = kvp.Value;
+
+            var key = KeybindUtils.GetKeycodeByActionId(actionId);
+            if (key == KeyboardKeyCode.None)
+            {
+                continue;
+            }
+            var icon = Helpers.CreateKeybindIcon(buttonObj, key, keybindIconPos);
+            vanillaKeybindIcons.Add(icon.transform.GetChild(0).GetComponent<TextMeshPro>(), actionId);
+            var comp = buttonObj.GetComponent<ActionButton>();
+            KeybindManager.VanillaKeybinds[comp.GetType()].Button = comp;
+        }
     }
 
     /// <summary>
@@ -142,22 +174,31 @@ public static class HudManagerPatches
 
     [HarmonyPatch(nameof(HudManager.Update))]
     [HarmonyPostfix]
-    public static void StartPostfix()
+    public static void UpdatePostfix()
     {
-        if (AmongUsClient.Instance.GameState != InnerNet.InnerNetClient.GameStates.Started) return;
-        if (PlayerControl.LocalPlayer.Data.IsDead) return;
-
-        foreach (var entry in KeybindManager.GetEntries())
+        foreach (var btnIcon in vanillaKeybindIcons)
         {
-            var player = ReInput.players.GetPlayer(0);
-            var keyboard = player.controllers.Keyboard;
+            btnIcon.Key.text = KeybindUtils.GetKeycodeByActionId(btnIcon.Value).ToString();
+            btnIcon.Key.transform.parent.gameObject.SetActive(ActiveInputManager.currentControlType == ActiveInputManager.InputType.Keyboard &&
+                                                              LocalSettingsTabSingleton<MiraApiSettings>.Instance.ShowKeybinds.Value);
+        }
 
-            if (player.GetButtonDown(entry.Id) &&
-               (entry.Modifier1 == ModifierKey.None || keyboard.GetModifierKey(entry.Modifier1)) &&
-               (entry.Modifier2 == ModifierKey.None || keyboard.GetModifierKey(entry.Modifier2)) &&
-               (entry.Modifier3 == ModifierKey.None || keyboard.GetModifierKey(entry.Modifier3)))
+        var player = ReInput.players.GetPlayer(0);
+        foreach (var entry in KeybindManager.Keybinds)
+        {
+            var keyboard = player.controllers.Keyboard;
+            bool modifierKeysPressed = entry.ModifierKeys.All(k => keyboard.GetModifierKey(k)) ||
+                                       entry.ModifierKeys.Length <= 0;
+            if (player.GetButtonDown(entry.Id) && modifierKeysPressed)
             {
-                entry.Handler?.Invoke();
+                entry.Invoke();
+            }
+        }
+        foreach (var entry in KeybindManager.VanillaKeybinds.Values)
+        {
+            if (player.GetButtonDown(entry.Id))
+            {
+                entry.Invoke();
             }
         }
     }

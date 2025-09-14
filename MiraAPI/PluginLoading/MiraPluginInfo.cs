@@ -5,6 +5,7 @@ using BepInEx.Configuration;
 using MiraAPI.GameModes;
 using MiraAPI.GameOptions;
 using MiraAPI.Hud;
+using MiraAPI.LocalSettings;
 using MiraAPI.Modifiers;
 using MiraAPI.Presets;
 

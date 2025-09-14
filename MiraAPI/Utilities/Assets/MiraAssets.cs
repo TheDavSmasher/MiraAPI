@@ -71,6 +71,11 @@ public static class MiraAssets
     public static LoadableResourceAsset NextButton { get; } = new("MiraAPI.Resources.NextButton.png");
 
     /// <summary>
+    /// Gets the Mira settings icon..
+    /// </summary>
+    public static LoadableResourceAsset SettingsIcon { get; } = new("MiraAPI.Resources.Settings.png");
+
+    /// <summary>
     /// Gets the highlighted Next Button sprite.
     /// </summary>
     public static LoadableResourceAsset NextButtonActive { get; } = new("MiraAPI.Resources.NextButtonActive.png");
@@ -94,4 +99,34 @@ public static class MiraAssets
     /// Gets the white CategoryHeader used in the Settings Menu.
     /// </summary>
     public static LoadableResourceAsset CategoryHeader { get; } = new("MiraAPI.Resources.CategoryHeader.png");
+
+    /// <summary>
+    /// Gets the sprite used for the Keybind icons.
+    /// </summary>
+    public static LoadableResourceAsset KeybindButton { get; } = new("MiraAPI.Resources.KeybindButton.png");
+
+    /// <summary>
+    /// Gets the sprite used for crewmate role files in TaskAdderGame.
+    /// </summary>
+    public static LoadableResourceAsset CrewmateFile { get; } = new("MiraAPI.Resources.CrewmateFile.png");
+    
+    /// <summary>
+    /// Gets the sprite used for impostor role files in TaskAdderGame.
+    /// </summary>
+    public static LoadableResourceAsset ImpostorFile { get; } = new("MiraAPI.Resources.ImpostorFile.png");
+    
+    /// <summary>
+    /// Gets the sprite used for custom team role files in TaskAdderGame.
+    /// </summary>
+    public static LoadableResourceAsset CustomTeamFile { get; } = new("MiraAPI.Resources.CustomFile.png");
+
+    /// <summary>
+    /// Gets the sprite used for modifier file in TaskAdderGame.
+    /// </summary>
+    public static LoadableResourceAsset ModifierFile { get; } = new("MiraAPI.Resources.ModifierFile.png");
+
+    /// <summary>
+    /// Gets the sprite used for timed modifier file in TaskAdderGame.
+    /// </summary>
+    public static LoadableResourceAsset TimedModifierFile { get; } = new("MiraAPI.Resources.TimedModifierFile.png");
 }

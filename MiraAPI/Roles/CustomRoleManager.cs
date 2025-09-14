@@ -36,6 +36,11 @@ public static class CustomRoleManager
         CustomRoleUtils.GetIntroSound(RoleTypes.Impostor)!;
 
     /// <summary>
+    /// Gets the list of all roles from vanilla RoleManager.
+    /// </summary>
+    public static RoleBehaviour[] AllRoles => RoleManager.Instance.AllRoles.ToArray();
+
+    /// <summary>
     /// Gets the list of custom roles as RoleBehaviour objects.
     /// </summary>
     public static IReadOnlyList<RoleBehaviour> CustomRoleBehaviours { get; private set; } = [];
@@ -57,7 +62,10 @@ public static class CustomRoleManager
 
     internal static void RegisterInRoleManager()
     {
-        RoleManager.Instance.AllRoles = RoleManager.Instance.AllRoles.Concat(CustomRoles.Values).ToArray();
+        foreach (var role in CustomRoles.Values)
+        {
+            RoleManager.Instance.AllRoles.Add(role);
+        }
 
         foreach (var role in CustomRoles.Values.Where(x => x.IsDead))
         {

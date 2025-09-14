@@ -4,6 +4,7 @@ using System.Collections.ObjectModel;
 using System.Reflection;
 using MiraAPI.Events.Mira;
 using MiraAPI.PluginLoading;
+using UnityEngine;
 
 namespace MiraAPI.Hud;
 

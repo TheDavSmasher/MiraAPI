@@ -1,12 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using HarmonyLib;
 using Il2CppInterop.Runtime.Attributes;
-using MiraAPI.Patches.Roles;
+using MiraAPI.LocalSettings;
 using MiraAPI.Utilities.Assets;
-using Reactor.Utilities;
 using Reactor.Utilities.Attributes;
 using Reactor.Utilities.Extensions;
 using TMPro;
@@ -98,7 +96,7 @@ public class ModifierDisplayComponent(nint cppPtr) : MonoBehaviour(cppPtr)
         IsOpen = false;
         _children.gameObject.SetActive(false);
 
-        if (PluginSingleton<MiraApiPlugin>.Instance.MiraConfig!.ModifiersHudLeftSide.Value)
+        if (LocalSettingsTabSingleton<MiraApiSettings>.Instance.ModifiersHudLeftSide.Value)
         {
             var aspect = GetComponent<AspectPosition>();
             _toggleButton.transform.localPosition = new Vector3(-1f, 2.7f, 0f);

@@ -2,10 +2,14 @@
 using System.Globalization;
 using MiraAPI.Events;
 using MiraAPI.Events.Mira;
+using MiraAPI.Keybinds;
+using MiraAPI.LocalSettings;
 using MiraAPI.Patches;
 using MiraAPI.Utilities;
 using MiraAPI.Utilities.Assets;
+using Reactor.Utilities;
 using Rewired;
+using TMPro;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UI;
@@ -34,6 +38,12 @@ public abstract class CustomActionButton
     public abstract float Cooldown { get; }
 
     /// <summary>
+    /// Gets a value indicating whether the timer should stop decreasing when the player is venting.
+    /// Note that both cooldown decrease and effect timer decrease is disabled.
+    /// </summary>
+    public virtual bool PauseTimerInVent => false;
+
+    /// <summary>
     /// Gets the sprite of the button. Use <see cref="LoadableResourceAsset"/> to load a sprite from a resource path. Use <see cref="LoadableBundleAsset{T}"/> to load a sprite from an asset bundle.
     /// </summary>
     public abstract LoadableAsset<Sprite> Sprite { get; }
@@ -44,7 +54,12 @@ public abstract class CustomActionButton
     public virtual string CooldownTimerFormatString => "0";
 
     /// <summary>
-    /// Gets the button's effect duration in seconds. If the button has no effect, set to 0.
+    /// Gets a value indicating whether the button has an effect ability. By default true if <see cref="EffectDuration"/> is greater than 0.
+    /// </summary>
+    public virtual bool HasEffect => EffectDuration > 0;
+
+    /// <summary>
+    /// Gets the button's effect duration in seconds. If 0, the effect needs to be ended manually.
     /// </summary>
     public virtual float EffectDuration => 0;
 
@@ -54,26 +69,14 @@ public abstract class CustomActionButton
     public virtual int MaxUses => 0;
 
     /// <summary>
-    /// Gets or sets the current key binding for this button.
+    /// Gets the value indicating uses mode.
     /// </summary>
-    public abstract KeyboardKeyCode Defaultkeybind { get; }
+    public virtual ButtonUsesMode UsesMode => ButtonUsesMode.PerGame;
 
     /// <summary>
-    /// The first optional modifier key (e.g., Control, Shift, Alt) that must be held with the main key to activate the button.
+    /// Gets the keybind for this button. If null, no keybind will be added.
     /// </summary>
-    public virtual ModifierKey Modifier1 => ModifierKey.None;
-
-    /// <summary>
-    /// The second optional modifier key.
-    /// Set to <see cref="ModifierKey.None"/> if unused.
-    /// </summary>
-    public virtual ModifierKey Modifier2 => ModifierKey.None;
-
-    /// <summary>
-    /// The third optional modifier key.
-    /// Set to <see cref="ModifierKey.None"/> if unused.
-    /// </summary>
-    public virtual ModifierKey Modifier3 => ModifierKey.None;
+    public virtual BaseKeybind? Keybind => null;
 
     /// <summary>
     /// Gets the button's text outline color.
@@ -84,11 +87,6 @@ public abstract class CustomActionButton
     /// Gets or sets the location of the button on the screen.
     /// </summary>
     public virtual ButtonLocation Location { get; set; } = ButtonLocation.BottomLeft;
-
-    /// <summary>
-    /// Gets a value indicating whether the button has an effect ability.
-    /// </summary>
-    public bool HasEffect => EffectDuration > 0;
 
     /// <summary>
     /// Gets a value indicating whether the button has limited uses.
@@ -119,6 +117,16 @@ public abstract class CustomActionButton
     /// Gets or sets the button object in game. This is created by Mira API automatically.
     /// </summary>
     public ActionButton? Button { get; set; }
+
+    /// <summary>
+    /// Gets the gameObject used for the keybind icon.
+    /// </summary>
+    public GameObject? KeybindIcon { get; private set; }
+
+    /// <summary>
+    /// Gets or sets the keybind icon text.
+    /// </summary>
+    private TextMeshPro? KeybindText { get; set; }
 
     /// <summary>
     /// The method used to create the button.
@@ -191,6 +199,26 @@ public abstract class CustomActionButton
                 }
             }
         }));
+
+        if (Keybind != null)
+        {
+            Keybind.OnActivate(() =>
+            {
+                if (Enabled(PlayerControl.LocalPlayer.Data.Role))
+                {
+                    ClickHandler();
+                }
+            });
+
+            KeybindIcon =
+                Helpers.CreateKeybindIcon(
+                    Button.gameObject,
+                    Keybind.CurrentKey,
+                    new Vector3(MaxUses <= 0 ? -0.4f : 0.4f, 0.45f, -9f)
+                );
+            KeybindText = KeybindIcon.transform.GetChild(0).GetComponent<TextMeshPro>();
+            Button.usesRemainingSprite.transform.localPosition = new(-0.341f, 0.45f, -0.1f);
+        }
     }
 
     /// <summary>
@@ -378,6 +406,13 @@ public abstract class CustomActionButton
     }
 
     /// <summary>
+    /// Returns a value indicating whether the effect can be ended early by the player.
+    /// Always false by default.
+    /// </summary>
+    /// <returns>Can the effect be canceled.</returns>
+    public virtual bool IsEffectCancellable() => false;
+
+    /// <summary>
     /// When the button is usable, this method is called to determine if the button can be clicked.
     /// By default, it takes into account the timer, effect, and uses.
     /// You can override it to change the behavior.
@@ -385,7 +420,7 @@ public abstract class CustomActionButton
     /// <returns>A value that represents whether the button can be clicked or not.</returns>
     public virtual bool CanClick()
     {
-        return Timer <= 0 && !EffectActive && CanUse();
+        return (EffectActive ? IsEffectCancellable() : Timer <= 0) && CanUse();
     }
 
     /// <summary>
@@ -395,7 +430,8 @@ public abstract class CustomActionButton
     /// <returns>A value that represents whether the button should light up or not.</returns>
     public virtual bool CanUse()
     {
-        return PlayerControl.LocalPlayer.moveable && (!LimitedUses || UsesLeft > 0);
+        return PlayerControl.LocalPlayer.moveable &&
+               ((EffectActive && IsEffectCancellable()) || (!EffectActive && (!LimitedUses || UsesLeft > 0)));
     }
 
     /// <summary>
@@ -417,6 +453,12 @@ public abstract class CustomActionButton
     /// </summary>
     public virtual void ClickHandler()
     {
+        if (EffectActive && IsEffectCancellable())
+        {
+            ResetCooldownAndOrEffect();
+            return;
+        }
+
         if (!CanClick())
         {
             return;
@@ -449,14 +491,22 @@ public abstract class CustomActionButton
     /// <param name="playerControl">The local PlayerControl.</param>
     public virtual void FixedUpdateHandler(PlayerControl playerControl)
     {
+        if (Keybind != null && KeybindText != null)
+        {
+            KeybindText.text = Keybind.CurrentKey.ToString();
+            KeybindIcon?.SetActive(ActiveInputManager.currentControlType == ActiveInputManager.InputType.Keyboard &&
+                                   LocalSettingsTabSingleton<MiraApiSettings>.Instance.ShowKeybinds.Value &&
+                                   Keybind.CurrentKey != KeyboardKeyCode.None);
+        }
+
         if (Timer >= 0)
         {
-            if (!TimerPaused)
+            if (!TimerPaused && (!PauseTimerInVent || !playerControl.inVent))
             {
                 Timer -= Time.deltaTime;
             }
         }
-        else if (HasEffect && EffectActive)
+        else if (HasEffect && EffectActive && EffectDuration > 0)
         {
             EffectActive = false;
             Timer = Cooldown;
@@ -474,7 +524,7 @@ public abstract class CustomActionButton
                 Button!.SetDisabled();
             }
 
-            if (EffectActive)
+            if (EffectActive && EffectDuration > 0)
             {
                 Button.SetFillUp(Timer, EffectDuration);
 

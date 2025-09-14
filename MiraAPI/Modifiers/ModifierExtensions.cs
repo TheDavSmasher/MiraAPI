@@ -63,7 +63,7 @@ public static class ModifierExtensions
     /// </summary>
     /// <param name="target">The player to remove the modifier from.</param>
     /// <param name="uniqueId">The unique ID of the modifier.</param>
-    [MethodRpc((uint)MiraRpc.RemoveModifier, SendImmediately = true)]
+    [MethodRpc((uint)MiraRpc.RemoveModifier)]
     public static void RpcRemoveModifier(this PlayerControl target, Guid uniqueId)
     {
         target.RemoveModifier(uniqueId);

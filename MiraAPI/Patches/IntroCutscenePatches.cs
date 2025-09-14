@@ -29,6 +29,16 @@ public static class IntroCutscenePatches
         MiraEventManager.InvokeEvent(@event);
     }
 
+    [HarmonyPostfix]
+    [HarmonyPatch(typeof(IntroCutscene._ShowRole_d__41), nameof(IntroCutscene._ShowRole_d__41.MoveNext))]
+    [HarmonyPriority(Priority.Last)]
+    public static void ShowRolePatch(IntroCutscene._ShowRole_d__41 __instance)
+    {
+        var realInstance = __instance.__4__this;
+        var @event = new IntroRoleRevealEvent(realInstance);
+        MiraEventManager.InvokeEvent(@event);
+    }
+
     [HarmonyPrefix]
     [HarmonyPatch(nameof(IntroCutscene.BeginImpostor))]
     [HarmonyPatch(nameof(IntroCutscene.BeginCrewmate))]

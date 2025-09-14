@@ -33,7 +33,7 @@ public static class RoleManagerPatches
             data.Role.Deinitialize(targetPlayer);
             Object.Destroy(data.Role.gameObject);
         }
-        var roleBehaviour = Object.Instantiate<RoleBehaviour>(__instance.AllRoles.First(r => r.Role == roleType), data.gameObject.transform);
+        var roleBehaviour = Object.Instantiate<RoleBehaviour>(__instance.AllRoles.ToArray().First(r => r.Role == roleType), data.gameObject.transform);
         roleBehaviour.Initialize(targetPlayer);
         targetPlayer.Data.Role = roleBehaviour;
         targetPlayer.Data.RoleType = roleType;

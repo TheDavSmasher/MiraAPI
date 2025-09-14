@@ -1,7 +1,5 @@
 ﻿using HarmonyLib;
 using MiraAPI.Modifiers;
-using MiraAPI.Roles;
-using UnityEngine;
 
 namespace MiraAPI.Patches.Freeplay;
 

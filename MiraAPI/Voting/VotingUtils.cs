@@ -71,7 +71,7 @@ public static class VotingUtils
     /// <param name="source">The player who is sending the RPC. Should be the host.</param>
     /// <param name="voterId">The player who voted.</param>
     /// <param name="votedFor">The player who the voter voted for.</param>
-    [MethodRpc((uint)MiraRpc.RemoveVote, SendImmediately = true)]
+    [MethodRpc((uint)MiraRpc.RemoveVote)]
     public static void RpcRemoveVote(PlayerControl source, byte voterId, byte votedFor)
     {
         if (!source.IsHost()) return;
@@ -107,7 +107,7 @@ public static class VotingUtils
     /// <param name="source">The player who sent this RPC.</param>
     /// <param name="srcPlayerId">The id of the player who casted the vote.</param>
     /// <param name="suspectPlayerId">The voted player's id.</param>
-    [MethodRpc((uint)MiraRpc.CastVote, SendImmediately = true)]
+    [MethodRpc((uint)MiraRpc.CastVote)]
     public static void RpcCastVote(PlayerControl source, byte srcPlayerId, byte suspectPlayerId)
     {
         CustomCastVote(srcPlayerId, suspectPlayerId);
