@@ -194,12 +194,10 @@ public static class HudManagerPatches
                 entry.Invoke();
             }
         }
-        foreach (var entry in KeybindManager.VanillaKeybinds.Values)
+
+        foreach (var entry in KeybindManager.VanillaKeybinds.Values.Where(x => player.GetButtonDown(x.Id)))
         {
-            if (player.GetButtonDown(entry.Id))
-            {
-                entry.Invoke();
-            }
+            entry.Invoke();
         }
     }
 }

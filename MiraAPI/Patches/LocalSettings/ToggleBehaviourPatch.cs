@@ -8,7 +8,7 @@ public static class ToggleBehaviourPatch
 {
     /// <summary>
     /// ResetText was inlined ofc.
-    /// Skill issue
+    /// Skill issue.
     /// </summary>
     [HarmonyPrefix]
     [HarmonyPatch(nameof(ToggleButtonBehaviour.UpdateText))]

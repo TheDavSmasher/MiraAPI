@@ -5,6 +5,7 @@ using System.Globalization;
 using System.Linq;
 using Il2CppInterop.Runtime.InteropTypes.Arrays;
 using MiraAPI.Keybinds;
+using MiraAPI.Roles;
 using MiraAPI.Utilities.Assets;
 using Rewired;
 using TMPro;
@@ -494,5 +495,19 @@ public static class Helpers
                 StringNames.GameSecondsAbbrev,
                 (Il2CppSystem.Object[])[value.ToString(formatString, CultureInfo.InvariantCulture)]),
         };
+    }
+
+    /// <summary>
+    /// Returns the string of a role.
+    /// </summary>
+    /// <param name="role">The role to find.</param>
+    /// <returns>The role name.</returns>
+    public static string GetRoleName(this RoleBehaviour role)
+    {
+        if (role is ICustomRole custom)
+        {
+            return custom.RoleName;
+        }
+        return role.NiceName;
     }
 }

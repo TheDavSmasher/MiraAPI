@@ -34,8 +34,8 @@ public record struct CustomRoleConfiguration
         ShowInFreeplay = roleBehaviour?.IsDead == false;
         FreeplayFolder = role.Team switch
         {
-            ModdedRoleTeams.Crewmate => "Crewmate",
-            ModdedRoleTeams.Impostor => "Impostor",
+            ModdedRoleTeams.Crewmate => TranslationController.Instance.GetString(StringNames.Crewmate),
+            ModdedRoleTeams.Impostor => TranslationController.Instance.GetString(StringNames.Impostor),
             _ => "Neutral",
         };
         IntroSound = role.Team is ModdedRoleTeams.Crewmate

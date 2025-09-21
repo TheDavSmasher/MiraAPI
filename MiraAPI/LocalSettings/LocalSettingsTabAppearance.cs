@@ -4,7 +4,7 @@ using UnityEngine;
 namespace MiraAPI.LocalSettings;
 
 /// <summary>
-/// Struct for modyfing tab apparance.
+/// Struct for modifying tab appearance.
 /// Defines how the settings look.
 /// </summary>
 public record struct LocalSettingTabAppearance()
@@ -23,6 +23,11 @@ public record struct LocalSettingTabAppearance()
     /// Gets or sets color of the tab button.
     /// </summary>
     public Color TabButtonColor { get; set; } = Color.white;
+
+    /// <summary>
+    /// Gets or sets a value indicating whether the icon should be hidden when tab button is hovered.
+    /// </summary>
+    public bool HideIconOnHover { get; set; } = true;
 
     /// <summary>
     /// Gets or sets hover color of the tab button.
@@ -78,7 +83,7 @@ public record struct LocalSettingTabAppearance()
     /// Gets or sets hover color of enum buttons.
     /// </summary>
     public Color EnumHoverColor { get; set; } = Palette.AcceptedGreen;
-    
+
     /// <summary>
     /// Gets or sets color of buttons.
     /// </summary>

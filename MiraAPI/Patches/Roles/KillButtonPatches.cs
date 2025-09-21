@@ -58,6 +58,11 @@ public static class KillButtonPatches
             return false;
         }
 
+        if (PlayerControl.LocalPlayer.Data.Role is not ICustomRole)
+        {
+            return true;
+        }
+
         PlayerControl.LocalPlayer.RpcCustomMurder(__instance.currentTarget);
         __instance.SetTarget(null);
 

@@ -246,6 +246,7 @@ public abstract class LocalSettingsTab(ConfigFile config)
             tabButtonText.maxVisibleCharacters = int.MaxValue;
             tabButtonText.text = TabName;
             tabButtonText.alignment = TextAlignmentOptions.Left;
+            tabButtonRend?.gameObject.SetActive(!TabAppearance.HideIconOnHover);
         }));
         tabButton.OnMouseOut.AddListener((UnityAction)(() =>
         {

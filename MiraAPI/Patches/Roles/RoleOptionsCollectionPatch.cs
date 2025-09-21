@@ -9,17 +9,17 @@ namespace MiraAPI.Patches.Roles;
 /// <summary>
 /// Patches to return the correct role counts.
 /// </summary>
-[HarmonyPatch(typeof(RoleOptionsCollectionV09))]
+[HarmonyPatch(typeof(RoleOptionsCollectionV10))]
 public static class RoleOptionsCollectionPatch
 {
     /// <summary>
     /// This patch fixes GetNumPerGame being inlined (2025.5.20) in the original code.
     /// </summary>
     [HarmonyPrefix]
-    [HarmonyPatch(nameof(RoleOptionsCollectionV09.AnyRolesEnabled))]
-    public static bool AnyRolesEnabledPrefix(RoleOptionsCollectionV09 __instance, ref bool __result)
+    [HarmonyPatch(nameof(RoleOptionsCollectionV10.AnyRolesEnabled))]
+    public static bool AnyRolesEnabledPrefix(RoleOptionsCollectionV10 __instance, ref bool __result)
     {
-        foreach (KeyValuePair<RoleTypes, RoleDataV09> keyValuePair in __instance.roles)
+        foreach (KeyValuePair<RoleTypes, RoleDataV10> keyValuePair in __instance.roles)
         {
             if (__instance.GetNumPerGame(keyValuePair.Key) > 0)
             {
@@ -34,7 +34,7 @@ public static class RoleOptionsCollectionPatch
     /// </summary>
     /// <returns>Return false to skip original method, true to not.</returns>
     [HarmonyPrefix]
-    [HarmonyPatch(nameof(RoleOptionsCollectionV09.GetChancePerGame))]
+    [HarmonyPatch(nameof(RoleOptionsCollectionV10.GetChancePerGame))]
     public static bool GetChancePrefix(RoleTypes role, ref int __result)
     {
         if (!CustomRoleManager.GetCustomRoleBehaviour(role, out var customRole) || customRole == null)
@@ -64,7 +64,7 @@ public static class RoleOptionsCollectionPatch
     /// </summary>
     /// <returns>Return false to skip original method, true to not.</returns>
     [HarmonyPrefix]
-    [HarmonyPatch(nameof(RoleOptionsCollectionV09.GetNumPerGame))]
+    [HarmonyPatch(nameof(RoleOptionsCollectionV10.GetNumPerGame))]
     public static bool GetNumPrefix(RoleTypes role, ref int __result)
     {
         if (!CustomRoleManager.GetCustomRoleBehaviour(role, out var customRole) || customRole == null)

@@ -29,7 +29,7 @@ public class LocalSliderSettingAttribute(
     private readonly string? _description = description;
 
     /// <inheritdoc/>
-    internal override LocalSliderSetting CreateSetting(Type tab, ConfigEntryBase configEntryBase)
+    public override LocalSliderSetting CreateSetting(Type tab, ConfigEntryBase configEntryBase)
     {
         return new LocalSliderSetting(tab, configEntryBase, _name, _description, new FloatRange(min, max), displayValue, suffixType, formatString, roundValue);
     }

@@ -22,7 +22,7 @@ public static class OptionsMenuPatches
     private static Dictionary<int, List<GameObject>> tabButtons = new();
 
     /// <summary>
-    /// Creates the tabs and their content
+    /// Creates the tabs and their content.
     /// </summary>
     [HarmonyPostfix]
     [HarmonyPatch(nameof(OptionsMenuBehaviour.Start))]

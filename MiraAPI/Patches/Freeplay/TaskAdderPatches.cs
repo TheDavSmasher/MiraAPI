@@ -3,15 +3,14 @@ using System.Globalization;
 using System.Linq;
 using System.Text;
 using AmongUs.GameOptions;
-using BepInEx.Unity.IL2CPP.Utils.Collections;
 using HarmonyLib;
 using Il2CppInterop.Runtime.InteropTypes.Arrays;
-using Il2CppSystem;
 using MiraAPI.LocalSettings;
 using MiraAPI.Modifiers;
 using MiraAPI.Modifiers.Types;
 using MiraAPI.PluginLoading;
 using MiraAPI.Roles;
+using MiraAPI.Utilities;
 using MiraAPI.Utilities.Assets;
 using Reactor.Utilities.Extensions;
 using UnityEngine;
@@ -67,19 +66,21 @@ internal static class TaskAdderPatches
         __instance.RootFolderPrefab.GetComponent<PassiveButton>().ClickMask = collider;
         __instance.RootFolderPrefab.gameObject.SetActive(false);
         __instance.TaskParent = inner.transform;
+        var crewLocale = TranslationController.Instance.GetString(StringNames.Crewmate);
+        var impLocale = TranslationController.Instance.GetString(StringNames.Impostor);
 
-        var crewmateFolder = __instance.Root.SubFolders.ToArray().FirstOrDefault(x => x.FolderName == "Crewmate")!;
-        var impostorFolder = __instance.Root.SubFolders.ToArray().FirstOrDefault(x => x.FolderName == "Impostor")!;
-        var neutralFolder = __instance.CreateFolder("Neutral", __instance.Root, 2, Color.gray);
+        var crewmateFolder = __instance.Root.SubFolders.ToArray().FirstOrDefault(x => x.FolderName == crewLocale)!;
+        var impostorFolder = __instance.Root.SubFolders.ToArray().FirstOrDefault(x => x.FolderName == impLocale)!;
+        //var neutralFolder = __instance.CreateFolder("Neutral", __instance.Root, 2, Color.gray);
         var modifiersFolder = __instance.CreateFolder("Modifiers", __instance.Root, 0, Color.blue);
 
         folders.Clear();
-        folders.Add("Crewmate", crewmateFolder);
-        folders.Add("Impostor", impostorFolder);
-        folders.Add("Neutral", neutralFolder);
+        folders.Add(crewmateFolder.FolderName, crewmateFolder);
+        folders.Add(impostorFolder.FolderName, impostorFolder);
+        //folders.Add("Neutrals", neutralFolder);
         folders.Add("Modifiers", modifiersFolder);
 
-        int folderIdx = 3;
+        int folderIdx = 2;
         foreach (var plugin in MiraPluginManager.Instance.RegisteredPlugins)
         {
             var pluginFolders = new Dictionary<string, TaskFolder>();
@@ -99,10 +100,9 @@ internal static class TaskAdderPatches
                 if (!pluginFolders.TryGetValue(folderName, out var pluginFolder))
                 {
                     pluginFolder = __instance.CreateFolder(plugin.PluginInfo.Metadata.Name, teamFolder);
+                    pluginFolder.name = $"Roles:{folderName}:{plugin.PluginId}";
                     pluginFolders.Add(folderName, teamFolder);
                 }
-
-                pluginFolder.RoleChildren.Add(role);
             }
 
             if (plugin.InternalModifiers.Exists(x => x.ShowInFreeplay))
@@ -145,8 +145,7 @@ internal static class TaskAdderPatches
             Il2CppSystem.Collections.Generic.List<RoleBehaviour> crewRoles = new();
             foreach (var role in RoleManager.Instance.AllRoles)
             {
-                if (role.Role != RoleTypes.ImpostorGhost && role.Role != RoleTypes.CrewmateGhost &&
-                    !role.IsCustomRole())
+                if (role.Role != RoleTypes.ImpostorGhost && role.Role != RoleTypes.CrewmateGhost && !role.IsCustomRole())
                 {
                     if (role.TeamType == RoleTeamTypes.Crewmate)
                     {
@@ -348,13 +347,13 @@ internal static class TaskAdderPatches
 
         var roleChildren = taskFolder.RoleChildren
             .ToArray()
-            .Where(x => !(taskFolder.IsChildOf(__instance.Root) && x is ICustomRole))
+            .Where(x => x is not ICustomRole)
             .ToArray();
         foreach (var role in roleChildren)
         {
             TaskAddButton roleAddButton = Object.Instantiate(__instance.RoleButton);
             roleAddButton.SafePositionWorld = __instance.SafePositionWorld;
-            roleAddButton.Text.text = prettyEnabled ? role.NiceName : "Be_" + role.NiceName + ".exe";
+            roleAddButton.Text.text = prettyEnabled ? role.GetRoleName() : "Be_" + role.GetRoleName() + ".exe";
             roleAddButton.Role = role;
             if (prettyEnabled)
             {
@@ -363,21 +362,7 @@ internal static class TaskAdderPatches
                     ? MiraAssets.ImpostorFile.LoadAsset()
                     : MiraAssets.CrewmateFile.LoadAsset();
             }
-            if (role is ICustomRole custom)
-            {
-                if (prettyEnabled && custom.Team == ModdedRoleTeams.Custom) roleAddButton.FileImage.sprite = MiraAssets.CustomTeamFile.LoadAsset();
-                var customColor = custom.IntroConfiguration?.IntroTeamColor ?? Color.gray;
-                if (custom.Team is ModdedRoleTeams.Crewmate)
-                {
-                    customColor = Palette.CrewmateBlue;
-                }
-                else if (custom.Team is ModdedRoleTeams.Impostor)
-                {
-                    customColor = Palette.ImpostorRed;
-                }
-                roleAddButton.FileImage.color = customColor;
-                roleAddButton.RolloverHandler.OutColor = customColor;
-            }
+
             __instance.AddFileAsChildCustom(roleAddButton, ref num, ref num2, ref num3);
             if (roleAddButton != null && roleAddButton.Button != null)
             {
@@ -385,9 +370,79 @@ internal static class TaskAdderPatches
             }
         }
 
+        string[] split = [];
+        try
+        {
+            split = taskFolder.name.Replace("(Clone)", string.Empty).Split(':');
+        }
+        catch
+        {
+            // I hate you
+        }
+        if (split is ["Roles", _, _] && folders.Any(x => taskFolder.IsChildOf(x.Value)))
+        {
+            var plugin = MiraPluginManager.GetPluginByGuid(split[2]);
+            if (plugin != null)
+            {
+                foreach (var role in plugin.InternalRoles)
+                {
+                    var roleBehaviour = role.Value;
+                    if (roleBehaviour.Role == RoleTypes.ImpostorGhost || roleBehaviour.Role == RoleTypes.CrewmateGhost ||
+                        roleBehaviour is ICustomRole { Configuration.ShowInFreeplay: false })
+                    {
+                        continue;
+                    }
+                    var crewLocale = TranslationController.Instance.GetString(StringNames.Crewmate);
+                    var impLocale = TranslationController.Instance.GetString(StringNames.Impostor);
+
+                    var teamFolder = roleBehaviour.IsImpostor ? impLocale : crewLocale;
+                    if (roleBehaviour is ICustomRole cs)
+                    {
+                        teamFolder = cs.Configuration.FreeplayFolder;
+                    }
+                    if (split[1] != teamFolder)
+                    {
+                        continue;
+                    }
+
+                    var roleAddButton = Object.Instantiate(__instance.RoleButton);
+                    roleAddButton.MyTask = null;
+                    roleAddButton.SafePositionWorld = __instance.SafePositionWorld;
+                    roleAddButton.Text.text = prettyEnabled ? roleBehaviour.GetRoleName() : "Be_" + roleBehaviour.GetRoleName() + ".exe";
+                    roleAddButton.Text.EnableMasking();
+                    roleAddButton.role = roleBehaviour;
+                    if (prettyEnabled)
+                    {
+                        roleAddButton.Text.fontSizeMin = 1;
+                        roleAddButton.FileImage.sprite = roleBehaviour.IsImpostor
+                            ? MiraAssets.ImpostorFile.LoadAsset()
+                            : MiraAssets.CrewmateFile.LoadAsset();
+                    }
+                    if (roleBehaviour is ICustomRole custom)
+                    {
+                        if (prettyEnabled && custom.Team == ModdedRoleTeams.Custom) roleAddButton.FileImage.sprite = MiraAssets.CustomTeamFile.LoadAsset();
+                        var customColor = custom.IntroConfiguration?.IntroTeamColor ?? Color.gray;
+                        if (custom.Team is ModdedRoleTeams.Crewmate)
+                        {
+                            customColor = Palette.CrewmateBlue;
+                        }
+                        else if (custom.Team is ModdedRoleTeams.Impostor)
+                        {
+                            customColor = Palette.ImpostorRed;
+                        }
+                        roleAddButton.FileImage.color = customColor;
+                        roleAddButton.RolloverHandler.OutColor = customColor;
+                    }
+
+                    __instance.AddFileAsChildCustom(roleAddButton, ref num, ref num2, ref num3);
+                    ControllerManager.Instance.AddSelectableUiElement(roleAddButton.Button);
+                }
+            }
+        }
+
         if (folders.TryGetValue("Modifiers", out var modifiersFolder) && taskFolder.IsChildOf(modifiersFolder))
         {
-            var plugin = MiraPluginManager.GetPluginByGuid(taskFolder.gameObject.name.Replace("(Clone)", string.Empty));
+            var plugin = MiraPluginManager.GetPluginByGuid(taskFolder.name.Replace("(Clone)", string.Empty));
             if (plugin != null)
             {
                 foreach (var modifier in plugin.InternalModifiers)
@@ -435,7 +490,6 @@ internal static class TaskAdderPatches
                     }));
 
                     __instance.AddFileAsChildCustom(taskAddButton, ref num, ref num2, ref num3);
-
                     ControllerManager.Instance.AddSelectableUiElement(taskAddButton.Button);
                 }
             }

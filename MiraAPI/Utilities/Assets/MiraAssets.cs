@@ -109,12 +109,12 @@ public static class MiraAssets
     /// Gets the sprite used for crewmate role files in TaskAdderGame.
     /// </summary>
     public static LoadableResourceAsset CrewmateFile { get; } = new("MiraAPI.Resources.CrewmateFile.png");
-    
+
     /// <summary>
     /// Gets the sprite used for impostor role files in TaskAdderGame.
     /// </summary>
     public static LoadableResourceAsset ImpostorFile { get; } = new("MiraAPI.Resources.ImpostorFile.png");
-    
+
     /// <summary>
     /// Gets the sprite used for custom team role files in TaskAdderGame.
     /// </summary>

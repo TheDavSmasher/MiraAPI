@@ -20,7 +20,10 @@ public abstract class LocalSettingBase<T> : ILocalSetting
     /// <inheritdoc />
     public ConfigEntryBase ConfigEntry { get; }
 
-    internal LocalSettingsTab? Tab => LocalSettingsManager.Tabs.FirstOrDefault(x => x.Settings.Contains(this));
+    /// <summary>
+    /// Gets the tab of the local setting.
+    /// </summary>
+    public LocalSettingsTab? Tab => LocalSettingsManager.Tabs.FirstOrDefault(x => x.Settings.Contains(this));
 
     /// <summary>
     /// Initializes a new instance of the <see cref="LocalSettingBase{T}"/> class.
@@ -53,7 +56,7 @@ public abstract class LocalSettingBase<T> : ILocalSetting
     }
 
     /// <summary>
-    /// Gets the value of the config entry, casted to the setting type.
+    /// Gets the value of the config entry, cast to the setting type.
     /// </summary>
     /// <returns>The value.</returns>
     public virtual T GetValue()

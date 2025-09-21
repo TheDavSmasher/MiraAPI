@@ -20,5 +20,5 @@ public abstract class LocalSettingAttribute(
     /// <param name="tab">Gets the tab where the setting is located.</param>
     /// <param name="configEntryBase">Gets the config entry the setting is attached to.</param>
     /// <returns>The created class.</returns>
-    internal abstract ILocalSetting CreateSetting(Type tab, ConfigEntryBase configEntryBase);
+    public abstract ILocalSetting CreateSetting(Type tab, ConfigEntryBase configEntryBase);
 }

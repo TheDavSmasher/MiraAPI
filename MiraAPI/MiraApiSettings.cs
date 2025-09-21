@@ -18,6 +18,7 @@ public class MiraApiSettings(ConfigFile config) : LocalSettingsTab(config)
     {
         TabButtonHoverColor = MiraApiPlugin.MiraColor,
         TabIcon = MiraAssets.SettingsIcon,
+        HideIconOnHover = false,
     };
 
     /// <summary>
