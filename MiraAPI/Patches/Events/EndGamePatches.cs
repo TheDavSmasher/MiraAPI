@@ -7,8 +7,17 @@ namespace MiraAPI.Patches.Events;
 
 internal static class EndGamePatches
 {
+    [HarmonyPatch(typeof(GameManager), nameof(GameManager.Awake))]
+    public static class GameManagerAwakePatch
+    {
+        public static void Postfix(GameManager __instance)
+        {
+            __instance.enabled = true;
+        }
+    }
+
     [HarmonyPatch(typeof(GameManager), nameof(GameManager.RpcEndGame))]
-    public static class GameManagerPatches
+    public static class GameManagerRpcEndGamePatch
     {
         public static bool Prefix(GameOverReason endReason)
         {

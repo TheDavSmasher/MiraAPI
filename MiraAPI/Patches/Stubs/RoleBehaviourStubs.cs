@@ -1,5 +1,6 @@
 ﻿using System.Runtime.CompilerServices;
 using HarmonyLib;
+using Hazel;
 using Il2CppSystem.Text;
 
 namespace MiraAPI.Patches.Stubs;
@@ -226,6 +227,78 @@ public static class RoleBehaviourStubs
     [HarmonyPatch(typeof(RoleBehaviour), nameof(RoleBehaviour.UseAbility))]
     [MethodImpl(MethodImplOptions.NoInlining)]
     public static void UseAbility(RoleBehaviour instance)
+    {
+        // nothing needed
+    }
+
+    /// <summary>
+    /// Stub method for RoleBehaviour.UseSecondaryAbility.
+    /// </summary>
+    /// <param name="instance">The RoleBehaviour object.</param>
+    [HarmonyReversePatch]
+    [HarmonyPatch(typeof(RoleBehaviour), nameof(RoleBehaviour.UseSecondaryAbility))]
+    [MethodImpl(MethodImplOptions.NoInlining)]
+    public static void UseSecondaryAbility(RoleBehaviour instance)
+    {
+        // nothing needed
+    }
+
+    /// <summary>
+    /// Stub method for RoleBehaviour.OnRoleSet.
+    /// </summary>
+    /// <param name="instance">The RoleBehaviour object.</param>
+    [HarmonyReversePatch]
+    [HarmonyPatch(typeof(RoleBehaviour), nameof(RoleBehaviour.OnRoleSet))]
+    [MethodImpl(MethodImplOptions.NoInlining)]
+    public static void OnRoleSet(RoleBehaviour instance)
+    {
+        // nothing needed
+    }
+
+    /// <summary>
+    /// Stub method for RoleBehaviour.InitializeMeetingAbilityButton.
+    /// </summary>
+    /// <param name="instance">The RoleBehaviour object.</param>
+    [HarmonyReversePatch]
+    [HarmonyPatch(typeof(RoleBehaviour), nameof(RoleBehaviour.InitializeMeetingAbilityButton))]
+    [MethodImpl(MethodImplOptions.NoInlining)]
+    public static void InitializeMeetingAbilityButton(RoleBehaviour instance)
+    {
+        // nothing needed
+    }
+
+    /// <summary>
+    /// Stub method for RoleBehaviour.FindClosestBody.
+    /// </summary>
+    /// <param name="instance">The RoleBehaviour object.</param>
+    [HarmonyReversePatch]
+    [HarmonyPatch(typeof(RoleBehaviour), nameof(RoleBehaviour.FindClosestBody))]
+    [MethodImpl(MethodImplOptions.NoInlining)]
+    public static DeadBody FindClosestBody(RoleBehaviour instance)
+    {
+        return null!;
+    }
+
+    /// <summary>
+    /// Stub method for RoleBehaviour.HandleRoleRpc.
+    /// </summary>
+    /// <param name="instance">The RoleBehaviour object.</param>
+    [HarmonyReversePatch]
+    [HarmonyPatch(typeof(RoleBehaviour), nameof(RoleBehaviour.HandleRoleRpc))]
+    [MethodImpl(MethodImplOptions.NoInlining)]
+    public static void HandleRoleRpc(RoleBehaviour instance, byte callId, MessageReader reader)
+    {
+        // nothing needed
+    }
+
+    /// <summary>
+    /// Stub method for RoleBehaviour.KillAnimSpecialSetup.
+    /// </summary>
+    /// <param name="instance">The RoleBehaviour object.</param>
+    [HarmonyReversePatch]
+    [HarmonyPatch(typeof(RoleBehaviour), nameof(RoleBehaviour.KillAnimSpecialSetup))]
+    [MethodImpl(MethodImplOptions.NoInlining)]
+    public static void KillAnimSpecialSetup(RoleBehaviour instance, DeadBody deadBody, PlayerControl killer, PlayerControl victim)
     {
         // nothing needed
     }

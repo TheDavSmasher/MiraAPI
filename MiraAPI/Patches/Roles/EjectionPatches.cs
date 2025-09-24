@@ -33,8 +33,8 @@ internal static class EjectionPatches
         __instance.completeString = role.GetCustomEjectionMessage(__instance.initData.networkedPlayer);
     }
 
-    [HarmonyPatch(typeof(ExileController), nameof(ExileController.WrapUp))]
-    public static class WrapUpPatch
+    [HarmonyPatch(typeof(ExileController), nameof(ExileController.ReEnableGameplay))]
+    public static class ReEnableGameplayPatch
     {
         public static void Postfix()
         {

@@ -13,7 +13,7 @@ namespace MiraAPI.Patches.Roles;
 public static class RoleOptionsCollectionPatch
 {
     /// <summary>
-    /// This patch fixes GetNumPerGame being inlined (2025.5.20) in the original code.
+    /// This patch fixes GetNumPerGame being inlined (2025.9.9) in the original code.
     /// </summary>
     [HarmonyPrefix]
     [HarmonyPatch(nameof(RoleOptionsCollectionV10.AnyRolesEnabled))]
