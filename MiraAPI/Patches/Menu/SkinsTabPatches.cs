@@ -18,6 +18,20 @@ public static class SkinsTabPatches
     private static SortedList<string, List<SkinData>> sortedSkins = [];
     private static int currentPage;
 
+    private static void PreviousPage(SkinsTab tab)
+    {
+        currentPage--;
+        currentPage = currentPage < 0 ? sortedSkins.Count - 1 : currentPage;
+        GenerateHats(tab, currentPage);
+    }
+
+    private static void NextPage(SkinsTab tab)
+    {
+        currentPage++;
+        currentPage = currentPage > sortedSkins.Count - 1 ? 0 : currentPage;
+        GenerateHats(tab, currentPage);
+    }
+
     [HarmonyPatch(nameof(SkinsTab.OnEnable))]
     [HarmonyPrefix]
     public static bool OnEnablePrefix(SkinsTab __instance)
@@ -36,6 +50,8 @@ public static class SkinsTabPatches
             }
         }
 
+        InventoryUtility.CreateNextBackButtons(__instance, PreviousPage, NextPage);
+
         GenerateHats(__instance, currentPage);
 
         return false;
@@ -48,15 +64,11 @@ public static class SkinsTabPatches
     {
         if (Input.GetKeyDown(KeyCode.LeftControl) || Input.GetKeyDown(KeyCode.RightControl) || Input.GetKeyDown(KeyCode.LeftArrow))
         {
-            currentPage--;
-            currentPage = currentPage < 0 ? sortedSkins.Count - 1 : currentPage;
-            GenerateHats(__instance, currentPage);
+            PreviousPage(__instance);
         }
         else if (Input.GetKeyDown(KeyCode.Tab) || Input.GetKeyDown(KeyCode.RightArrow))
         {
-            currentPage++;
-            currentPage = currentPage > sortedSkins.Count - 1 ? 0 : currentPage;
-            GenerateHats(__instance, currentPage);
+            NextPage(__instance);
         }
     }
 
@@ -76,10 +88,10 @@ public static class SkinsTabPatches
         text.gameObject.transform.localScale = Vector3.one;
         text.GetComponent<TextTranslatorTMP>().Destroy();
         text.EnableStencilMasking();
-        text.text = $"{groupName} ({currentPage + 1}/{sortedSkins.Count})\nPress Ctrl or Tab to cycle pages";
+        text.text = $"{groupName} ({currentPage + 1}/{sortedSkins.Count})";
         text.alignment = TextAlignmentOptions.Center;
-        text.fontSize = 3f;
-        text.fontSizeMax = 3f;
+        text.fontSize = 5f;
+        text.fontSizeMax = 5f;
         text.fontSizeMin = 0f;
         float xLerp = __instance.XRange.Lerp(0.5f);
         float yLerp = __instance.YStart - hatIndex / __instance.NumPerRow * __instance.YOffset;
@@ -102,9 +114,18 @@ public static class SkinsTabPatches
     {
         var colorChip = Object.Instantiate(__instance.ColorTabPrefab, __instance.scroller.Inner);
         colorChip.gameObject.name = skin.ProductId;
-        colorChip.Button.OnClick.AddListener((Action)(() => __instance.ClickEquip()));
-        colorChip.Button.OnMouseOver.AddListener((Action)(() => __instance.SelectSkin(skin)));
-        colorChip.Button.OnMouseOut.AddListener((Action)(() => __instance.SelectSkin(HatManager.Instance.GetSkinById(DataManager.Player.Customization.Skin))));
+        if (ActiveInputManager.currentControlType == ActiveInputManager.InputType.Keyboard)
+        {
+            colorChip.Button.OnClick.AddListener((Action)__instance.ClickEquip);
+            colorChip.Button.OnMouseOver.AddListener((Action)(() => __instance.SelectSkin(skin)));
+            colorChip.Button.OnMouseOut.AddListener(
+                (Action)(() =>
+                    __instance.SelectSkin(HatManager.Instance.GetSkinById(DataManager.Player.Customization.Skin))));
+        }
+        else
+        {
+            colorChip.Button.OnClick.AddListener((Action)(() => __instance.SelectSkin(skin)));
+        }
         colorChip.Button.ClickMask = __instance.scroller.Hitbox;
         colorChip.ProductId = skin.ProductId;
         colorChip.SelectionHighlight.gameObject.SetActive(false);

@@ -6,10 +6,13 @@ using System.Linq;
 using AmongUs.Data;
 using HarmonyLib;
 using MiraAPI.Utilities;
+using MiraAPI.Utilities.Assets;
 using Reactor.Utilities;
 using Reactor.Utilities.Extensions;
 using TMPro;
 using UnityEngine;
+using UnityEngine.Events;
+using UnityEngine.UI;
 using Object = UnityEngine.Object;
 
 namespace MiraAPI.Patches.Menu;
@@ -19,6 +22,20 @@ public static class HatsTabPatches
 {
     private static SortedList<string, List<HatData>> sortedHats = [];
     private static int currentPage;
+
+    private static void PreviousPage(HatsTab hatsTab)
+    {
+        currentPage--;
+        currentPage = currentPage < 0 ? sortedHats.Count - 1 : currentPage;
+        GenerateHats(hatsTab, currentPage);
+    }
+
+    private static void NextPage(HatsTab hatsTab)
+    {
+        currentPage++;
+        currentPage = currentPage > sortedHats.Count - 1 ? 0 : currentPage;
+        GenerateHats(hatsTab, currentPage);
+    }
 
     [HarmonyPatch(nameof(HatsTab.OnEnable))]
     [HarmonyPrefix]
@@ -38,6 +55,8 @@ public static class HatsTabPatches
             }
         }
 
+        InventoryUtility.CreateNextBackButtons(__instance, PreviousPage, NextPage);
+
         GenerateHats(__instance, currentPage);
 
         return false;
@@ -45,22 +64,17 @@ public static class HatsTabPatches
 
     [HarmonyPatch(typeof(HatsTab), nameof(HatsTab.Update))]
     [HarmonyPrefix]
-
     public static void UpdatePrefix(HatsTab __instance)
     {
         if (sortedHats.Count == 0) return;
 
         if (Input.GetKeyDown(KeyCode.LeftControl) || Input.GetKeyDown(KeyCode.RightControl) || Input.GetKeyDown(KeyCode.LeftArrow))
         {
-            currentPage--;
-            currentPage = currentPage < 0 ? sortedHats.Count - 1 : currentPage;
-            GenerateHats(__instance, currentPage);
+            PreviousPage(__instance);
         }
         else if (Input.GetKeyDown(KeyCode.Tab) || Input.GetKeyDown(KeyCode.RightArrow))
         {
-            currentPage++;
-            currentPage = currentPage > sortedHats.Count - 1 ? 0 : currentPage;
-            GenerateHats(__instance, currentPage);
+            NextPage(__instance);
         }
     }
 
@@ -84,10 +98,10 @@ public static class HatsTabPatches
         text.gameObject.transform.localScale = Vector3.one;
         text.GetComponent<TextTranslatorTMP>().Destroy();
         text.EnableStencilMasking();
-        text.text = $"{groupName} ({currentPage + 1}/{sortedHats.Count})\nPress Ctrl or Tab to cycle pages";
+        text.text = $"{groupName} ({currentPage + 1}/{sortedHats.Count})";
         text.alignment = TextAlignmentOptions.Center;
-        text.fontSize = 3f;
-        text.fontSizeMax = 3f;
+        text.fontSize = 5f;
+        text.fontSizeMax = 5f;
         text.fontSizeMin = 0f;
         var xLerp = __instance.XRange.Lerp(0.5f);
         var yLerp = __instance.YStart - hatIndex / __instance.NumPerRow * __instance.YOffset;
@@ -125,9 +139,17 @@ public static class HatsTabPatches
     {
         var colorChip = Object.Instantiate(__instance.ColorTabPrefab, __instance.scroller.Inner);
         colorChip.gameObject.name = hat.ProductId;
-        colorChip.Button.OnClick.AddListener((Action)(() => __instance.ClickEquip()));
-        colorChip.Button.OnMouseOver.AddListener((Action)(() => __instance.SelectHat(hat)));
-        colorChip.Button.OnMouseOut.AddListener((Action)(() => __instance.SelectHat(HatManager.Instance.GetHatById(DataManager.Player.Customization.Hat))));
+        if (ActiveInputManager.currentControlType == ActiveInputManager.InputType.Keyboard)
+        {
+            colorChip.Button.OnClick.AddListener((Action)__instance.ClickEquip);
+            colorChip.Button.OnMouseOver.AddListener((Action)(() => __instance.SelectHat(hat)));
+            colorChip.Button.OnMouseOut.AddListener((Action)(() => __instance.SelectHat(HatManager.Instance.GetHatById(DataManager.Player.Customization.Hat))));
+        }
+        else
+        {
+            colorChip.Button.OnClick.AddListener((Action)(() => __instance.SelectHat(hat)));
+        }
+
         colorChip.Inner.SetHat(hat, __instance.HasLocalPlayer() ? PlayerControl.LocalPlayer.Data.DefaultOutfit.ColorId : DataManager.Player.Customization.Color);
         colorChip.Button.ClickMask = __instance.scroller.Hitbox;
         colorChip.SelectionHighlight.gameObject.SetActive(false);

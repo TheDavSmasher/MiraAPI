@@ -25,6 +25,21 @@ public static class VisorsTabPatches
         }
     }
 
+    private static void PreviousPage(VisorsTab tab)
+    {
+        currentPage--;
+        currentPage = currentPage < 0 ? SortedVisors.Count - 1 : currentPage;
+        GenerateHats(tab, currentPage);
+    }
+
+    private static void NextPage(VisorsTab tab)
+    {
+        currentPage++;
+        currentPage = currentPage > SortedVisors.Count - 1 ? 0 : currentPage;
+        GenerateHats(tab, currentPage);
+    }
+
+
     [HarmonyPatch(nameof(VisorsTab.OnEnable))]
     [HarmonyPrefix]
     public static bool OnEnablePrefix(VisorsTab __instance)
@@ -32,6 +47,9 @@ public static class VisorsTabPatches
         __instance.visorId = HatManager.Instance.GetVisorById(DataManager.Player.Customization.Visor).ProdId;
 
         if (!SortedVisors.ContainsKey("Vanilla")) AddRange(DestroyableSingleton<HatManager>.Instance.GetUnlockedVisors().Select(x => ("Vanilla", x)));
+
+        InventoryUtility.CreateNextBackButtons(__instance, PreviousPage, NextPage);
+
         GenerateHats(__instance, currentPage);
 
         return false;
@@ -44,15 +62,11 @@ public static class VisorsTabPatches
     {
         if (Input.GetKeyDown(KeyCode.LeftControl) || Input.GetKeyDown(KeyCode.RightControl) || Input.GetKeyDown(KeyCode.LeftArrow))
         {
-            currentPage--;
-            currentPage = currentPage < 0 ? SortedVisors.Count - 1 : currentPage;
-            GenerateHats(__instance, currentPage);
+            PreviousPage(__instance);
         }
         else if (Input.GetKeyDown(KeyCode.Tab) || Input.GetKeyDown(KeyCode.RightArrow))
         {
-            currentPage++;
-            currentPage = currentPage > SortedVisors.Count - 1 ? 0 : currentPage;
-            GenerateHats(__instance, currentPage);
+            NextPage(__instance);
         }
     }
 
@@ -72,10 +86,10 @@ public static class VisorsTabPatches
         text.gameObject.transform.localScale = Vector3.one;
         text.GetComponent<TextTranslatorTMP>().Destroy();
         text.EnableStencilMasking();
-        text.text = $"{groupName} ({currentPage + 1}/{SortedVisors.Count})\nPress Ctrl or Tab to cycle pages";
+        text.text = $"{groupName} ({currentPage + 1}/{SortedVisors.Count})";
         text.alignment = TextAlignmentOptions.Center;
-        text.fontSize = 3f;
-        text.fontSizeMax = 3f;
+        text.fontSize = 5f;
+        text.fontSizeMax = 5f;
         text.fontSizeMin = 0f;
         float xLerp = __instance.XRange.Lerp(0.5f);
         float yLerp = __instance.YStart - hatIndex / __instance.NumPerRow * __instance.YOffset;
@@ -98,9 +112,20 @@ public static class VisorsTabPatches
     {
         var colorChip = Object.Instantiate(__instance.ColorTabPrefab, __instance.scroller.Inner);
         colorChip.gameObject.name = visor.ProductId;
-        colorChip.Button.OnClick.AddListener((Action)(() => __instance.ClickEquip()));
-        colorChip.Button.OnMouseOver.AddListener((Action)(() => __instance.SelectVisor(visor)));
-        colorChip.Button.OnMouseOut.AddListener((Action)(() => __instance.SelectVisor(HatManager.Instance.GetVisorById(DataManager.Player.Customization.Visor))));
+
+        if (ActiveInputManager.currentControlType == ActiveInputManager.InputType.Keyboard)
+        {
+            colorChip.Button.OnClick.AddListener((Action)__instance.ClickEquip);
+            colorChip.Button.OnMouseOver.AddListener((Action)(() => __instance.SelectVisor(visor)));
+            colorChip.Button.OnMouseOut.AddListener(
+                (Action)(() =>
+                    __instance.SelectVisor(HatManager.Instance.GetVisorById(DataManager.Player.Customization.Visor))));
+        }
+        else
+        {
+            colorChip.Button.OnClick.AddListener((Action)(() => __instance.SelectVisor(visor)));
+        }
+
         colorChip.Button.ClickMask = __instance.scroller.Hitbox;
         colorChip.ProductId = visor.ProductId;
         colorChip.SelectionHighlight.gameObject.SetActive(false);
