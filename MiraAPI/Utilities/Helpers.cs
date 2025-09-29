@@ -1,15 +1,16 @@
-﻿using System;
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using HarmonyLib;
 using Il2CppInterop.Runtime.InteropTypes.Arrays;
-using MiraAPI.Keybinds;
 using MiraAPI.Roles;
 using MiraAPI.Utilities.Assets;
+using Reactor.Utilities;
 using Rewired;
 using TMPro;
 using UnityEngine;
+using MethodBase = System.Reflection.MethodBase;
 using Object = UnityEngine.Object;
 
 namespace MiraAPI.Utilities;
@@ -36,6 +37,31 @@ public static class Helpers
         keybindIcon.name = "KeybindIcon";
         keybindIcon.transform.localPosition = localPos;
         return keybindIcon;
+    }
+
+    public static MethodBase? GetStateMachineMoveNext<T>(string methodName)
+    {
+        var typeName = typeof(T).FullName;
+        var showRoleStateMachine =
+            typeof(T)
+                .GetNestedTypes()
+                .FirstOrDefault(x=>x.Name.Contains(methodName));
+
+        if (showRoleStateMachine == null)
+        {
+            Logger<MiraApiPlugin>.Error($"Failed to find {methodName} state machine for {typeName}");
+            return null;
+        }
+
+        var moveNext = AccessTools.Method(showRoleStateMachine, "MoveNext");
+        if (moveNext == null)
+        {
+            Logger<MiraApiPlugin>.Error($"Failed to find MoveNext method for {typeName}.{methodName}");
+            return null;
+        }
+
+        Logger<MiraApiPlugin>.Info($"Found {methodName}.MoveNext");
+        return moveNext;
     }
 
     /// <summary>

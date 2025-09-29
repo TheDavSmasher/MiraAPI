@@ -1,8 +1,12 @@
-﻿using HarmonyLib;
+﻿using System.Linq;
+using System.Reflection;
+using HarmonyLib;
+using Il2CppInterop.Runtime.InteropTypes;
 using MiraAPI.Events;
 using MiraAPI.Events.Vanilla.Gameplay;
 using MiraAPI.Roles;
 using MiraAPI.Utilities;
+using Reactor.Utilities;
 
 namespace MiraAPI.Patches;
 
@@ -29,14 +33,29 @@ public static class IntroCutscenePatches
         MiraEventManager.InvokeEvent(@event);
     }
 
-    [HarmonyPostfix]
-    [HarmonyPatch(typeof(IntroCutscene._ShowRole_d__40), nameof(IntroCutscene._ShowRole_d__40.MoveNext))]
-    [HarmonyPriority(Priority.Last)]
-    public static void ShowRolePatch(IntroCutscene._ShowRole_d__40 __instance)
+    [HarmonyPatch]
+    public static class IntroCutsceneShowRolePatch
     {
-        var realInstance = __instance.__4__this;
-        var @event = new IntroRoleRevealEvent(realInstance);
-        MiraEventManager.InvokeEvent(@event);
+        public static MethodBase TargetMethod()
+        {
+            return Helpers.GetStateMachineMoveNext<IntroCutscene>("ShowRole")!;
+        }
+
+        public static void Postfix(Il2CppObjectBase __instance)
+        {
+            var wrapper = new StateMachineWrapper<IntroCutscene>(__instance);
+            // run before the first yield
+            if (wrapper.GetState() != 1)
+            {
+                return;
+            }
+
+            var introCutscene = wrapper.Instance;
+
+            Logger<MiraApiPlugin>.Info("IntroCutscene ShowRole reached");
+            var @event = new IntroRoleRevealEvent(introCutscene);
+            MiraEventManager.InvokeEvent(@event);
+        }
     }
 
     [HarmonyPrefix]
@@ -66,21 +85,54 @@ public static class IntroCutscenePatches
         }
     }
 
-    [HarmonyPostfix]
-    [HarmonyPatch(typeof(IntroCutscene._CoBegin_d__34), nameof(IntroCutscene._CoBegin_d__34.MoveNext))]
-    public static void GameBeginPatch(IntroCutscene._CoBegin_d__34 __instance)
+    [HarmonyPatch]
+    public static class IntroCutsceneDestroyPatch
     {
-        if (__instance.__1__state != -1)
+        private static bool _usedFallback;
+
+        public static MethodBase TargetMethod()
         {
-            return;
+            var onDestroy = AccessTools.Method(typeof(IntroCutscene), "OnDestroy");
+            if (onDestroy != null)
+            {
+                _usedFallback = false;
+                Logger<MiraApiPlugin>.Info("Using OnDestroy for IntroCutsceneDestroyPatch");
+                return onDestroy;
+            }
+
+            _usedFallback = true;
+            return Helpers.GetStateMachineMoveNext<IntroCutscene>("CoBegin")!;
         }
 
-        MiraEventManager.InvokeEvent(new IntroEndEvent(__instance.__4__this));
+        public static void Postfix(Il2CppObjectBase __instance)
+        {
+            IntroCutscene introCutscene;
 
-        var @event = new BeforeRoundStartEvent(true);
-        MiraEventManager.InvokeEvent(@event);
+            if (_usedFallback)
+            {
+                var wrapper = new StateMachineWrapper<IntroCutscene>(__instance);
+                // run after the final yield
+                if (wrapper.GetState() != -1)
+                {
+                    return;
+                }
+                introCutscene = wrapper.Instance;
+            }
+            else
+            {
+                introCutscene = __instance.Cast<IntroCutscene>();
+            }
 
-        if (@event.IsCancelled) return;
-        MiraEventManager.InvokeEvent(new RoundStartEvent(true));
+
+            Logger<MiraApiPlugin>.Info("IntroCutscene ended");
+
+            MiraEventManager.InvokeEvent(new IntroEndEvent(introCutscene));
+
+            var @event = new BeforeRoundStartEvent(true);
+            MiraEventManager.InvokeEvent(@event);
+
+            if (@event.IsCancelled) return;
+            MiraEventManager.InvokeEvent(new RoundStartEvent(true));
+        }
     }
 }
