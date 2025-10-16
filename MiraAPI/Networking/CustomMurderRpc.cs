@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.Linq;
 using AmongUs.Data;
 using AmongUs.GameOptions;
@@ -174,7 +175,7 @@ public static class CustomMurderRpc
             {
                 try
                 {
-                    HudManager.Instance.KillOverlay.ShowKillAnimation(source.Data, data);
+                    HudManager.Instance.KillOverlay.ShowMiraKillAnimation(source.Data, data);
                 }
                 catch (Exception e)
                 {
@@ -296,5 +297,69 @@ public static class CustomMurderRpc
 
         PlayerControl.LocalPlayer.isKilling = false;
         source.isKilling = false;
+    }
+
+    /// <summary>
+    /// Reimplementation of vanilla's kill animation screen.
+    /// </summary>
+    /// <param name="killOverlay">The kill overlay from the Hud Manager.</param>
+    /// <param name="killer">The murderer's network information.</param>
+    /// <param name="victim">The murdered player's network information.</param>
+    public static void ShowMiraKillAnimation(this KillOverlay killOverlay, NetworkedPlayerInfo killer, NetworkedPlayerInfo victim)
+    {
+        List<OverlayKillAnimation> self = killOverlay.KillAnims.ToList();
+        OverlayKillAnimation killAnimation;
+        if (killer.Object)
+        {
+            OverlayKillAnimation[] killAnimations = killer.Object.MyPhysics.Animations.GetKillAnimations();
+            if (GameOptionsManager.Instance.CurrentGameOptions.GameMode == AmongUs.GameOptions.GameModes.HideNSeek && AprilFoolsMode.ShouldHorseAround())
+            {
+                self = killOverlay.HorseWrangleAnims.ToList();
+            }
+            else if (killAnimations.Length != 0)
+            {
+                self = killAnimations.ToList();
+            }
+            else
+            {
+                SkinViewData skin = ShipStatus.Instance.CosmeticsCache.GetSkin(killer.Object.CurrentOutfit.SkinId);
+                if (skin && skin.CustomKillAnimID > 0)
+                {
+                    if (!string.IsNullOrEmpty(skin.HatID_KillAnim) && skin.HatID_KillAnim != killer.Object.CurrentOutfit.HatId)
+                    {
+                        if (killer.Role.CustomKillAnimations.Length != 0)
+                        {
+                            self = killer.Role.CustomKillAnimations.ToList();
+                        }
+                        killAnimation = self.Random();
+                        killOverlay.ShowKillAnimation(killAnimation, killer, victim);
+                        return;
+                    }
+                    if (!string.IsNullOrEmpty(skin.VisorID_KillAnim) && skin.VisorID_KillAnim != killer.Object.CurrentOutfit.VisorId)
+                    {
+                        if (killer.Role.CustomKillAnimations.Length != 0)
+                        {
+                            self = killer.Role.CustomKillAnimations.ToList();
+                        }
+                        killAnimation = self.Random();
+                        killOverlay.ShowKillAnimation(killAnimation, killer, victim);
+                        return;
+                    }
+                    self = new List<OverlayKillAnimation>
+                    {
+                        killOverlay.CustomKillAnimations[skin.CustomKillAnimID - 1],
+                    };
+                    killAnimation = self.Random();
+                    killOverlay.ShowKillAnimation(killAnimation, killer, victim);
+                    return;
+                }
+                else if (killer.Role.CustomKillAnimations.Length != 0)
+                {
+                    self = killer.Role.CustomKillAnimations.ToList();
+                }
+            }
+        }
+        killAnimation = self.Random();
+        killOverlay.ShowKillAnimation(killAnimation, killer, victim);
     }
 }
