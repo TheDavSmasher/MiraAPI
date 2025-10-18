@@ -251,7 +251,7 @@ internal static class GameSettingMenuPatches
                 __instance.ChangeTab(4, true);
             }));
 
-        _customOneButton.buttonText.text = MiraApiPlugin.CustomCategoryMenuNameOne;
+        _customOneButton.buttonText.text = SelectedMod != null ? SelectedMod.MiraPlugin.CustomOptionMenuNameOne : "Custom Category 1";
         customPos.y += 0.5f;
         _customOneButton.transform.localPosition = customPos;
         _customOneButton.name = "CustomOneButton";
@@ -273,7 +273,7 @@ internal static class GameSettingMenuPatches
                 __instance.ChangeTab(5, true);
             }));
 
-        _customTwoButton.buttonText.text = MiraApiPlugin.CustomCategoryMenuNameTwo;
+        _customTwoButton.buttonText.text = SelectedMod != null ? SelectedMod.MiraPlugin.CustomOptionMenuNameTwo : "Custom Category 2";
         customPos.y += 0.5f;
         _customTwoButton.transform.localPosition = customPos;
         _customTwoButton.name = "CustomTwoButton";
@@ -416,6 +416,8 @@ internal static class GameSettingMenuPatches
 
         if (SelectedModIdx != 0)
         {
+            _customOneButton.buttonText.text = SelectedMod!.MiraPlugin.CustomOptionMenuNameOne;
+            _customTwoButton.buttonText.text = SelectedMod!.MiraPlugin.CustomOptionMenuNameTwo;
             var modHasRoles = SelectedMod!.InternalRoles.Count != 0;
             var modHasCustomOne = SelectedMod.InternalOptionGroups.Exists(
                 x => x.ParentMenu == MenuCategory.CustomOne);
