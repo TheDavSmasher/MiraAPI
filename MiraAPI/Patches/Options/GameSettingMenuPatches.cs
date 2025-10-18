@@ -252,7 +252,7 @@ internal static class GameSettingMenuPatches
             }));
 
         _customOneButton.buttonText.text = SelectedMod != null ? SelectedMod.MiraPlugin.CustomOptionMenuNameOne : "Custom Category 1";
-        customPos.y += 0.5f;
+        customPos.y -= 0.637f;
         _customOneButton.transform.localPosition = customPos;
         _customOneButton.name = "CustomOneButton";
 
@@ -274,7 +274,7 @@ internal static class GameSettingMenuPatches
             }));
 
         _customTwoButton.buttonText.text = SelectedMod != null ? SelectedMod.MiraPlugin.CustomOptionMenuNameTwo : "Custom Category 2";
-        customPos.y += 0.5f;
+        customPos.y -= 0.637f;
         _customTwoButton.transform.localPosition = customPos;
         _customTwoButton.name = "CustomTwoButton";
 
@@ -435,29 +435,7 @@ internal static class GameSettingMenuPatches
             _customTwoButton.gameObject.SetActive(true);
             menu.GameSettingsButton.gameObject.SetActive(true);
             menu.RoleSettingsButton.gameObject.SetActive(false);
-
-            // If the mod has no primary custom tab, we can go ahead and hide the button.
-            if (!modHasCustomOne)
-            {
-                _customOneButton.gameObject.SetActive(false);
-                menu.RoleSettingsButton.gameObject.SetActive(true);
-
-                if (_customOneTab!.gameObject.active)
-                {
-                    menu.RoleSettingsButton.SelectButton(true);
-                }
-            }
-            // If the mod has no secondary custom tab, we can go ahead and hide the button.
-            if (!modHasCustomTwo)
-            {
-                _customTwoButton.gameObject.SetActive(false);
-                menu.RoleSettingsButton.gameObject.SetActive(true);
-
-                if (_customTwoTab!.gameObject.active)
-                {
-                    menu.RoleSettingsButton.SelectButton(true);
-                }
-            }
+            var defaultButton = menu.RoleSettingsButton;
 
             // If there are no registered custom roles in the selected mod, hide the button.
             if (!modHasRoles)
@@ -474,6 +452,7 @@ internal static class GameSettingMenuPatches
                 {
                     _modifiersButton.gameObject.SetActive(false);
                     menu.RoleSettingsButton.gameObject.SetActive(true);
+                    defaultButton = _modifiersButton;
 
                     if (_modifiersTab!.gameObject.active)
                     {
@@ -496,6 +475,7 @@ internal static class GameSettingMenuPatches
                 // If the mod has roles, we can enable the bigger role button and disable the small one.
                 if (modHasRoles)
                 {
+                    defaultButton = menu.RoleSettingsButton;
                     menu.RoleSettingsButton.gameObject.SetActive(true);
                     _smallRolesButton.gameObject.SetActive(false);
                 }
@@ -510,6 +490,7 @@ internal static class GameSettingMenuPatches
                 {
                     menu.ChangeTab(0, false);
                 }
+                defaultButton = menu.RoleSettingsButton;
 
                 // If the mod has roles and modifiers, we can move their buttons to the game settings button position, since nothing is there.
                 if (menu.RoleSettingsButton.gameObject.active)
@@ -527,6 +508,25 @@ internal static class GameSettingMenuPatches
                         _smallRolesButton.transform.localPosition.x,
                         menu.GameSettingsButton.transform.localPosition.y,
                         _smallRolesButton.transform.localPosition.z);
+                }
+            }
+
+            // If the mod has no primary custom tab, we can go ahead and hide the button.
+            if (!modHasCustomOne)
+            {
+                _customOneButton.gameObject.SetActive(false);
+                if (_customOneTab!.gameObject.active)
+                {
+                    defaultButton.SelectButton(true);
+                }
+            }
+            // If the mod has no secondary custom tab, we can go ahead and hide the button.
+            if (!modHasCustomTwo)
+            {
+                _customTwoButton.gameObject.SetActive(false);
+                if (_customTwoTab!.gameObject.active)
+                {
+                    defaultButton.SelectButton(true);
                 }
             }
         }
