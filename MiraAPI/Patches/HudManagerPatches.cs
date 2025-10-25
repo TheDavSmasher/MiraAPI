@@ -112,6 +112,8 @@ public static class HudManagerPatches
                 Error($"Failed to create custom button {button.GetType().Name}: {e}");
             }
         }
+        __instance.ImpostorVentButton.transform.SetParent(null);
+        __instance.ImpostorVentButton.transform.SetParent(BottomRight.transform);
 
         gridArrange.Start();
         gridArrange.ArrangeChilds();
