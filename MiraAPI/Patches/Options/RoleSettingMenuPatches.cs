@@ -439,7 +439,6 @@ public static class RoleSettingMenuPatches
                 __instance.AdvancedRolesSettings.transform);
 
             newOpt.SetClickMask(__instance.ButtonClickMask);
-            option.ChangeRoleSetting();
 
             SpriteRenderer[] componentsInChildren = newOpt.GetComponentsInChildren<SpriteRenderer>(true);
             foreach (var renderer in componentsInChildren)

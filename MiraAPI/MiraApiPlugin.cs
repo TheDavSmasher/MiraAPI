@@ -1,5 +1,6 @@
 ﻿global using static Reactor.Utilities.Logger<MiraAPI.MiraApiPlugin>;
 using BepInEx;
+using BepInEx.Configuration;
 using BepInEx.Unity.IL2CPP;
 using HarmonyLib;
 using MiraAPI.PluginLoading;
@@ -31,6 +32,7 @@ public partial class MiraApiPlugin : BasePlugin
     /// </summary>
     public static Color DefaultHeaderColor { get; } = new Color32(77, 77, 77, 255);
 
+    internal static ConfigEntry<string>? DistanceSuffix { get; private set; }
     private static MiraPluginManager? PluginManager { get; set; }
     internal Harmony Harmony { get; } = new(Id);
 
@@ -40,6 +42,8 @@ public partial class MiraApiPlugin : BasePlugin
         Harmony.PatchAll();
 
         ReactorCredits.Register("Mira API", Version, true, ReactorCredits.AlwaysShow);
+
+        DistanceSuffix = Config.Bind("Display", "Distance", "unit(s)", "Dictates how a distance is shown in numeric option displays");
 
         PluginManager = new MiraPluginManager();
         PluginManager.Initialize();

@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
@@ -12,6 +13,7 @@ using TMPro;
 using UnityEngine;
 using MethodBase = System.Reflection.MethodBase;
 using Object = UnityEngine.Object;
+using Random = UnityEngine.Random;
 
 namespace MiraAPI.Utilities;
 
@@ -521,6 +523,79 @@ public static class Helpers
                 StringNames.GameSecondsAbbrev,
                 (Il2CppSystem.Object[])[value.ToString(formatString, CultureInfo.InvariantCulture)]),
         };
+    }
+    /// <summary>
+    /// Shorthand for <see cref="string.Split(char, StringSplitOptions)"/> that removes empty entries and trims leading and ending spaces.
+    /// </summary>
+    /// <param name="value">The string to split.</param>
+    /// <param name="separator">The separator.</param>
+    /// <returns>An array of substrings.</returns>
+    public static string[] TrueSplit(this string value, char separator) => value.Split(separator, StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+
+    /// <summary>
+    /// Joins a collection of items that are separated by a character.
+    /// </summary>
+    /// <param name="separator">The separator.</param>
+    /// <param name="items">The collection of items to string together.</param>
+    /// <typeparam name="T">The type of the items.</typeparam>
+    /// <returns>A string formed by concatenating the ToString results of each item, each separated by a separator.</returns>
+    public static string Join<T>(char separator, IEnumerable<T> items) => Join(separator.ToString(), items);
+
+    /// <inheritdoc cref="Join{T}(char, IEnumerable{T})"/>
+    public static string Join<T>(string separator, IEnumerable<T> items)
+    {
+        if (!items.Any())
+            return string.Empty;
+
+        var result = string.Empty;
+        items.Do(x => result += $"{separator}{x}");
+        return result[separator.Length..];
+    }
+
+    /// <summary>
+    /// Shorthand helper for overriding the on click listeners for PassiveButton.
+    /// </summary>
+    /// <param name="passive">The PassiveButton being modified.</param>
+    /// <param name="action">The action that's replacing the original listeners.</param>
+    public static void OverrideOnClickListeners(this PassiveButton passive, Action action)
+    {
+        if (!passive)
+            return;
+
+        passive.OnClick?.RemoveAllListeners();
+        passive.OnClick = new();
+        passive.OnClick.AddListener(action);
+        passive.enabled = true;
+    }
+
+    /// <summary>
+    /// Shorthand helper for overriding the on mouse over listeners for PassiveButton.
+    /// </summary>
+    /// <inheritdoc cref="OverrideOnClickListeners"/>
+    public static void OverrideOnMouseOverListeners(this PassiveButton passive, Action action)
+    {
+        if (!passive)
+            return;
+
+        passive.OnMouseOver?.RemoveAllListeners();
+        passive.OnMouseOver = new();
+        passive.OnMouseOver.AddListener(action);
+        passive.enabled = true;
+    }
+
+    /// <summary>
+    /// Shorthand helper for overriding the on mouse out listeners for PassiveButton.
+    /// </summary>
+    /// <inheritdoc cref="OverrideOnClickListeners"/>
+    public static void OverrideOnMouseOutListeners(this PassiveButton passive, Action action)
+    {
+        if (!passive)
+            return;
+
+        passive.OnMouseOut?.RemoveAllListeners();
+        passive.OnMouseOut = new();
+        passive.OnMouseOut.AddListener(action);
+        passive.enabled = true;
     }
 
     /// <summary>

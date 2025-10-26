@@ -71,7 +71,12 @@ public class ModdedMultiSelectOption<T> : ModdedOption<T> where T : struct, Enum
     }
 
     /// <inheritdoc />
-    public override OptionBehaviour CreateOption(ToggleOption toggleOpt, NumberOption numberOpt, StringOption stringOpt, Transform container)
+    public override OptionBehaviour CreateOption(
+        ToggleOption toggleOpt,
+        NumberOption numberOpt,
+        StringOption stringOpt,
+        PlayerOption playerOpt,
+        Transform container)
     {
         var stringOption = Object.Instantiate(stringOpt, container);
 

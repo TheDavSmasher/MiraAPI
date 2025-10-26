@@ -28,6 +28,27 @@ public class ModdedPlayerOption : ModdedOption<int>
     /// </summary>
     public bool AllowNone { get; set; }
 
+    /// <inheritdoc />
+    public override void ChangeGameSetting()
+    {
+        var numberOption = OptionBehaviour as PlayerOption;
+
+        numberOption!.PlusBtn.transform.localPosition += new Vector3(0.6f, 0f, 0f);
+        numberOption.MinusBtn.transform.localPosition += new Vector3(1.5f, 0f, 0f);
+
+        var background = numberOption.transform.GetChild(0);
+        background.localPosition += new Vector3(-0.8f, 0f, 0f);
+        background.localScale += new Vector3(1f, 0f, 0f);
+
+        var title = numberOption.TitleText;
+        title.transform.localPosition = new(-2.0466f, 0f, -2.9968f);
+        title.GetComponent<RectTransform>().sizeDelta = new(5.8f, 0.458f);
+
+        var valueBox = numberOption.transform.GetChild(5);
+        valueBox.localPosition += new Vector3(1.05f, 0f, 0f);
+        valueBox.localScale += new Vector3(0.2f, 0f, 0f);
+    }
+
     /// <summary>
     /// Initializes a new instance of the <see cref="ModdedPlayerOption"/> class.
     /// </summary>

@@ -93,6 +93,11 @@ public interface IModdedOption
     void SaveToPreset(ConfigFile presetConfig, bool saveDefault = false);
 
     /// <summary>
+    /// Changes the scales and positions of the option if it's attached to the game options menu.
+    /// </summary>
+    void ChangeGameSetting();
+
+    /// <summary>
     /// Binds the option to a configuration file.
     /// </summary>
     /// <param name="config">The ConfigFile to bind the option to.</param>

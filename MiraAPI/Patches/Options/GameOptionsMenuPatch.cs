@@ -284,7 +284,8 @@ internal static class GameOptionsMenuPatch
                 menu.playerOptionOrigin,
                 menu.settingsContainer));
 
-        group.Options.ForEach(x => x.ChangeGameSetting());
+        // TODO: Reimplement this without breaking the menu.
+        // group.Options.ForEach(x => x.ChangeGameSetting());
 
         foreach (var newOpt in options)
         {

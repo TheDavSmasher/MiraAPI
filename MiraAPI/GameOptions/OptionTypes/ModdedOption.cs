@@ -182,6 +182,23 @@ public abstract class ModdedOption<T> : IModdedOption
         Transform container);
 
     /// <summary>
+    /// Visually adjust the game option as needed.
+    /// </summary>
+    public abstract void ChangeGameSetting();
+
+    /// <summary>
+    /// Binds the option to the configuration file of the parent mod, if available.
+    /// </summary>
+    public virtual void BindConfig()
+    {
+        var entry = ParentMod?.GetConfigFile().Bind(ConfigDefinition, DefaultValue);
+        if (entry != null)
+        {
+            Value = entry.Value;
+        }
+    }
+
+    /// <summary>
     /// Implicitly converts the option to type of <typeparamref name="T"/>.
     /// </summary>
     /// <param name="option">The option.</param>
