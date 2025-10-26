@@ -1,7 +1,7 @@
 ﻿namespace MiraAPI.Events.Vanilla.Gameplay;
 
 /// <summary>
-/// Start Round event, invoked on IntroCutscene.OnDestroy and ExileController.WrapUp.
+/// Start Round event, invoked on IntroCutscene.OnDestroy and ExileController.WrapUp if the event isn't cancelled.
 /// </summary>
 public class RoundStartEvent : MiraEvent
 {

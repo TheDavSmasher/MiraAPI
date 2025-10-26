@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Reflection;
-using HarmonyLib;
+﻿using HarmonyLib;
 using MiraAPI.Events;
 using MiraAPI.Events.Vanilla.Gameplay;
 using MiraAPI.Events.Vanilla.Meeting;
@@ -35,13 +33,18 @@ internal static class EjectionPatches
         __instance.completeString = role.GetCustomEjectionMessage(__instance.initData.networkedPlayer);
     }
 
-    [HarmonyPatch(typeof(ExileController), nameof(ExileController.WrapUp))]
-    public static class WrapUpPatch
+    [HarmonyPatch(typeof(ExileController), nameof(ExileController.ReEnableGameplay))]
+    public static class ReEnableGameplayPatch
     {
         public static void Postfix()
         {
-            var @event = new RoundStartEvent(false);
+            var @event = new BeforeRoundStartEvent(false);
             MiraEventManager.InvokeEvent(@event);
+
+            if (@event.IsCancelled) return;
+
+            var @event2 = new RoundStartEvent(false);
+            MiraEventManager.InvokeEvent(@event2);
         }
     }
 }

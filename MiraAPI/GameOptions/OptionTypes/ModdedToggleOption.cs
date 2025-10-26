@@ -15,7 +15,8 @@ public class ModdedToggleOption : ModdedOption<bool>
     /// </summary>
     /// <param name="title">The option title.</param>
     /// <param name="defaultValue">The default value.</param>
-    public ModdedToggleOption(string title, bool defaultValue) : base(title, defaultValue)
+    /// <param name="includeInPreset">Whether to include this option in the preset or not.</param>
+    public ModdedToggleOption(string title, bool defaultValue, bool includeInPreset=true) : base(title, defaultValue, includeInPreset)
     {
         Data = ScriptableObject.CreateInstance<CheckboxGameSetting>();
 
@@ -25,9 +26,11 @@ public class ModdedToggleOption : ModdedOption<bool>
     }
 
     /// <inheritdoc />
-    public override OptionBehaviour CreateOption(ToggleOption toggleOpt, NumberOption numberOpt, StringOption stringOpt, Transform container)
+    public override OptionBehaviour CreateOption(ToggleOption toggleOpt, NumberOption numberOpt, StringOption stringOpt, PlayerOption playerOpt, Transform container)
     {
         var toggleOption = Object.Instantiate(toggleOpt, Vector3.zero, Quaternion.identity, container);
+        toggleOption.name =
+            $"{ParentMod!.OptionsTitleText}.ToggleOption.{TranslationController.Instance.GetString(StringName)}";
 
         toggleOption.SetUpFromData(Data, 20);
 

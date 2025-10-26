@@ -50,7 +50,7 @@ public class CustomGameOverRpc(MiraApiPlugin plugin, uint id) : PlayerCustomRpc<
         {
             if (!gameOver.VerifyCondition(innerNetObject, [.. data.Winners]))
             {
-                Logger<MiraApiPlugin>.Info($"Game over condition not met for {gameOver.GetType().Name}");
+                Info($"Game over condition not met for {gameOver.GetType().Name}");
                 return;
             }
 
@@ -64,7 +64,7 @@ public class CustomGameOverRpc(MiraApiPlugin plugin, uint id) : PlayerCustomRpc<
         else
         {
             CustomGameOver.Instance = null;
-            Logger<MiraApiPlugin>.Error($"Unknown game over reason: {data.Reason}");
+            Error($"Unknown game over reason: {data.Reason}");
         }
     }
 }

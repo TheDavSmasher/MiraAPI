@@ -3,6 +3,7 @@ using MiraAPI.Example.Options.Roles;
 using MiraAPI.Example.Roles;
 using MiraAPI.GameOptions;
 using MiraAPI.Hud;
+using MiraAPI.Keybinds;
 using MiraAPI.Utilities.Assets;
 using Reactor.Utilities;
 using UnityEngine;
@@ -21,6 +22,7 @@ public class TeleportButton : CustomActionButton
     public override LoadableAsset<Sprite> Sprite => ExampleAssets.TeleportButton;
     public override Color TextOutlineColor => new Color32(221, 176, 152, 255);
     public static bool IsZoom { get; private set; }
+    public override MiraKeybind? Keybind => MiraGlobalKeybinds.PrimaryAbility;
 
     public override bool Enabled(RoleBehaviour? role)
     {

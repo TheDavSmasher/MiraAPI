@@ -16,13 +16,20 @@ public class PlayerDeathEvent : MiraEvent
     public DeathReason DeathReason { get; }
 
     /// <summary>
+    /// Gets the dead body associated with the player, if any.
+    /// </summary>
+    public DeadBody? DeadBody { get; }
+
+    /// <summary>
     /// Initializes a new instance of the <see cref="PlayerDeathEvent"/> class.
     /// </summary>
     /// <param name="player">The player who died.</param>
     /// <param name="reason">The reason the player died.</param>
-    public PlayerDeathEvent(PlayerControl player, DeathReason reason)
+    /// <param name="deadBody">The player's body, if it exists.</param>
+    public PlayerDeathEvent(PlayerControl player, DeathReason reason, DeadBody? deadBody)
     {
         Player = player;
         DeathReason = reason;
+        DeadBody = deadBody;
     }
 }

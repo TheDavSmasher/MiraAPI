@@ -1,6 +1,14 @@
-﻿using HarmonyLib;
+﻿using System.Collections.Generic;
+using System.Linq;
+using HarmonyLib;
 using MiraAPI.Hud;
+using MiraAPI.Keybinds;
+using MiraAPI.LocalSettings;
+using MiraAPI.Utilities;
+using Reactor.Utilities;
 using Reactor.Utilities.Extensions;
+using Rewired;
+using TMPro;
 using UnityEngine;
 using Object = UnityEngine.Object;
 
@@ -13,9 +21,13 @@ namespace MiraAPI.Patches;
 public static class HudManagerPatches
 {
     // Custom buttons parent.
-    internal static GameObject? _bottomLeft;
-    internal static Transform? _bottomRight;
-    internal static Transform? _buttons;
+    public static GameObject? BottomLeft { get; private set; }
+    public static Transform? BottomRight { get; private set; }
+    public static Transform? Buttons { get; private set; }
+
+    private static Dictionary<TextMeshPro, int> vanillaKeybindIcons = new();
+
+    internal static List<TextMeshPro> moddedKeybindIcons = new();
 
     /*
     /// <summary>
@@ -36,39 +48,56 @@ public static class HudManagerPatches
     [HarmonyPatch(nameof(HudManager.Start))]
     public static void StartPostfix(HudManager __instance)
     {
-        if (_buttons == null)
+        if (Buttons == null)
         {
-            _buttons = __instance.transform.Find("Buttons");
+            Buttons = __instance.transform.Find("Buttons");
         }
 
-        if (_bottomRight == null)
+        if (BottomRight == null)
         {
-            _bottomRight = _buttons.Find("BottomRight");
+            BottomRight = Buttons.Find("BottomRight");
         }
 
-        if (_bottomLeft == null)
+        if (BottomLeft == null)
         {
-            _bottomLeft = Object.Instantiate(_bottomRight.gameObject, _buttons);
+            BottomLeft = Object.Instantiate(BottomRight.gameObject, Buttons);
         }
 
-        foreach (var t in _bottomLeft.GetComponentsInChildren<ActionButton>(true))
+        foreach (var t in BottomLeft.GetComponentsInChildren<ActionButton>(true))
         {
             t.gameObject.Destroy();
         }
 
-        var gridArrange = _bottomLeft.GetComponent<GridArrange>();
-        var aspectPosition = _bottomLeft.GetComponent<AspectPosition>();
+        var gridArrange = BottomLeft.GetComponent<GridArrange>();
+        var aspectPosition = BottomLeft.GetComponent<AspectPosition>();
 
-        _bottomLeft.name = "BottomLeft";
+        BottomLeft.name = "BottomLeft";
         gridArrange.Alignment = GridArrange.StartAlign.Right;
         aspectPosition.Alignment = AspectPosition.EdgeAlignments.LeftBottom;
+
+        if (Constants.GetPlatformType() is Platforms.Android or Platforms.IPhone)
+        {
+            var fakeButton = Object.Instantiate(__instance.AbilityButton, BottomLeft.transform);
+            foreach (var renderer in fakeButton.GetComponentsInChildren<Renderer>())
+            {
+                renderer.enabled = false;
+            }
+
+            fakeButton.buttonLabelText.Destroy();
+            fakeButton.cooldownTimerText.Destroy();
+            fakeButton.usesRemainingText.Destroy();
+            fakeButton.GetComponent<PassiveButton>().Destroy();
+            fakeButton.ToggleVisible(true);
+            fakeButton.Destroy();
+        }
+        moddedKeybindIcons = [];
 
         foreach (var button in CustomButtonManager.CustomButtons)
         {
             var location = button.Location switch
             {
-                ButtonLocation.BottomLeft => _bottomLeft.transform,
-                ButtonLocation.BottomRight => _bottomRight,
+                ButtonLocation.BottomLeft => BottomLeft.transform,
+                ButtonLocation.BottomRight => BottomRight,
                 _ => null,
             };
 
@@ -77,13 +106,49 @@ public static class HudManagerPatches
                 continue;
             }
 
-            button.CreateButton(location);
+            try
+            {
+                button.CreateButton(location);
+            }
+            catch (System.Exception e)
+            {
+                Error($"Failed to create custom button {button.GetType().Name}: {e}");
+            }
         }
+        __instance.ImpostorVentButton.transform.SetParent(null);
+        __instance.ImpostorVentButton.transform.SetParent(BottomRight.transform);
 
         gridArrange.Start();
         gridArrange.ArrangeChilds();
-
         aspectPosition.AdjustPosition();
+
+        vanillaKeybindIcons = [];
+        var keybindIconPos = new Vector3(-0.4f, 0.4f, -9.5f);
+        var vanillaButtons = new Dictionary<GameObject, int>
+        {
+            { __instance.KillButton.gameObject, 8 },
+            { __instance.UseButton.gameObject, 6 },
+            { __instance.ReportButton.gameObject, 7 },
+            { __instance.ImpostorVentButton.gameObject, 50 },
+            { __instance.SabotageButton.gameObject, 4 },
+            { __instance.AbilityButton.gameObject, 49 },
+        };
+
+        foreach (var kvp in vanillaButtons)
+        {
+            var buttonObj = kvp.Key;
+            var actionId = kvp.Value;
+
+            var key = KeybindUtils.GetKeycodeByActionId(actionId);
+            if (key == KeyboardKeyCode.None)
+            {
+                continue;
+            }
+            var icon = Helpers.CreateKeybindIcon(buttonObj, key, keybindIconPos);
+            vanillaKeybindIcons.Add(icon.transform.GetChild(0).GetComponent<TextMeshPro>(), actionId);
+            var comp = buttonObj.GetComponent<ActionButton>();
+            KeybindManager.VanillaKeybinds[comp.GetType()].Button = comp;
+        }
     }
 
     /// <summary>
@@ -105,7 +170,48 @@ public static class HudManagerPatches
 
         foreach (var button in CustomButtonManager.CustomButtons)
         {
-            button.SetActive(isActive, role);
+            try
+            {
+                button.SetActive(isActive, role);
+            }
+            catch (System.Exception e)
+            {
+                Error($"Failed to set custom button {button.GetType().Name} active: {e}");
+            }
+        }
+    }
+
+    [HarmonyPatch(nameof(HudManager.Update))]
+    [HarmonyPostfix]
+    public static void UpdatePostfix()
+    {
+        var canSeeBinds = ActiveInputManager.currentControlType == ActiveInputManager.InputType.Keyboard &&
+                          LocalSettingsTabSingleton<MiraApiSettings>.Instance.ShowKeybinds.Value;
+        foreach (var btnIcon in vanillaKeybindIcons)
+        {
+            btnIcon.Key.text = KeybindUtils.GetKeycodeByActionId(btnIcon.Value).ToString();
+            btnIcon.Key.transform.parent.gameObject.SetActive(canSeeBinds);
+        }
+        foreach (var btnIcon in moddedKeybindIcons)
+        {
+            btnIcon.transform.parent.gameObject.SetActive(canSeeBinds);
+        }
+
+        var player = ReInput.players.GetPlayer(0);
+        foreach (var entry in KeybindManager.Keybinds)
+        {
+            var keyboard = player.controllers.Keyboard;
+            bool modifierKeysPressed = entry.ModifierKeys.All(k => keyboard.GetModifierKey(k)) ||
+                                       entry.ModifierKeys.Length <= 0;
+            if (player.GetButtonDown(entry.Id) && modifierKeysPressed)
+            {
+                entry.Invoke();
+            }
+        }
+
+        foreach (var entry in KeybindManager.VanillaKeybinds.Values.Where(x => player.GetButtonDown(x.Id)))
+        {
+            entry.Invoke();
         }
     }
 }

@@ -9,7 +9,7 @@ namespace MiraAPI.Modifiers.ModifierDisplay;
 /// The code placed on every Modifier HUD object. Used to handle updating.
 /// </summary>
 [RegisterInIl2Cpp]
-public class ModifierUiComponent(nint ptr) : MonoBehaviour(ptr)
+public class ModifierUiComponent(nint cppPtr) : MonoBehaviour(cppPtr)
 {
     /// <summary>
     /// Gets the modifier which this component is for.
@@ -17,12 +17,13 @@ public class ModifierUiComponent(nint ptr) : MonoBehaviour(ptr)
     [HideFromIl2Cpp]
     public BaseModifier? Modifier { get; internal set; }
 
+    // ReSharper disable InconsistentNaming
     private SpriteRenderer modBg = null!;
     private TextMeshPro desc = null!;
     private SpriteRenderer icon = null!;
     private TextMeshPro nameText = null!;
     private RectTransform descRect = null!;
-
+    // ReSharper restore InconsistentNaming
     private void Awake()
     {
         if (Modifier == null) return;

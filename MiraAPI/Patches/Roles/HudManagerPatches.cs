@@ -12,7 +12,7 @@ namespace MiraAPI.Patches.Roles;
 public static class HudManagerPatches
 {
     // Custom role tab.
-    private static TaskPanelBehaviour? _roleTab;
+    public static TaskPanelBehaviour? RoleTab;
 
     /// <summary>
     /// Fixes Kill Button not showing for Neutral killing role.
@@ -38,9 +38,9 @@ public static class HudManagerPatches
             __instance.SabotageButton.gameObject.SetActive(isActive && customRole.Configuration.CanUseSabotage);
         }
 
-        if (_roleTab)
+        if (RoleTab)
         {
-            _roleTab?.gameObject.SetActive(isActive);
+            RoleTab?.gameObject.SetActive(isActive);
         }
     }
 
@@ -62,18 +62,16 @@ public static class HudManagerPatches
 
         if (role is ICustomRole { Configuration.RoleHintType: RoleHintType.RoleTab } customRole)
         {
-            customRole.HudUpdate(__instance);
-
-            if (_roleTab == null)
+            if (RoleTab == null)
             {
-                _roleTab = CustomRoleManager.CreateRoleTab(customRole);
+                RoleTab = CustomRoleManager.CreateRoleTab(customRole);
             }
 
-            CustomRoleManager.UpdateRoleTab(_roleTab, customRole);
+            CustomRoleManager.UpdateRoleTab(RoleTab, customRole);
         }
-        else if (_roleTab)
+        else if (RoleTab)
         {
-            _roleTab?.gameObject.Destroy();
+            RoleTab?.gameObject.Destroy();
         }
     }
 }

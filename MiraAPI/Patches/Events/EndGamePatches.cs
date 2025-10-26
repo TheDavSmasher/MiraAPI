@@ -5,29 +5,44 @@ using MiraAPI.GameEnd;
 
 namespace MiraAPI.Patches.Events;
 
-[HarmonyPatch(typeof(EndGameManager), nameof(EndGameManager.SetEverythingUp))]
 internal static class EndGamePatches
 {
-    public static bool Prefix(EndGameManager __instance)
+    [HarmonyPatch(typeof(GameManager), nameof(GameManager.RpcEndGame))]
+    public static class GameManagerRpcEndGamePatch
     {
-        if (CustomGameOver.Instance is not { } gameOver)
+        public static bool Prefix(GameOverReason endReason)
         {
-            return true;
-        }
+            var @event = new BeforeGameEndEvent(endReason);
+            MiraEventManager.InvokeEvent(@event);
 
-        var result = gameOver.BeforeEndGameSetup(__instance);
-        return result;
+            return !@event.IsCancelled;
+        }
     }
 
-    public static void Postfix(EndGameManager __instance)
+    [HarmonyPatch(typeof(EndGameManager), nameof(EndGameManager.SetEverythingUp))]
+    public static class EndGameManagerPatches
     {
-        if (CustomGameOver.Instance is { } gameOver)
+        public static bool Prefix(EndGameManager __instance)
         {
-            gameOver.AfterEndGameSetup(__instance);
-            CustomGameOver.Instance = null;
+            if (CustomGameOver.Instance is not { } gameOver)
+            {
+                return true;
+            }
+
+            var result = gameOver.BeforeEndGameSetup(__instance);
+            return result;
         }
 
-        var @event = new GameEndEvent(__instance);
-        MiraEventManager.InvokeEvent(@event);
+        public static void Postfix(EndGameManager __instance)
+        {
+            if (CustomGameOver.Instance is { } gameOver)
+            {
+                gameOver.AfterEndGameSetup(__instance);
+                CustomGameOver.Instance = null;
+            }
+
+            var @event = new GameEndEvent(__instance);
+            MiraEventManager.InvokeEvent(@event);
+        }
     }
 }

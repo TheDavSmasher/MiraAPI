@@ -1,32 +1,27 @@
 ﻿namespace MiraAPI.Utilities;
 
 /// <summary>
-/// An enum to dictate how to represent a numeric value.
+/// Suffixes used for options numbers.
 /// </summary>
 public enum MiraNumberSuffixes
 {
     /// <summary>
-    /// There should be no suffix.
+    /// No suffix.
     /// </summary>
     None,
 
     /// <summary>
-    /// Display as a multiplier.
+    /// Multiplier suffix (x).
     /// </summary>
     Multiplier,
 
     /// <summary>
-    /// Display in seconds.
+    /// Seconds suffix (s).
     /// </summary>
     Seconds,
 
     /// <summary>
-    /// Display as a percentage.
+    /// Percentage suffix (%).
     /// </summary>
     Percent,
-
-    /// <summary>
-    /// Display in units.
-    /// </summary>
-    Distance,
 }

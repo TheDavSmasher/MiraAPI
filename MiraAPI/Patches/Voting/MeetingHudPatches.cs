@@ -15,6 +15,24 @@ namespace MiraAPI.Patches.Voting;
 [SuppressMessage("ReSharper", "InconsistentNaming", Justification = "Harmony Convention")]
 internal static class MeetingHudPatches
 {
+    [HarmonyPrefix]
+    [HarmonyPatch(typeof(PlayerVoteArea), nameof(PlayerVoteArea.VoteForMe))]
+    public static bool VotePatch(PlayerVoteArea __instance)
+    {
+        var beforeVoteEvent = new BeforeVoteEvent(__instance, PlayerControl.LocalPlayer);
+        MiraEventManager.InvokeEvent(beforeVoteEvent);
+
+        if (beforeVoteEvent.IsCancelled)
+        {
+            return false;
+        }
+
+        var afterVoteEvent = new AfterVoteEvent(__instance, PlayerControl.LocalPlayer);
+        MiraEventManager.InvokeEvent(afterVoteEvent);
+
+        return true;
+    }
+
     [HarmonyPostfix]
     [HarmonyPatch(nameof(MeetingHud.Start))]
     public static void MeetingHudStartPatch(MeetingHud __instance)
@@ -141,84 +159,6 @@ internal static class MeetingHudPatches
     }
 
     [HarmonyPrefix]
-    [HarmonyPatch(nameof(MeetingHud.CastVote))]
-    public static bool CastVotePatch(MeetingHud __instance, byte srcPlayerId, byte suspectPlayerId)
-    {
-        var plr = GameData.Instance.GetPlayerById(srcPlayerId);
-
-        if (plr == null)
-        {
-            return false;
-        }
-
-        var voteData = plr.Object.GetVoteData();
-        if (voteData == null || voteData.VotesRemaining == 0 ||
-            voteData.VotedFor(suspectPlayerId))
-        {
-            return false;
-        }
-
-        VotingUtils.HandleVote(voteData, suspectPlayerId);
-
-        __instance.SetDirtyBit(1U);
-        __instance.CheckForEndVoting();
-
-        if (voteData.VotesRemaining != 0)
-        {
-            return false;
-        }
-
-        __instance.playerStates.First(x => x.TargetPlayerId == srcPlayerId).SetVote(suspectPlayerId);
-        PlayerControl.LocalPlayer.RpcSendChatNote(srcPlayerId, ChatNoteTypes.DidVote);
-
-        return false;
-    }
-
-    [HarmonyPostfix]
-    [HarmonyPatch(nameof(MeetingHud.CmdCastVote))]
-    public static void CmdCastVotePatch(MeetingHud __instance, byte playerId, byte suspectIdx)
-    {
-        var plr = GameData.Instance.GetPlayerById(playerId);
-        var voteData = plr.Object.GetVoteData();
-
-        if (!AmongUsClient.Instance.AmHost)
-        {
-            if (voteData == null || voteData.VotesRemaining == 0 ||
-                voteData.VotedFor(suspectIdx))
-            {
-                return;
-            }
-
-            VotingUtils.HandleVote(voteData, suspectIdx);
-
-            if (voteData.VotesRemaining == 0)
-            {
-                __instance.playerStates.First(x => x.TargetPlayerId == playerId).SetVote(suspectIdx);
-            }
-        }
-
-        if (PlayerControl.LocalPlayer.PlayerId != playerId)
-        {
-            return;
-        }
-
-        SoundManager.Instance.PlaySound(__instance.VoteLockinSound, false);
-
-        foreach (var playerVoteArea in __instance.playerStates)
-        {
-            playerVoteArea.ClearButtons();
-        }
-
-        __instance.SkipVoteButton.ClearButtons();
-
-        var localVoteData = PlayerControl.LocalPlayer.GetVoteData();
-        if (localVoteData == null || localVoteData.VotesRemaining != 0) return;
-
-        __instance.SkipVoteButton.voteComplete = true;
-        __instance.SkipVoteButton.gameObject.SetActive(false);
-    }
-
-    [HarmonyPrefix]
     [HarmonyPatch(nameof(MeetingHud.CheckForEndVoting))]
     public static bool EndCheck(MeetingHud __instance)
     {
@@ -280,12 +220,21 @@ internal static class MeetingHudPatches
         return false;
     }
 
+    // TODO: figure out a way to do host-authorization since right now any player can send RpcCastVote
+    [HarmonyPrefix]
+    [HarmonyPatch(nameof(MeetingHud.CmdCastVote))]
+    // Although this method is inlined in MeetingHud.Confirm, the next patch fixes that.
+    public static bool CmdCastVoteOverridePatch(MeetingHud __instance, byte playerId, byte suspectIdx)
+    {
+        VotingUtils.RpcCastVote(PlayerControl.LocalPlayer, playerId, suspectIdx);
+        return false;
+    }
+
     [HarmonyPrefix]
     [HarmonyPatch(nameof(MeetingHud.Confirm))]
     public static bool ConfirmPatch(MeetingHud __instance, [HarmonyArgument(0)] byte suspect)
     {
         __instance.CmdCastVote(PlayerControl.LocalPlayer.PlayerId, suspect);
-
         return false;
     }
 }

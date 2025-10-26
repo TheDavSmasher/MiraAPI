@@ -1,12 +1,9 @@
-﻿using Il2CppSystem.Collections.Generic;
-using MiraAPI.Example.Options.Modifiers;
+﻿using MiraAPI.Example.Options.Modifiers;
 using MiraAPI.GameOptions;
 using MiraAPI.Modifiers;
 using MiraAPI.Modifiers.Types;
 using MiraAPI.Utilities.Assets;
-using Reactor.Utilities.Extensions;
 using UnityEngine;
-using Random = System.Random;
 
 namespace MiraAPI.Example.Modifiers;
 

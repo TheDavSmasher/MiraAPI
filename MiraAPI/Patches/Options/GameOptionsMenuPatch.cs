@@ -14,18 +14,12 @@ using Object = UnityEngine.Object;
 
 namespace MiraAPI.Patches.Options;
 
-/// <summary>
-/// Patches the GameOptionsMenu to add custom options.
-/// </summary>
 [HarmonyPatch(typeof(GameOptionsMenu))]
-public static class GameOptionsMenuPatch
+internal static class GameOptionsMenuPatch
 {
-    /// <summary>
-    /// Update patch for the GameOptionsMenu.
-    /// </summary>
-    /// <param name="__instance">The GameOptionsMenu instance.</param>
     [HarmonyPostfix]
     [HarmonyPatch(nameof(GameOptionsMenu.Update))]
+    // ReSharper disable once InconsistentNaming
     public static void UpdatePatch(GameOptionsMenu __instance)
     {
         if (GameSettingMenuPatches.SelectedModIdx == 0)
@@ -38,11 +32,20 @@ public static class GameOptionsMenuPatch
         {
             ModifiersUpdate(ref num);
         }
+        else if (__instance.name == "CUSTOM TAB 1")
+        {
+            CustomMenuOneUpdate(ref num);
+        }
+        else if (__instance.name == "CUSTOM TAB 2")
+        {
+            CustomMenuTwoUpdate(ref num);
+        }
         else
         {
             var filteredGroups =
-                GameSettingMenuPatches.SelectedMod?.OptionGroups
-                    .Where(x => x.OptionableType == null && !x.ShowInModifiersMenu) ?? [];
+                GameSettingMenuPatches.SelectedMod?.InternalOptionGroups
+                    .Where(x => x.OptionableType == null &&
+                                !x.ShowInModifiersMenu && x.ParentMenu == MenuCategory.Roles) ?? [];
 
             foreach (var group in filteredGroups)
             {
@@ -105,9 +108,51 @@ public static class GameOptionsMenuPatch
         }
     }
 
+    private static void CustomMenuOneUpdate(ref float num)
+    {
+        var groups = GameSettingMenuPatches.SelectedMod?.InternalOptionGroups
+            .Where(x => x.ParentMenu == MenuCategory.CustomOne) ?? [];
+
+        foreach (var modGroup in groups)
+        {
+            UpdateGroup(modGroup, ref num);
+        }
+    }
+
+    private static void CustomMenuOneCreate(GameOptionsMenu menu)
+    {
+        var groups = GameSettingMenuPatches.SelectedMod?.InternalOptionGroups
+            .Where(x => x.ParentMenu == MenuCategory.CustomOne) ?? [];
+        foreach (var group in groups)
+        {
+            CreateGroup(menu, group);
+        }
+    }
+
+    private static void CustomMenuTwoUpdate(ref float num)
+    {
+        var groups = GameSettingMenuPatches.SelectedMod?.InternalOptionGroups
+            .Where(x => x.ParentMenu == MenuCategory.CustomTwo) ?? [];
+
+        foreach (var modGroup in groups)
+        {
+            UpdateGroup(modGroup, ref num);
+        }
+    }
+
+    private static void CustomMenuTwoCreate(GameOptionsMenu menu)
+    {
+        var groups = GameSettingMenuPatches.SelectedMod?.InternalOptionGroups
+            .Where(x => x.ParentMenu == MenuCategory.CustomTwo) ?? [];
+        foreach (var group in groups)
+        {
+            CreateGroup(menu, group);
+        }
+    }
+
     private static void ModifiersUpdate(ref float num)
     {
-        var groups = GameSettingMenuPatches.SelectedMod?.OptionGroups
+        var groups = GameSettingMenuPatches.SelectedMod?.InternalOptionGroups
             .Where(x => x.ShowInModifiersMenu || x.OptionableType?.IsAssignableTo(typeof(BaseModifier))==true) ?? [];
 
         foreach (var modGroup in groups)
@@ -118,7 +163,7 @@ public static class GameOptionsMenuPatch
 
     private static void ModifiersCreate(GameOptionsMenu menu)
     {
-        var groups = GameSettingMenuPatches.SelectedMod?.OptionGroups
+        var groups = GameSettingMenuPatches.SelectedMod?.InternalOptionGroups
             .Where(x => x.ShowInModifiersMenu || x.OptionableType?.IsAssignableTo(typeof(BaseModifier))==true) ?? [];
         foreach (var group in groups)
         {
@@ -128,6 +173,7 @@ public static class GameOptionsMenuPatch
 
     [HarmonyPrefix]
     [HarmonyPatch(nameof(GameOptionsMenu.CreateSettings))]
+    // ReSharper disable once InconsistentNaming
     public static bool SettingsPatch(GameOptionsMenu __instance)
     {
         if (GameSettingMenuPatches.SelectedModIdx == 0)
@@ -142,9 +188,19 @@ public static class GameOptionsMenuPatch
             ModifiersCreate(__instance);
             return false;
         }
+        else if (__instance.name == "CUSTOM TAB 1")
+        {
+            CustomMenuOneCreate(__instance);
+            return false;
+        }
+        else if (__instance.name == "CUSTOM TAB 2")
+        {
+            CustomMenuTwoCreate(__instance);
+            return false;
+        }
 
-        var filteredGroups = GameSettingMenuPatches.SelectedMod?.OptionGroups
-            .Where(x => x.OptionableType == null && !x.ShowInModifiersMenu) ?? [];
+        var filteredGroups = GameSettingMenuPatches.SelectedMod?.InternalOptionGroups
+            .Where(x => x.OptionableType == null && !x.ShowInModifiersMenu && x.ParentMenu == MenuCategory.Roles) ?? [];
 
         foreach (var group in filteredGroups)
         {
@@ -156,6 +212,7 @@ public static class GameOptionsMenuPatch
 
     [HarmonyPrefix]
     [HarmonyPatch(nameof(GameOptionsMenu.Initialize))]
+    // ReSharper disable once InconsistentNaming
     public static bool InitPatch(GameOptionsMenu __instance)
     {
         if (__instance.Children != null && __instance.Children.Count != 0)
@@ -224,6 +281,7 @@ public static class GameOptionsMenuPatch
                 menu.checkboxOrigin,
                 menu.numberOptionOrigin,
                 menu.stringOptionOrigin,
+                menu.playerOptionOrigin,
                 menu.settingsContainer));
 
         group.Options.ForEach(x => x.ChangeGameSetting());

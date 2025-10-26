@@ -38,7 +38,7 @@ public class LoadableAddressableAsset<T>(string uid) : LoadableAsset<T> where T 
 
         var remoteReference = new AssetReference(uid);
 
-        if (!GC.TryStartNoGCRegion(4096, true)) Logger<MiraApiPlugin>.Error("Could not start NoGCRegion of size 4kb, there is the possibility of injected unmanaged classes being garbage collected as per BepInEx/Il2CppInterop/issues/40");
+        if (!GC.TryStartNoGCRegion(4096, true)) Error("Could not start NoGCRegion of size 4kb, there is the possibility of injected unmanaged classes being garbage collected as per BepInEx/Il2CppInterop/issues/40");
 
         LoadedAsset = remoteReference.LoadAssetAsync<T>().WaitForCompletion();
         if (LoadedAsset == null)

@@ -23,10 +23,10 @@ public static class VentEventPatches
 
     [HarmonyPrefix]
     [HarmonyPatch(typeof(PlayerPhysics), nameof(PlayerPhysics.RpcEnterVent))]
-    public static bool PlayerPhysicsRpcEnterVentPrefix(PlayerPhysics __instance, int id)
+    public static bool PlayerPhysicsRpcEnterVentPrefix(PlayerPhysics __instance, int ventId)
     {
         var pc = __instance.myPlayer;
-        var vent = ShipStatus.Instance.AllVents.FirstOrDefault(v => v.Id == id);
+        var vent = ShipStatus.Instance.AllVents.FirstOrDefault(v => v.Id == ventId);
 
         var @event = new EnterVentEvent(pc, vent);
         MiraEventManager.InvokeEvent(@event);
@@ -40,10 +40,10 @@ public static class VentEventPatches
 
     [HarmonyPrefix]
     [HarmonyPatch(typeof(PlayerPhysics), nameof(PlayerPhysics.RpcExitVent))]
-    public static bool PlayerPhysicsRpcExitVentPrefix(PlayerPhysics __instance, int id)
+    public static bool PlayerPhysicsRpcExitVentPrefix(PlayerPhysics __instance, int ventId)
     {
         var pc = __instance.myPlayer;
-        var vent = ShipStatus.Instance.AllVents.First(v => v.Id == id);
+        var vent = ShipStatus.Instance.AllVents.First(v => v.Id == ventId);
 
         var @event = new ExitVentEvent(pc, vent);
         MiraEventManager.InvokeEvent(@event);

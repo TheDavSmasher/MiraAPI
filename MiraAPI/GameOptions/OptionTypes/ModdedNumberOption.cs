@@ -38,6 +38,11 @@ public class ModdedNumberOption : ModdedOption<float>
     public bool ZeroInfinity { get; }
 
     /// <summary>
+    /// Gets a value indicating whether holding shift will divide the increment.
+    /// </summary>
+    public bool ShiftIncrement { get; }
+
+    /// <summary>
     /// Initializes a new instance of the <see cref="ModdedNumberOption"/> class.
     /// </summary>
     /// <param name="title">The title of the option.</param>
@@ -48,6 +53,8 @@ public class ModdedNumberOption : ModdedOption<float>
     /// <param name="suffixType">The suffix type.</param>
     /// <param name="formatString">Optional format string for the option screen.</param>
     /// <param name="zeroInfinity">Whether zero is infinity or not.</param>
+    /// <param name="includeInPreset">Whether to include this option in the preset or not.</param>
+    /// <param name="shiftIncrement">Whether holding shift will divide the increment or not.</param>
     public ModdedNumberOption(
         string title,
         float defaultValue,
@@ -56,13 +63,15 @@ public class ModdedNumberOption : ModdedOption<float>
         float increment,
         MiraNumberSuffixes suffixType,
         string? formatString = null,
-        bool zeroInfinity = false) : base(title, defaultValue)
+        bool zeroInfinity = false,
+        bool includeInPreset = true) : base(title, defaultValue, includeInPreset)
     {
         Min = min;
         Max = max;
         Increment = increment;
         SuffixType = suffixType;
         ZeroInfinity = zeroInfinity;
+        ShiftIncrement = increment != 1f;
 
         Value = Mathf.Clamp(defaultValue, min, max);
 
@@ -91,9 +100,16 @@ public class ModdedNumberOption : ModdedOption<float>
         ToggleOption toggleOpt,
         NumberOption numberOpt,
         StringOption stringOpt,
+        PlayerOption playerOpt,
         Transform container)
     {
         var numberOption = Object.Instantiate(numberOpt, Vector3.zero, Quaternion.identity, container);
+        numberOption.name =
+            $"{ParentMod!.OptionsTitleText}.NumberOption.{TranslationController.Instance.GetString(StringName)}";
+        var optionComponent = numberOption.gameObject.AddComponent<MiraNumberOptionComponent>();
+        optionComponent.NumberOption = this;
+        optionComponent.DefaultIncrement = Increment;
+        optionComponent.ShiftIncrementToggle = ShiftIncrement;
 
         numberOption.SetUpFromData(Data, 20);
         numberOption.OnValueChanged = (Il2CppSystem.Action<OptionBehaviour>)ValueChanged;

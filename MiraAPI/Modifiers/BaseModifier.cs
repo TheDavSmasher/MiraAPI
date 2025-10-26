@@ -40,8 +40,8 @@ public abstract class BaseModifier : IOptionable
     /// Gets the parent mod of the modifier.
     /// </summary>
     public MiraPluginInfo ParentMod => Array.Find(
-        MiraPluginManager.Instance.RegisteredPlugins(),
-        x => x.Modifiers.Exists(y => y.TypeId == TypeId)
+        MiraPluginManager.Instance.RegisteredPlugins,
+        x => x.InternalModifiers.Exists(y => y.TypeId == TypeId)
         ) ?? throw new InvalidOperationException("Modifier is not registered.");
 
     /// <summary>
@@ -63,6 +63,11 @@ public abstract class BaseModifier : IOptionable
     /// Gets a value indicating whether the modifier is shown in the freeplay menu.
     /// </summary>
     public virtual bool ShowInFreeplay => false;
+
+    /// <summary>
+    /// Gets a value indicating the color that should be used for the modifier within freeplay.
+    /// </summary>
+    public virtual Color FreeplayFileColor => Color.gray;
 
     /// <summary>
     /// Gets a value indicating whether the modifier is unique. If true, the player can only have one instance of this modifier.

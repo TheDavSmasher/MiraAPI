@@ -80,7 +80,7 @@ public abstract class TimedModifier : BaseModifier
     {
         if (TimerActive)
         {
-            Logger<MiraApiPlugin>.Error("Can't start a timer that has already been started.");
+            Error("Can't start a timer that has already been started.");
             return;
         }
 

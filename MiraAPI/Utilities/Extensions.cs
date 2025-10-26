@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Reflection;
 using System.Text.RegularExpressions;
@@ -9,6 +10,8 @@ using MiraAPI.Networking;
 using MiraAPI.Roles;
 using MiraAPI.Voting;
 using Reactor.Utilities;
+using Rewired;
+using Rewired.Data;
 using TMPro;
 using UnityEngine;
 
@@ -26,19 +29,107 @@ public static class Extensions
 
         if (count == null)
         {
-            Logger<MiraApiPlugin>.Error("Couldn't get role count for NetData, defaulting to zero.");
+            Error("Couldn't get role count for NetData, defaulting to zero.");
             count = 0;
         }
 
         if (chance == null)
         {
-            Logger<MiraApiPlugin>.Error("Couldn't get role chance for NetData, defaulting to zero.");
+            Error("Couldn't get role chance for NetData, defaulting to zero.");
             chance = 0;
         }
 
         return new NetData(
             RoleId.Get(role.GetType()),
             BitConverter.GetBytes(count.Value).AddRangeToArray(BitConverter.GetBytes(chance.Value)));
+    }
+
+    /// <summary>
+    /// Used if you override Minigame.Close.
+    /// </summary>
+    /// <param name="self">The minigame.</param>
+    public static void BaseClose(this Minigame self)
+    {
+        bool isComplete;
+        if (self.amClosing == Minigame.CloseState.Closing)
+        {
+            UnityEngine.Object.Destroy(self.gameObject);
+            return;
+        }
+        if (self.CloseSound && Constants.ShouldPlaySfx())
+        {
+            SoundManager.Instance.PlaySound(self.CloseSound, false, 1f, null);
+        }
+        if (PlayerControl.LocalPlayer.Data.Role.TeamType == RoleTeamTypes.Crewmate)
+        {
+            GameManager.Instance.LogicMinigame.OnMinigameClose();
+        }
+        if (PlayerControl.LocalPlayer)
+        {
+            PlayerControl.HideCursorTemporarily();
+        }
+        self.amClosing = Minigame.CloseState.Closing;
+        self.logger.Info(string.Concat("Closing minigame ", self.GetType().Name));
+        IAnalyticsReporter analytics = DestroyableSingleton<DebugAnalytics>.Instance.Analytics;
+        NetworkedPlayerInfo data = PlayerControl.LocalPlayer.Data;
+        TaskTypes taskType = self.TaskType;
+        float realtimeSinceStartup = Time.realtimeSinceStartup - self.timeOpened;
+        PlayerTask myTask = self.MyTask;
+        if (myTask != null)
+        {
+            isComplete = myTask.IsComplete;
+        }
+        else
+        {
+            isComplete = false;
+        }
+        analytics.MinigameClosed(data, taskType, realtimeSinceStartup, isComplete);
+        self.StartCoroutine(self.CoDestroySelf());
+    }
+
+    /// <summary>
+    /// Sets the cooldown of a button with a formatted string.
+    /// </summary>
+    /// <param name="button">The ActionButton to set the cooldown for.</param>
+    /// <param name="timer">The current timer value.</param>
+    /// <param name="maxTimer">The maximum timer value.</param>
+    /// <param name="format">The format string to use for the timer text.</param>
+    public static void SetCooldownFormat(this ActionButton? button, float timer, float maxTimer, string format = "0")
+    {
+        var num = Mathf.Clamp(timer / maxTimer, 0f, 1f);
+        button.isCoolingDown = num > 0f;
+        button.SetCooldownFill(num);
+        if (button.isCoolingDown)
+        {
+            button.cooldownTimerText.text = timer.ToString(format, NumberFormatInfo.InvariantInfo);
+            button.cooldownTimerText.gameObject.SetActive(true);
+            return;
+        }
+        button.cooldownTimerText.gameObject.SetActive(false);
+    }
+
+    /// <summary>
+    /// Sets the fill-up variant of a cooldown button with a formatted string.
+    /// </summary>
+    /// <param name="button">The ActionButton to set the cooldown for.</param>
+    /// <param name="timer">The current timer value.</param>
+    /// <param name="maxTimer">The maximum timer value.</param>
+    /// <param name="format">The format string to use for the timer text.</param>
+    public static void SetFillUpFormat(this ActionButton button, float timer, float maxTimer, string format = "0")
+    {
+        var num = Mathf.Clamp(timer / maxTimer, 0f, 1f);
+        button.isCoolingDown = num > 0f;
+        if (button.isCoolingDown && timer < 3f)
+        {
+            button.graphic.transform.localPosition = button.position + (Vector3)UnityEngine.Random.insideUnitCircle * 0.05f;
+            button.cooldownTimerText.text = timer.ToString(format, NumberFormatInfo.InvariantInfo);
+            button.cooldownTimerText.gameObject.SetActive(true);
+        }
+        else
+        {
+            button.graphic.transform.localPosition = button.position;
+        }
+        button.SetCooldownFill(num);
     }
 
     /// <summary>
@@ -63,6 +154,24 @@ public static class Extensions
     public static bool IsHost(this PlayerControl playerControl)
     {
         return TutorialManager.InstanceExists || AmongUsClient.Instance.HostId == playerControl.OwnerId;
+    }
+
+    /// <summary>
+    /// Used to convert a System.Collections.Generic.List to Il2cppSystem.
+    /// </summary>
+    /// <param name="systemList">The list.</param>
+    /// <typeparam name="T">The type in the list.</typeparam>
+    /// <returns>The converted list.</returns>
+    public static Il2CppSystem.Collections.Generic.List<T> ToIl2CppList<T>(this List<T> systemList)
+    {
+        var il2cppList = new Il2CppSystem.Collections.Generic.List<T>();
+
+        foreach (var item in systemList)
+        {
+            il2cppList.Add(item);
+        }
+
+        return il2cppList;
     }
 
     /// <summary>
@@ -102,6 +211,12 @@ public static class Extensions
         return component;
     }
 
+    /// <summary>
+    /// Gets the maximum value from a dictionary of integers, returning the key and value.
+    /// </summary>
+    /// <param name="self">The dictionary to search.</param>
+    /// <param name="tie">Whether there is a tie for the maximum value.</param>
+    /// <returns>The key-value pair with the maximum value.</returns>
     public static KeyValuePair<byte, int> MaxPair(this Dictionary<byte, int> self, out bool tie)
     {
         tie = true;
@@ -121,6 +236,12 @@ public static class Extensions
         return result;
     }
 
+    /// <summary>
+    /// Gets the maximum value from a dictionary of floats, returning the key and value.
+    /// </summary>
+    /// <param name="self">The dictionary to search.</param>
+    /// <param name="tie">Whether there is a tie for the maximum value.</param>
+    /// <returns>The key-value pair with the maximum value.</returns>
     public static KeyValuePair<byte, float> MaxPair(this Dictionary<byte, float> self, out bool tie)
     {
         tie = true;
@@ -277,7 +398,7 @@ public static class Extensions
 
             if (length > chunkSize)
             {
-                Logger<MiraApiPlugin>.Info($"NetData length is greater than chunk size: {length} > {chunkSize}");
+                Info($"NetData length is greater than chunk size: {length} > {chunkSize}");
                 continue;
             }
 
@@ -343,18 +464,6 @@ public static class Extensions
     }
 
     /// <summary>
-    /// Gets an alternate color based on the original color.
-    /// </summary>
-    /// <param name="color">The original color.</param>
-    /// <param name="amount">The amount to darken or lighten the original color by between 0.0 and 1.0.</param>
-    /// <returns>An alternate color that has been darkened or lightened.</returns>
-    [Obsolete("Use FindAlternateColor for WACG compliance.")]
-    public static Color GetAlternateColor(this Color color, float amount = 0.45f)
-    {
-        return color.IsColorDark() ? LightenColor(color, amount) : DarkenColor(color, amount);
-    }
-
-    /// <summary>
     /// Lightens a color by a specified amount.
     /// </summary>
     /// <param name="color">The original color.</param>
@@ -363,16 +472,6 @@ public static class Extensions
     public static Color LightenColor(this Color color, float amount = 0.45f)
     {
         return new Color(color.r + amount, color.g + amount, color.b + amount);
-    }
-
-    /// <summary>
-    /// Checks if a color is dark.
-    /// </summary>
-    /// <param name="color">The color to check.</param>
-    /// <returns>True if the color is dark, false otherwise.</returns>
-    public static bool IsColorDark(this Color color)
-    {
-        return color.r < 0.5f && color is { g: < 0.5f, b: < 0.5f };
     }
 
     /// <summary>
@@ -416,6 +515,7 @@ public static class Extensions
     /// <param name="includeImpostors">Whether impostors should be included in the search.</param>
     /// <param name="distance">The radius to search within.</param>
     /// <param name="ignoreColliders">Whether colliders should be ignored when searching.</param>
+    /// <param name="includeGhosts">Determines if Ghosts are included.</param>
     /// <param name="predicate">Optional predicate to test if the object is valid.</param>
     /// <returns>The closest player if there is one, false otherwise.</returns>
     public static PlayerControl? GetClosestPlayer(
@@ -423,16 +523,16 @@ public static class Extensions
         bool includeImpostors,
         float distance,
         bool ignoreColliders = false,
+        bool includeGhosts = false,
         Predicate<PlayerControl>? predicate = null)
     {
         var filteredPlayers = Helpers.GetClosestPlayers(playerControl, distance, ignoreColliders)
             .Where(
                 playerInfo => !playerInfo.Data.Disconnected &&
                               playerInfo.PlayerId != playerControl.PlayerId &&
-                              !playerInfo.Data.IsDead &&
+                              (includeGhosts || !playerInfo.Data.IsDead) &&
                               (includeImpostors || !playerInfo.Data.Role.IsImpostor))
             .ToList();
-
         return predicate != null ? filteredPlayers.Find(predicate) : filteredPlayers.FirstOrDefault();
     }
 
@@ -446,5 +546,54 @@ public static class Extensions
         renderer.material.SetFloat(ShaderID.Outline, color.HasValue ? 1 : 0);
         renderer.material.SetColor(ShaderID.OutlineColor, color ?? Color.clear);
         renderer.material.SetColor(ShaderID.AddColor, color ?? Color.clear);
+    }
+
+    // Inspired by: https://github.com/eDonnes124/Town-Of-Us-R/blob/master/source/Patches/Keybinds.cs#L29
+
+    /// <summary>
+    /// Registers a new mod keybind as a user-assignable button action in Rewired.
+    /// </summary>
+    /// <param name="userData">The Rewired user data to add the action to.</param>
+    /// <param name="id">The internal name of the action.</param>
+    /// <param name="name">Text shown in the rebinding UI.</param>
+    /// /// <param name="group">Group shown above the label.</param>
+    /// <param name="key">The default key to assign to this action.</param>
+    /// <param name="category">Category ID to group actions in Rewired (default is 0).</param>
+    /// <param name="elementIdentifierId">The element identifier ID (default is -1, meaning none specified).</param>
+    /// <param name="type">The <see cref="InputActionType"/> for this action (default is Button).</param>
+    /// <param name="modifiers">Optional modifier keys (e.g., <c>Control</c>, <c>Shift</c>, <c>Alt</c>) that must be held together with the main key.</param>
+    /// <returns>The action ID of the newly registered action.</returns>
+    public static InputAction RegisterModBind(this UserData userData, string id, string name, string? group, KeyboardKeyCode key, int category = 0, int elementIdentifierId = -1, InputActionType type = InputActionType.Button, ModifierKey[]? modifiers = null)
+    {
+        userData.AddAction(category);
+        var action = userData.GetAction(userData.actions.Count - 1)!;
+
+        action.name = id;
+        action.descriptiveName = group != null
+            ? $"<b><size=70%>{Palette.CrewmateRoleHeaderDarkBlue.ToTextColor()}{group.ReplaceLineEndings(" ")}</color></size></b>\n{name}"
+            : name;
+        action.categoryId = category;
+        action.type = type;
+        action.userAssignable = true;
+
+        var map = new ActionElementMap
+        {
+            _elementIdentifierId = elementIdentifierId,
+            _actionId = action.id,
+            _elementType = ControllerElementType.Button,
+            _axisContribution = Pole.Positive,
+            _keyboardKeyCode = key,
+        };
+
+        if (modifiers != null)
+        {
+            if (modifiers.Length > 0) map._modifierKey1 = modifiers[0];
+            if (modifiers.Length > 1) map._modifierKey2 = modifiers[1];
+            if (modifiers.Length > 2) map._modifierKey3 = modifiers[2];
+        }
+
+        userData.keyboardMaps[0].actionElementMaps.Add(map);
+        userData.joystickMaps[0].actionElementMaps.Add(map);
+        return action;
     }
 }

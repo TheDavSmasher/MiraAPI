@@ -25,6 +25,11 @@ public class HandleVoteEvent : MiraCancelableEvent
     public byte TargetId { get; }
 
     /// <summary>
+    /// Gets a value indicating whether to prevent the vote from commencing.
+    /// </summary>
+    public bool PreventVote { get; }
+
+    /// <summary>
     /// Gets the player info of the target.
     /// </summary>
     public NetworkedPlayerInfo TargetPlayerInfo { get; }
@@ -39,6 +44,7 @@ public class HandleVoteEvent : MiraCancelableEvent
         VoteData = playerVoteData;
         Player = playerVoteData.Owner;
         TargetId = targetId;
+        PreventVote = false;
         TargetPlayerInfo = GameData.Instance.GetPlayerById(targetId);
     }
 }

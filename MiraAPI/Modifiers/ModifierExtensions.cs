@@ -30,7 +30,7 @@ public static class ModifierExtensions
         _ = ModifierManager.GetModifierType(typeId) ?? throw new InvalidOperationException(
             $"Modifier with ID {typeId} is not registered.");
 
-        Rpc<AddModifierRpc>.Instance.Send(target, new ModifierData(typeId, Guid.NewGuid(), args));
+        Rpc<AddModifierRpc>.Instance.Send(target, new ModifierData(typeId, Guid.NewGuid(), args), true);
     }
 
     /// <summary>
@@ -83,7 +83,7 @@ public static class ModifierExtensions
         var modifier = target.GetModifier(typeId, predicate);
         if (modifier is null)
         {
-            Logger<MiraApiPlugin>.Error($"Player {target.PlayerId} does not have modifier with type ID {typeId}.");
+            Error($"Player {target.PlayerId} does not have modifier with type ID {typeId}.");
             return;
         }
 

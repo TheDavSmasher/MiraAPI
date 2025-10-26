@@ -4,6 +4,7 @@ using MiraAPI.Networking;
 using MiraAPI.PluginLoading;
 using Reactor.Localization.Utilities;
 using Reactor.Networking.Rpc;
+using Reactor.Utilities;
 using UnityEngine;
 
 namespace MiraAPI.GameOptions.OptionTypes;
@@ -12,8 +13,10 @@ namespace MiraAPI.GameOptions.OptionTypes;
 /// Represents a modded option.
 /// </summary>
 /// <typeparam name="T">The value type.</typeparam>
-public abstract class ModdedOption<T> : IModdedOption where T : struct
+public abstract class ModdedOption<T> : IModdedOption
 {
+    private IMiraPlugin? _parentMod;
+
     /// <inheritdoc />
     public uint Id { get; }
 
@@ -24,7 +27,7 @@ public abstract class ModdedOption<T> : IModdedOption where T : struct
     public StringNames StringName { get; }
 
     /// <inheritdoc />
-    public BaseGameSetting? Data { get; protected init; }
+    public BaseGameSetting Data { get; protected set; } = null!;
 
     /// <inheritdoc />
     public IMiraPlugin? ParentMod
@@ -32,12 +35,13 @@ public abstract class ModdedOption<T> : IModdedOption where T : struct
         get => _parentMod;
         set
         {
+            if (_parentMod != null || value == null) return;
             _parentMod = value;
-            BindConfig();
+
+            var entry = _parentMod.GetConfigFile().Bind(ConfigDefinition, DefaultValue);
+            Value = entry.Value;
         }
     }
-
-    private IMiraPlugin? _parentMod;
 
     /// <summary>
     /// Gets or sets the value of the option.
@@ -58,6 +62,9 @@ public abstract class ModdedOption<T> : IModdedOption where T : struct
     public Func<bool> Visible { get; set; }
 
     /// <inheritdoc />
+    public bool IncludeInPreset { get; set; }
+
+    /// <inheritdoc />
     public OptionBehaviour? OptionBehaviour { get; protected set; }
 
     /// <inheritdoc />
@@ -68,7 +75,8 @@ public abstract class ModdedOption<T> : IModdedOption where T : struct
     /// </summary>
     /// <param name="title">The option title.</param>
     /// <param name="defaultValue">The default value.</param>
-    protected ModdedOption(string title, T defaultValue)
+    /// <param name="includeInPreset">Whether to include the option in the preset.</param>
+    protected ModdedOption(string title, T defaultValue, bool includeInPreset = true)
     {
         Id = ModdedOptionsManager.NextId;
         Title = title;
@@ -76,6 +84,7 @@ public abstract class ModdedOption<T> : IModdedOption where T : struct
         Value = defaultValue;
         StringName = CustomStringName.CreateAndRegister(Title);
         Visible = () => true;
+        IncludeInPreset = includeInPreset;
     }
 
     internal void ValueChanged(OptionBehaviour optionBehaviour)
@@ -87,17 +96,18 @@ public abstract class ModdedOption<T> : IModdedOption where T : struct
     /// Sets the value of the option.
     /// </summary>
     /// <param name="newValue">The new value.</param>
-    public void SetValue(T newValue)
+    /// <param name="sendRpc">Whether to send the value to other players.</param>
+    public void SetValue(T newValue, bool sendRpc = true)
     {
         var oldVal = Value;
         Value = newValue;
 
-        if (!Value.Equals(oldVal))
+        if (Value?.Equals(oldVal) == false)
         {
             ChangedEvent?.Invoke(Value);
         }
 
-        if (AmongUsClient.Instance.AmHost)
+        if (sendRpc && AmongUsClient.Instance.AmHost)
         {
             if (ParentMod?.GetConfigFile().TryGetEntry<T>(ConfigDefinition, out var entry) == true)
             {
@@ -108,6 +118,37 @@ public abstract class ModdedOption<T> : IModdedOption where T : struct
         }
 
         OnValueChanged(newValue);
+    }
+
+    /// <inheritdoc />
+    public void SaveToPreset(ConfigFile presetConfig, bool saveDefault=false)
+    {
+        if (ConfigDefinition is null)
+        {
+            Error($"Attempted to save {Title} to preset, but ConfigDefinition is null.");
+            return;
+        }
+        Bind(presetConfig);
+        presetConfig[ConfigDefinition].BoxedValue = saveDefault ? DefaultValue : Value;
+    }
+
+    /// <inheritdoc />
+    public void Bind(ConfigFile config)
+    {
+        config.Bind(ConfigDefinition, DefaultValue);
+    }
+
+    /// <inheritdoc />
+    public void LoadFromPreset(ConfigFile presetConfig)
+    {
+        if (presetConfig.TryGetEntry(ConfigDefinition, out ConfigEntry<T> entry))
+        {
+            SetValue(entry.Value, false);
+        }
+        else
+        {
+            Error($"Attempted to load {Title} from preset, but ConfigDefinition is not found in preset.");
+        }
     }
 
     /// <inheritdoc />
@@ -137,28 +178,8 @@ public abstract class ModdedOption<T> : IModdedOption where T : struct
         ToggleOption toggleOpt,
         NumberOption numberOpt,
         StringOption stringOpt,
+        PlayerOption playerOpt,
         Transform container);
-
-    /// <inheritdoc />
-    public abstract void ChangeGameSetting();
-
-    /// <inheritdoc />
-    public virtual void ChangeRoleSetting()
-    {
-        // TODO: Implement this as an abstract
-    }
-
-    /// <summary>
-    /// Binds the option to the configuration file of the parent mod, if available.
-    /// </summary>
-    public virtual void BindConfig()
-    {
-        var entry = ParentMod?.GetConfigFile().Bind(ConfigDefinition, DefaultValue);
-        if (entry != null)
-        {
-            Value = entry.Value;
-        }
-    }
 
     /// <summary>
     /// Implicitly converts the option to type of <typeparamref name="T"/>.

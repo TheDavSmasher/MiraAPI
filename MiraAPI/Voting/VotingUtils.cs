@@ -41,13 +41,23 @@ public static class VotingUtils
     /// </summary>
     /// <param name="voteData">The player's vote data.</param>
     /// <param name="suspectIdx">Who the player voted for.</param>
-    public static void HandleVote(PlayerVoteData voteData, byte suspectIdx)
+    /// <param name="cancelVote">Whether you want the vote to commence or not.</param>
+    private static void HandleVote(PlayerVoteData voteData, byte suspectIdx, out bool cancelVote)
     {
         var @event = new HandleVoteEvent(voteData, suspectIdx);
         MiraEventManager.InvokeEvent(@event);
 
+        cancelVote = @event.PreventVote;
+
         if (@event.IsCancelled)
         {
+            return;
+        }
+
+        if (voteData.VotesRemaining == 0 ||
+            voteData.VotedFor(suspectIdx))
+        {
+            cancelVote = true;
             return;
         }
 
@@ -64,10 +74,7 @@ public static class VotingUtils
     [MethodRpc((uint)MiraRpc.RemoveVote)]
     public static void RpcRemoveVote(PlayerControl source, byte voterId, byte votedFor)
     {
-        if (source.OwnerId != AmongUsClient.Instance.HostId)
-        {
-            return;
-        }
+        if (!source.IsHost()) return;
 
         MeetingHud.Instance.playerStates.First(state => state.TargetPlayerId == voterId).UnsetVote();
 
@@ -92,6 +99,65 @@ public static class VotingUtils
 
         MeetingHud.Instance.SkipVoteButton.voteComplete = false;
         MeetingHud.Instance.SkipVoteButton.gameObject.SetActive(true);
+    }
+
+    /// <summary>
+    /// Networks the casting of a vote. We replace the vanilla solution with a custom version that works for the use case.
+    /// </summary>
+    /// <param name="source">The player who sent this RPC.</param>
+    /// <param name="srcPlayerId">The id of the player who casted the vote.</param>
+    /// <param name="suspectPlayerId">The voted player's id.</param>
+    [MethodRpc((uint)MiraRpc.CastVote)]
+    public static void RpcCastVote(PlayerControl source, byte srcPlayerId, byte suspectPlayerId)
+    {
+        CustomCastVote(srcPlayerId, suspectPlayerId);
+    }
+
+    private static void CustomCastVote(byte srcPlayerId, byte suspectPlayerId)
+    {
+        var plr = GameData.Instance.GetPlayerById(srcPlayerId);
+        if (!plr) return;
+
+        var voteData = plr.Object.GetVoteData();
+        if (!voteData) return;
+
+        HandleVote(voteData, suspectPlayerId, out var cancelVote);
+
+        // Handle local behaviour for the voter (for some reason checking AmOwner does not work for host)
+        if (PlayerControl.LocalPlayer.PlayerId == srcPlayerId)
+        {
+            if (!cancelVote) SoundManager.Instance.PlaySound(MeetingHud.Instance.VoteLockinSound, false);
+
+            foreach (var playerVoteArea in MeetingHud.Instance.playerStates)
+            {
+                playerVoteArea.ClearButtons();
+            }
+
+            MeetingHud.Instance.SkipVoteButton.ClearButtons();
+
+            var localVoteData = PlayerControl.LocalPlayer.GetVoteData();
+            if (!localVoteData || localVoteData.VotesRemaining != 0) return;
+
+            MeetingHud.Instance.SkipVoteButton.voteComplete = true;
+            MeetingHud.Instance.SkipVoteButton.gameObject.SetActive(false);
+        }
+
+        if (cancelVote) return;
+
+        // If player has no more votes, then make it show that the player has used all their votes.
+        if (voteData.VotesRemaining == 0)
+        {
+            MeetingHud.Instance.playerStates.First(x => x.TargetPlayerId == srcPlayerId).SetVote(suspectPlayerId);
+        }
+
+        // If host, then check end voting, and set votes/send chat if applicable
+        if (!PlayerControl.LocalPlayer.IsHost()) return;
+
+        MeetingHud.Instance.SetDirtyBit(1U);
+        MeetingHud.Instance.CheckForEndVoting();
+
+        if (voteData.VotesRemaining != 0) return;
+        PlayerControl.LocalPlayer.RpcSendChatNote(srcPlayerId, ChatNoteTypes.DidVote);
     }
 
     /// <summary>
@@ -158,7 +224,7 @@ public static class VotingUtils
                 var playerById = GameData.Instance.GetPlayerById(vote.Voter);
                 if (playerById == null)
                 {
-                    Logger<MiraApiPlugin>.Error($"Couldn't find player info for voter: {vote.Voter}");
+                    Error($"Couldn't find player info for voter: {vote.Voter}");
                 }
                 else if (i == 0 && vote.Suspect == SkipVoteId)
                 {

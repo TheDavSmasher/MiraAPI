@@ -1,6 +1,4 @@
 ﻿using MiraAPI.Modifiers.Types;
-using MiraAPI.Utilities.Assets;
-using UnityEngine;
 
 namespace MiraAPI.Example.Modifiers;
 

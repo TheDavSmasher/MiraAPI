@@ -21,7 +21,7 @@ public static class CustomGameModeManager
     }
 
     /// <summary>
-    /// Current gamemode.
+    /// Gets the current gamemode.
     /// </summary>
     public static CustomGameMode? ActiveMode { get; internal set; } = new DefaultMode();
 
@@ -37,7 +37,7 @@ public static class CustomGameModeManager
             return;
         }
 
-        Logger<MiraApiPlugin>.Error($"No gamemode with id {id} found!");
+        Error($"No gamemode with id {id} found!");
     }
 
     /// <summary>
@@ -48,7 +48,7 @@ public static class CustomGameModeManager
     {
         if (!typeof(CustomGameMode).IsAssignableFrom(gameModeType))
         {
-            Logger<MiraApiPlugin>.Warning($"{gameModeType.Name} does not inherit CustomGameMode!");
+            Warning($"{gameModeType.Name} does not inherit CustomGameMode!");
             return;
         }
 
@@ -56,13 +56,13 @@ public static class CustomGameModeManager
 
         if (modeObj is not CustomGameMode gameMode)
         {
-            Logger<MiraApiPlugin>.Error($"Failed to create instance of {gameModeType.Name}");
+            Error($"Failed to create instance of {gameModeType.Name}");
             return;
         }
 
         if (GameModes.Any(x => x.Key == gameMode.Id))
         {
-            Logger<MiraApiPlugin>.Error($"ID for gamemode {gameMode.Name} already exists!");
+            Error($"ID for gamemode {gameMode.Name} already exists!");
             return;
         }
 

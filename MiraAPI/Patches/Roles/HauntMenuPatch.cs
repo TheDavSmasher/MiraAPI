@@ -1,13 +1,15 @@
 ﻿using HarmonyLib;
 using MiraAPI.Roles;
+using MiraAPI.Utilities;
 using UnityEngine;
 
 namespace MiraAPI.Patches.Roles;
 
 /// <summary>
-/// Patches the haunt menu to show the actual role name rather then team.
+/// Patches the haunt menu to show the actual role name rather than team.
 /// </summary>
-[HarmonyPatch(typeof(HauntMenuMinigame), nameof(HauntMenuMinigame.SetFilterText))]
+[HarmonyPatch(typeof(HauntMenuMinigame), nameof(HauntMenuMinigame.SetHauntTarget))]
+// SetFilterText was INLINED
 public static class HauntMenuMinigamePatch
 {
     public static void Postfix(HauntMenuMinigame __instance)
@@ -21,7 +23,7 @@ public static class HauntMenuMinigamePatch
         var role = __instance.HauntTarget.Data.Role;
         var color = role is ICustomRole custom ? custom.RoleColor : role.TeamColor;
 
-        __instance.FilterText.text = role.NiceName;
+        __instance.FilterText.text = role.GetRoleName();
         __instance.FilterText.color = color;
     }
 }

@@ -17,6 +17,18 @@ namespace MiraAPI.Modifiers;
 /// </summary>
 public static class ModifierManager
 {
+    /// <summary>
+    /// Gets or sets a value indicating whether modifiers should be assigned to players.
+    /// </summary>
+    public static bool MiraAssignsModifiers { get; set; } = true;
+
+    /// <summary>
+    /// Gets the list of all registered modifiers.
+    /// </summary>
+    public static IReadOnlyList<BaseModifier> Modifiers { get; internal set; } = [];
+
+    internal static List<BaseModifier> InternalModifiers { get; } = [];
+
     private static readonly Dictionary<uint, Type> IdToTypeModifierMap = [];
     private static readonly Dictionary<Type, uint> TypeToIdModifierMap = [];
     private static readonly Dictionary<int, List<uint>> PrioritiesToIdsMap = [];
@@ -75,7 +87,8 @@ public static class ModifierManager
             modifier = (BaseModifier)FormatterServices.GetUninitializedObject(modifierType);
         }
 
-        info.Modifiers.Add(modifier);
+        info.InternalModifiers.Add(modifier);
+        InternalModifiers.Add(modifier);
 
         if (modifier is not GameModifier gameModifier)
         {
@@ -84,7 +97,7 @@ public static class ModifierManager
 
         if (modifierType.GetConstructor(Type.EmptyTypes) == null)
         {
-            Logger<MiraApiPlugin>.Error($"Game Modifier {modifierType.FullName} does not have a parameterless constructor!");
+            Error($"Game Modifier {modifierType.FullName} does not have a parameterless constructor!");
             return false;
         }
 
@@ -99,7 +112,11 @@ public static class ModifierManager
         return true;
     }
 
-    internal static void AssignModifiers(List<PlayerControl> plrs)
+    /// <summary>
+    /// Assigns modifiers to players. ONLY CALL THIS METHOD IF YOU KNOW WHAT YOU ARE DOING.
+    /// </summary>
+    /// <param name="plrs">The players to assign modifiers to.</param>
+    public static void AssignModifiers(List<PlayerControl> plrs)
     {
         var rand = new Random();
 
@@ -109,6 +126,7 @@ public static class ModifierManager
             .Select(x => Activator.CreateInstance(x.Value) as GameModifier)
             .OfType<GameModifier>()
             .Where(x => x.GetAmountPerGame() > 0 && x.GetAssignmentChance() > 0)
+            .Shuffle()
             .OrderByDescending(x => x.Priority())
             .ToArray();
 
@@ -119,7 +137,7 @@ public static class ModifierManager
             var validPlayers = plrs.Where(x => IsGameModifierValid(x, modifier, modifier.TypeId)).ToList();
             if (validPlayers.Count == 0)
             {
-                Logger<MiraApiPlugin>.Warning($"No valid players for modifier {modifier.ModifierName}");
+                Warning($"No valid players for modifier {modifier.ModifierName}");
                 continue;
             }
 
@@ -140,7 +158,7 @@ public static class ModifierManager
 
                 if (candidates.Count == 0)
                 {
-                    Logger<MiraApiPlugin>.Warning(
+                    Warning(
                         $"No available players for modifier {modifier.ModifierName} at assignment {i + 1}");
                     break;
                 }
@@ -148,7 +166,7 @@ public static class ModifierManager
                 var plr = candidates.Random();
                 if (plr == null)
                 {
-                    Logger<MiraApiPlugin>.Warning($"Valid player for modifier {modifier.ModifierName} disappeared");
+                    Warning($"Valid player for modifier {modifier.ModifierName} disappeared");
                     continue;
                 }
 

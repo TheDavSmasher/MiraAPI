@@ -30,13 +30,13 @@ public static class GameOverManager
 
         if (gameOverType.IsAbstract)
         {
-            Logger<MiraApiPlugin>.Error("The type must not be abstract.");
+            Error("The type must not be abstract.");
             return false;
         }
 
         if (gameOverType.GetConstructor(Type.EmptyTypes) == null)
         {
-            Logger<MiraApiPlugin>.Error("The type must have a parameterless constructor.");
+            Error("The type must have a parameterless constructor.");
             return false;
         }
 

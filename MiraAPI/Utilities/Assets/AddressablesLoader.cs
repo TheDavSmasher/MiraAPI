@@ -33,7 +33,7 @@ public static class AddressablesLoader
     {
         if (_isInitialized)
         {
-            Logger<MiraApiPlugin>.Error("AddressablesLoader has already been initialized, cannot register more catalogs.");
+            Error("AddressablesLoader has already been initialized, cannot register more catalogs.");
             return;
         }
 
@@ -48,7 +48,7 @@ public static class AddressablesLoader
     {
         if (_isInitialized)
         {
-            Logger<MiraApiPlugin>.Error("AddressablesLoader has already been initialized, cannot register more keys for hats.");
+            Error("AddressablesLoader has already been initialized, cannot register more keys for hats.");
             return;
         }
 
@@ -63,7 +63,7 @@ public static class AddressablesLoader
     {
         if (_isInitialized)
         {
-            Logger<MiraApiPlugin>.Error("AddressablesLoader has already been initialized, cannot register more keys for skins.");
+            Error("AddressablesLoader has already been initialized, cannot register more keys for skins.");
             return;
         }
 
@@ -79,7 +79,7 @@ public static class AddressablesLoader
     {
         if (_isInitialized)
         {
-            Logger<MiraApiPlugin>.Error("AddressablesLoader has already been initialized, cannot register more keys for nameplates.");
+            Error("AddressablesLoader has already been initialized, cannot register more keys for nameplates.");
             return;
         }
 
@@ -95,7 +95,7 @@ public static class AddressablesLoader
     {
         if (_isInitialized)
         {
-            Logger<MiraApiPlugin>.Error("AddressablesLoader has already been initialized, cannot register more keys for visors.");
+            Error("AddressablesLoader has already been initialized, cannot register more keys for visors.");
             return;
         }
 
@@ -106,7 +106,7 @@ public static class AddressablesLoader
     {
         if (_isInitialized)
         {
-            Logger<MiraApiPlugin>.Error("AddressablesLoader has already been initialized.");
+            Error("AddressablesLoader has already been initialized.");
             return;
         }
 
@@ -129,10 +129,10 @@ public static class AddressablesLoader
         // Check for errors
         if (catalogOperation.Status != AsyncOperationStatus.Succeeded)
         {
-            Logger<MiraApiPlugin>.Error($"Failed to load catalog {location}.");
+            Error($"Failed to load catalog {location}.");
         }
 
-        Logger<MiraApiPlugin>.Info($"Loaded addressables {location}.");
+        Info($"Loaded addressables {location}.");
         LoadedLocations.Add(location);
     }
 
@@ -193,7 +193,7 @@ public static class AddressablesLoader
             }
             catch
             {
-                Logger<MiraApiPlugin>.Error($"Failed to find tag {tag}");
+                Error($"Failed to find tag {tag}");
             }
         }
         return behaviours;
@@ -214,7 +214,7 @@ public static class AddressablesLoader
             }
             catch
             {
-                Logger<MiraApiPlugin>.Error($"Failed to find tag {tag}");
+                Error($"Failed to find tag {tag}");
             }
         }
         return behaviours;

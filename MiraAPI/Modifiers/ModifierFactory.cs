@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Linq.Expressions;
 using MiraAPI.Utilities;
@@ -11,7 +12,7 @@ namespace MiraAPI.Modifiers;
 /// </summary>
 public static class ModifierFactory
 {
-    private static readonly Dictionary<(Type, Type[]), Func<object[], BaseModifier>> _constructorCache = [];
+    private static readonly Dictionary<(Type, Type[]), Func<object[], BaseModifier>> ConstructorCache = [];
 
     private static Func<object[], BaseModifier> CreateConstructor(Type type, params object[] args)
     {
@@ -45,13 +46,13 @@ public static class ModifierFactory
     /// <returns>An instance of the modifier.</returns>
     public static BaseModifier CreateInstance(Type type, params object[] args)
     {
-        var argTypes = args.Select(arg => arg?.GetType() ?? typeof(object)).ToArray();
+        var argTypes = args.Select(arg => arg.GetType()).ToArray();
         var key = (type, argTypes);
 
-        if (!_constructorCache.TryGetValue(key, out var constructor))
+        if (!ConstructorCache.TryGetValue(key, out var constructor))
         {
             constructor = CreateConstructor(type, args);
-            _constructorCache[key] = constructor;
+            ConstructorCache[key] = constructor;
         }
 
         return constructor(args);
@@ -95,6 +96,7 @@ public static class ModifierFactory<T> where T : BaseModifier
     /// </summary>
     /// <param name="args">Parameters for the constructor.</param>
     /// <returns>An instance of the modifier.</returns>
+    [SuppressMessage("Design", "CA1000:Do not declare static members on generic types", Justification = "This is a factory class.")]
     public static T CreateInstance(params object[] args)
     {
         return Constructor(args);

@@ -7,6 +7,7 @@ namespace MiraAPI.Utilities.Assets;
 /// A utility class for loading assets from embedded resources.
 /// </summary>
 /// <param name="path">The path to the embedded resource.</param>
+/// <param name="pixelsPerUnit">The pixels per unit for the loaded sprite.</param>
 public class LoadableResourceAsset(string path, float pixelsPerUnit=100f) : LoadableAsset<Sprite>
 {
     private readonly Assembly _assembly = Assembly.GetCallingAssembly();
@@ -14,9 +15,9 @@ public class LoadableResourceAsset(string path, float pixelsPerUnit=100f) : Load
     /// <inheritdoc />
     public override Sprite LoadAsset()
     {
-        if (LoadedAsset != null)
+        if (LoadedAsset)
         {
-            return LoadedAsset;
+            return LoadedAsset!;
         }
 
         return LoadedAsset = SpriteTools.LoadSpriteFromPath(path, _assembly, pixelsPerUnit);

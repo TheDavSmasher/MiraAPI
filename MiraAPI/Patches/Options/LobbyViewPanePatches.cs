@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using AmongUs.GameOptions;
 using HarmonyLib;
 using MiraAPI.GameOptions;
 using MiraAPI.Modifiers;
@@ -24,7 +25,7 @@ public static class LobbyViewPanePatches
 
     private static MiraPluginInfo? SelectedMod => SelectedModIdx == 0
         ? null
-        : MiraPluginManager.Instance.RegisteredPlugins()[SelectedModIdx - 1];
+        : MiraPluginManager.Instance.RegisteredPlugins[SelectedModIdx - 1];
 
     private static PassiveButton? ModifiersTabButton { get; set; }
 
@@ -74,7 +75,7 @@ public static class LobbyViewPanePatches
             (UnityAction)(() =>
             {
                 SelectedModIdx += 1;
-                if (SelectedModIdx > MiraPluginManager.Instance.RegisteredPlugins().Length)
+                if (SelectedModIdx > MiraPluginManager.Instance.RegisteredPlugins.Length)
                 {
                     SelectedModIdx = 0;
                 }
@@ -98,7 +99,7 @@ public static class LobbyViewPanePatches
                 SelectedModIdx -= 1;
                 if (SelectedModIdx < 0)
                 {
-                    SelectedModIdx = MiraPluginManager.Instance.RegisteredPlugins().Length;
+                    SelectedModIdx = MiraPluginManager.Instance.RegisteredPlugins.Length;
                 }
 
                 Refresh(__instance);
@@ -113,24 +114,27 @@ public static class LobbyViewPanePatches
         menu.scrollBar.ScrollToTop();
     }
 
-    [HarmonyPrefix]
-    [HarmonyPatch(nameof(LobbyViewSettingsPane.SetTab))]
-    public static bool SetTabPatch(LobbyViewSettingsPane __instance)
+    [HarmonyPostfix]
+    [HarmonyPatch(nameof(LobbyViewSettingsPane.ChangeTab))]
+    [HarmonyPatch(nameof(LobbyViewSettingsPane.RefreshTab))]
+    // CHANGED BECAUSE OF INLINING
+    public static void SetTabPatch(LobbyViewSettingsPane __instance)
     {
         if (__instance.currentTab != ModifiersTabName || SelectedMod == null)
         {
             ModifiersTabButton?.SelectButton(false);
-            return true;
+            return;
         }
 
         __instance.taskTabButton.SelectButton(false);
         __instance.rolesTabButton.SelectButton(false);
 
         ModifiersTabButton?.SelectButton(true);
-        var filteredGroups = SelectedMod.OptionGroups
-            .Where(x => x.GroupVisible() && (x.ShowInModifiersMenu || x.OptionableType?.IsAssignableTo(typeof(BaseModifier))==true));
+
+        var filteredGroups = SelectedMod.InternalOptionGroups
+            .Where(x => x.GroupVisible() && (x.ShowInModifiersMenu || (x.OptionableType != null && x.OptionableType.IsAssignableTo(typeof(BaseModifier)))));
+
         DrawOptions(__instance, filteredGroups);
-        return false;
     }
 
     [HarmonyPrefix]
@@ -142,8 +146,14 @@ public static class LobbyViewPanePatches
             return true;
         }
 
-        var filteredGroups = SelectedMod.OptionGroups
-            .Where(x => x.OptionableType == null && x.GroupVisible.Invoke());
+        if (__instance.currentTab == ModifiersTabName)
+        {
+            return false;
+        }
+
+        var filteredGroups = SelectedMod.InternalOptionGroups
+            .Where(x => x is { ShowInModifiersMenu: false, OptionableType: null } && x.GroupVisible());
+
         DrawOptions(__instance, filteredGroups);
         return false;
     }
@@ -154,7 +164,113 @@ public static class LobbyViewPanePatches
     {
         if (SelectedModIdx == 0)
         {
-            return true;
+            float num = 0.95f;
+            float num2 = -6.53f;
+            CategoryHeaderMasked categoryHeaderMasked =
+                Object.Instantiate(__instance.categoryHeaderOrigin, __instance.settingsContainer);
+            categoryHeaderMasked.SetHeader(StringNames.RoleQuotaLabel, 61);
+            categoryHeaderMasked.transform.localScale = Vector3.one;
+            categoryHeaderMasked.transform.localPosition = new Vector3(-9.77f, 1.26f, -2f);
+            __instance.settingsInfo.Add(categoryHeaderMasked.gameObject);
+            var list = new List<RoleBehaviour>();
+            for (int i = 0; i < 2; i++)
+            {
+                var categoryHeaderRoleVariant =
+                    Object.Instantiate(__instance.categoryHeaderRoleOrigin, __instance.settingsContainer);
+                categoryHeaderRoleVariant.SetHeader(
+                    (i == 0) ? StringNames.CrewmateRolesHeader : StringNames.ImpostorRolesHeader,
+                    61);
+                categoryHeaderRoleVariant.transform.localScale = Vector3.one;
+                categoryHeaderRoleVariant.transform.localPosition = new Vector3(0.09f, num, -2f);
+                __instance.settingsInfo.Add(categoryHeaderRoleVariant.gameObject);
+                num -= 0.696f;
+                var roles = RoleManager.Instance.AllRoles.ToArray().Where(x =>
+                    x is not ICustomRole && x.Role != RoleTypes.Crewmate && x.Role != RoleTypes.Impostor &&
+                    x.Role != RoleTypes.CrewmateGhost && x.Role != RoleTypes.ImpostorGhost).ToList();
+                for (int j = 0; j < roles.Count; j++)
+                {
+                    var roleBehaviour = roles[j];
+                    int chancePerGame =
+                        GameOptionsManager.Instance.CurrentGameOptions.RoleOptions.GetChancePerGame(
+                            roleBehaviour.Role);
+                    int numPerGame =
+                        GameOptionsManager.Instance.CurrentGameOptions.RoleOptions
+                            .GetNumPerGame(roleBehaviour.Role);
+                    bool flag = numPerGame == 0;
+                    var viewSettingsInfoPanelRoleVariant =
+                        Object.Instantiate(
+                            __instance.infoPanelRoleOrigin,
+                            __instance.settingsContainer);
+                    viewSettingsInfoPanelRoleVariant.transform.localScale = Vector3.one;
+                    viewSettingsInfoPanelRoleVariant.transform.localPosition = new Vector3(num2, num, -2f);
+                    if (!flag)
+                    {
+                        list.Add(roleBehaviour);
+                    }
+
+                    viewSettingsInfoPanelRoleVariant.SetInfo(
+                        roleBehaviour.NiceName,
+                        numPerGame,
+                        chancePerGame,
+                        61,
+                        (i == 0) ? Palette.CrewmateRoleBlue : Palette.ImpostorRoleRed,
+                        roleBehaviour.RoleIconSolid,
+                        i == 0,
+                        flag);
+                    __instance.settingsInfo.Add(viewSettingsInfoPanelRoleVariant.gameObject);
+                    num -= 0.664f;
+                }
+            }
+
+            if (list.Count > 0)
+            {
+                var categoryHeaderMasked2 =
+                    Object.Instantiate(__instance.categoryHeaderOrigin, __instance.settingsContainer);
+                categoryHeaderMasked2.SetHeader(StringNames.RoleSettingsLabel, 61);
+                categoryHeaderMasked2.transform.localScale = Vector3.one;
+                categoryHeaderMasked2.transform.localPosition = new Vector3(-9.77f, num, -2f);
+                __instance.settingsInfo.Add(categoryHeaderMasked2.gameObject);
+                num -= 2.1f;
+                float num3 = 0f;
+                for (int k = 0; k < list.Count; k++)
+                {
+                    float num4;
+                    if (k % 2 == 0)
+                    {
+                        num4 = -5.8f;
+                        if (k > 0)
+                        {
+                            num -= num3 + 0.85f;
+                            num3 = 0f;
+                        }
+                    }
+                    else
+                    {
+                        num4 = 0.14999962f;
+                    }
+
+                    var advancedRoleViewPanel =
+                        Object.Instantiate(__instance.advancedRolePanelOrigin, __instance.settingsContainer);
+                    advancedRoleViewPanel.transform.localScale = Vector3.one;
+                    advancedRoleViewPanel.transform.localPosition = new Vector3(num4, num, -2f);
+                    float num5 = advancedRoleViewPanel.SetUp(list[k], 0.85f, 61);
+                    if (num5 > num3)
+                    {
+                        num3 = num5;
+                    }
+
+                    __instance.settingsInfo.Add(advancedRoleViewPanel.gameObject);
+                }
+            }
+
+            __instance.scrollBar.SetYBoundsMax(-num);
+
+            return false;
+        }
+
+        if (__instance.currentTab == ModifiersTabName)
+        {
+            return false;
         }
 
         DrawRolesTab(__instance);
@@ -165,12 +281,15 @@ public static class LobbyViewPanePatches
     {
         var num = 1.44f;
 
-        foreach (var group in groups)
+        var groupArray = groups.Where(x => x.GroupVisible() && x.Options.Any(y => y.Visible())).ToArray();
+
+        foreach (var group in groupArray)
         {
             var categoryHeaderMasked = Object.Instantiate(
                 menu.categoryHeaderOrigin,
                 menu.settingsContainer,
                 true);
+
             categoryHeaderMasked.SetHeader(StringNames.Name, 61);
             categoryHeaderMasked.Title.text = group.GroupName;
             categoryHeaderMasked.transform.localScale = Vector3.one;
@@ -182,7 +301,7 @@ public static class LobbyViewPanePatches
 
             foreach (var option in group.Options)
             {
-                if (!option.Visible.Invoke())
+                if (!option.Visible())
                 {
                     continue;
                 }
@@ -191,6 +310,7 @@ public static class LobbyViewPanePatches
                     menu.infoPanelOrigin,
                     menu.settingsContainer,
                     true);
+
                 viewSettingsInfoPanel.transform.localScale = Vector3.one;
                 float num2;
                 if (i % 2 == 0)
@@ -229,7 +349,7 @@ public static class LobbyViewPanePatches
             num -= 0.85f;
         }
 
-        menu.scrollBar.CalculateAndSetYBounds(menu.settingsInfo.Count + 10, 2f, 6f, 0.85f);
+        menu.scrollBar.SetYBoundsMax(-num - 2);
     }
 
     private static void DrawRolesTab(LobbyViewSettingsPane instance)
@@ -250,7 +370,7 @@ public static class LobbyViewPanePatches
 
         var list = new List<Type>();
 
-        var roleGroups = SelectedMod.CustomRoles.Values.OfType<ICustomRole>()
+        var roleGroups = SelectedMod.InternalRoles.Values.OfType<ICustomRole>()
             .ToLookup(x => x.RoleOptionsGroup);
 
         // sort the groups by priority
@@ -291,6 +411,11 @@ public static class LobbyViewPanePatches
 
             foreach (var customRole in grouping)
             {
+                if (customRole.Configuration.HideSettings)
+                {
+                    continue;
+                }
+
                 var roleBehaviour = customRole as RoleBehaviour;
                 if (roleBehaviour == null)
                 {
@@ -310,7 +435,7 @@ public static class LobbyViewPanePatches
                 viewSettingsInfoPanelRoleVariant.transform.localScale = Vector3.one;
                 viewSettingsInfoPanelRoleVariant.transform.localPosition = new Vector3(num2, num, -2f);
 
-                var advancedRoleOptions = SelectedMod.OptionGroups
+                var advancedRoleOptions = SelectedMod.InternalOptionGroups
                     .Where(x => x.OptionableType == customRole.GetType())
                     .SelectMany(x => x.Options)
                     .ToList();
@@ -321,7 +446,7 @@ public static class LobbyViewPanePatches
                 }
 
                 viewSettingsInfoPanelRoleVariant.SetInfo(
-                    roleBehaviour.NiceName,
+                    roleBehaviour.GetRoleName(),
                     numPerGame,
                     chancePerGame,
                     61,
@@ -397,7 +522,7 @@ public static class LobbyViewPanePatches
             return 0;
         }
 
-        var role = SelectedMod.CustomRoles.Values.FirstOrDefault(x => x.GetType() == roleType);
+        var role = SelectedMod.InternalRoles.Values.FirstOrDefault(x => x.GetType() == roleType);
 
         if (role == null)
         {
@@ -420,7 +545,7 @@ public static class LobbyViewPanePatches
         var num = viewPanel.yPosStart;
         var num2 = 1.08f;
 
-        var filteredOptions = SelectedMod.OptionGroups
+        var filteredOptions = SelectedMod.InternalOptionGroups
             .Where(x => x.OptionableType == roleType)
             .SelectMany(x=>x.Options)
             .ToList();

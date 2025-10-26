@@ -32,6 +32,12 @@ public record struct CustomRoleConfiguration
         TasksCountForProgress = role.Team is ModdedRoleTeams.Crewmate;
         HideSettings = roleBehaviour?.IsDead == true;
         ShowInFreeplay = roleBehaviour?.IsDead == false;
+        FreeplayFolder = role.Team switch
+        {
+            ModdedRoleTeams.Crewmate => TranslationController.Instance.GetString(StringNames.Crewmate),
+            ModdedRoleTeams.Impostor => TranslationController.Instance.GetString(StringNames.Impostor),
+            _ => "Neutral",
+        };
         IntroSound = role.Team is ModdedRoleTeams.Crewmate
             ? CustomRoleManager.CrewmateIntroSound
             : CustomRoleManager.ImpostorIntroSound;
@@ -111,6 +117,11 @@ public record struct CustomRoleConfiguration
     /// Gets or sets a value indicating whether the role should show up in the Freeplay Role Selection menu.
     /// </summary>
     public bool ShowInFreeplay { get; set; }
+
+    /// <summary>
+    /// Gets or sets a freeplay folder this role belongs to. Defaults to team folder.
+    /// </summary>
+    public string FreeplayFolder { get; set; }
 
     /// <summary>
     /// Gets or sets the outline color for the KillButton if <see cref="UseVanillaKillButton"/> is true.

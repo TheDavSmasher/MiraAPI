@@ -24,6 +24,7 @@ public class UpdateSystemEvent : MiraCancelableEvent
     ///  Initializes a new instance of the <see cref="UpdateSystemEvent"/> class.
     /// </summary>
     /// <param name="systemType">The SystemType being updated.</param>
+    /// <param name="player">The player that is updating the system.</param>
     /// <param name="amount">Amount to update System to.</param>
     public UpdateSystemEvent(SystemTypes systemType, PlayerControl player, byte amount)
     {

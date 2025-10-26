@@ -44,4 +44,9 @@ public enum MiraRpc : uint
     /// Custom RPC to undo a player's vote.
     /// </summary>
     RemoveVote,
+
+    /// <summary>
+    /// Custom RPC to replace Among Us CastVote.
+    /// </summary>
+    CastVote,
 }

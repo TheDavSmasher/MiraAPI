@@ -17,7 +17,7 @@ public static class ColorExtensions
         var r = color.r <= 0.03928f ? color.r / 12.92f : Mathf.Pow((color.r + 0.055f) / 1.055f, 2.4f);
         var g = color.g <= 0.03928f ? color.g / 12.92f : Mathf.Pow((color.g + 0.055f) / 1.055f, 2.4f);
         var b = color.b <= 0.03928f ? color.b / 12.92f : Mathf.Pow((color.b + 0.055f) / 1.055f, 2.4f);
-        return 0.2126f * r + 0.7152f * g + 0.0722f * b;
+        return (0.2126f * r) + (0.7152f * g) + (0.0722f * b);
     }
 
     /// <summary>

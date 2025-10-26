@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System.Diagnostics.CodeAnalysis;
+using System.Linq;
 
 namespace MiraAPI.Hud;
 
@@ -13,7 +14,6 @@ public static class CustomButtonSingleton<T> where T : CustomActionButton
     /// <summary>
     /// Gets the instance of the button.
     /// </summary>
-#pragma warning disable CA1000
+    [SuppressMessage("Design", "CA1000:Do not declare static members on generic types", Justification = "This is a utility class to get the instance of a custom action button.")]
     public static T Instance => _instance ??= CustomButtonManager.CustomButtons.OfType<T>().Single();
-#pragma warning restore CA1000
 }

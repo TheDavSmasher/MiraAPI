@@ -2,7 +2,9 @@
 
 namespace MiraAPI.GameOptions;
 
+#pragma warning disable CA1852
 internal class ModifierOptionGroup : AbstractOptionGroup
+#pragma warning restore CA1852
 {
     public override string GroupName { get; }
 

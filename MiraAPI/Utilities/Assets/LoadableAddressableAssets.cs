@@ -45,7 +45,7 @@ public class LoadableAddressableAssets<T>(string key) where T : UnityEngine.Obje
 
         var locations = Addressables.LoadResourceLocationsAsync(key).WaitForCompletion();
 
-        if (!GC.TryStartNoGCRegion(4096, true)) Logger<MiraApiPlugin>.Error("Could not start NoGCRegion of size 4kb, there is the possibility of injected unmanaged classes being garbage collected as per BepInEx/Il2CppInterop/issues/40");
+        if (!GC.TryStartNoGCRegion(4096, true)) Error("Could not start NoGCRegion of size 4kb, there is the possibility of injected unmanaged classes being garbage collected as per BepInEx/Il2CppInterop/issues/40");
 
         var assetsIList = Addressables.LoadAssetsAsync<T>(locations, null, false).WaitForCompletion();
         if (assetsIList == null)

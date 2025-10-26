@@ -33,15 +33,4 @@ public static class MinigameStubs
     {
         // nothing needed
     }
-
-    /// <summary>
-    /// Fixes the error when creating custom minigames. Credit to Submerged for discovering this fix.
-    /// </summary>
-    /// <param name="__instance">The Minigame instance.</param>
-    [HarmonyPrefix]
-    [HarmonyPatch(typeof(Minigame), nameof(Minigame.Begin))]
-    public static void MinigameErrorFixPatch(Minigame __instance)
-    {
-        __instance.logger ??= new Logger("Minigame", Logger.Level.Info, Logger.Category.Gameplay);
-    }
 }

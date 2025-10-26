@@ -73,16 +73,47 @@ public interface ICustomRole : IOptionable
     /// </summary>
     MiraPluginInfo ParentMod => CustomRoleManager.FindParentMod(this);
 
-    /// <summary>
-    /// This method runs on the PlayerControl.FixedUpdate method for ALL players with this role.
-    /// </summary>
-    /// <param name="playerControl">The PlayerControl that has this role.</param>
-    void PlayerControlFixedUpdate(PlayerControl playerControl)
-    {
-    }
-
     internal ConfigDefinition NumConfigDefinition => new("Roles", $"Num {GetType().FullName}");
     internal ConfigDefinition ChanceConfigDefinition => new("Roles", $"Chance {GetType().FullName}");
+
+    /// <summary>
+    /// Binds the configuration options for this role to the provided ConfigFile.
+    /// </summary>
+    /// <param name="config">The ConfigFile to bind the options to.</param>
+    public virtual void BindConfig(ConfigFile config)
+    {
+        config.Bind(NumConfigDefinition, Configuration.DefaultRoleCount);
+        config.Bind(ChanceConfigDefinition, Configuration.DefaultChance);
+    }
+
+    /// <summary>
+    /// Saves the role's configuration to a preset ConfigFile.
+    /// </summary>
+    /// <param name="presetConfig">The ConfigFile to save the preset configuration to.</param>
+    /// <param name="useDefault">Whether to use the default values for the configuration.</param>
+    public virtual void SaveToPreset(ConfigFile presetConfig, bool useDefault=false)
+    {
+        BindConfig(presetConfig);
+        presetConfig[NumConfigDefinition].BoxedValue = useDefault ? Configuration.DefaultRoleCount : GetCount();
+        presetConfig[ChanceConfigDefinition].BoxedValue = useDefault ? Configuration.DefaultChance : GetChance();
+    }
+
+    /// <summary>
+    /// Loads the role's configuration from a preset ConfigFile.
+    /// </summary>
+    /// <param name="presetConfig">The ConfigFile containing the preset configuration.</param>
+    public virtual void LoadFromPreset(ConfigFile presetConfig)
+    {
+        if (presetConfig.TryGetEntry(NumConfigDefinition, out ConfigEntry<int> numEntry))
+        {
+            SetCount(numEntry.Value);
+        }
+
+        if (presetConfig.TryGetEntry(ChanceConfigDefinition, out ConfigEntry<int> chanceEntry))
+        {
+            SetChance(chanceEntry.Value);
+        }
+    }
 
     /// <summary>
     /// Gets the role chance option.
@@ -125,7 +156,7 @@ public interface ICustomRole : IOptionable
     {
         if (!Configuration.CanModifyChance)
         {
-            Logger<MiraApiPlugin>.Error($"Cannot modify chance for role: {RoleName}");
+            Error($"Cannot modify chance for role: {RoleName}");
             return;
         }
 
@@ -135,7 +166,7 @@ public interface ICustomRole : IOptionable
             return;
         }
 
-        Logger<MiraApiPlugin>.Error($"Error getting chance configuration for role: {RoleName}");
+        Error($"Error getting chance configuration for role: {RoleName}");
     }
 
     /// <summary>
@@ -150,7 +181,7 @@ public interface ICustomRole : IOptionable
             return;
         }
 
-        Logger<MiraApiPlugin>.Error($"Error getting count configuration for role: {RoleName}");
+        Error($"Error getting count configuration for role: {RoleName}");
     }
 
     /// <summary>
@@ -181,14 +212,6 @@ public interface ICustomRole : IOptionable
         }
 
         return true;
-    }
-
-    /// <summary>
-    /// This method runs on the HudManager.Update method ONLY when the LOCAL player has this role.
-    /// </summary>
-    /// <param name="hudManager">Reference to HudManager instance.</param>
-    void HudUpdate(HudManager hudManager)
-    {
     }
 
     /// <summary>

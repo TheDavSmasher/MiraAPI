@@ -9,10 +9,7 @@ using MiraAPI.Events.Vanilla.Player;
 using MiraAPI.Example.Buttons.Freezer;
 using MiraAPI.Example.Roles;
 using MiraAPI.Utilities;
-using MiraAPI.Utilities.Assets;
 using Reactor.Utilities;
-using TMPro;
-using UnityEngine;
 
 namespace MiraAPI.Example;
 
@@ -21,7 +18,7 @@ public static class ExampleEventHandlers
     public static void Initialize()
     {
         // You can register event handlers with the MiraEventManager class.
-        MiraEventManager.RegisterEventHandler<BeforeMurderEvent>(@event =>
+        var handle = MiraEventManager.RegisterEventHandler<BeforeMurderEvent>(@event =>
         {
             Logger<ExamplePlugin>.Info($"{@event.Source.Data.PlayerName} is about to kill {@event.Target.Data.PlayerName}");
         });
@@ -35,6 +32,9 @@ public static class ExampleEventHandlers
         {
             Logger<ExamplePlugin>.Info($"{@event.Player.Data.PlayerName} completed {@event.Task.TaskType.ToString()}");
         });
+
+        // You can also unregister event handlers using the handle returned from RegisterEventHandler.
+        MiraEventManager.UnregisterEventHandler(handle);
     }
 
     // If you want to add extra votes to a player, do something like this.

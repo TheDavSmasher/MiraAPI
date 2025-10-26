@@ -1,12 +1,16 @@
-﻿using System;
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using HarmonyLib;
-using MonoMod.Utils;
+using Il2CppInterop.Runtime.InteropTypes.Arrays;
+using MiraAPI.Roles;
+using MiraAPI.Utilities.Assets;
+using Reactor.Utilities;
+using Rewired;
 using TMPro;
 using UnityEngine;
+using MethodBase = System.Reflection.MethodBase;
 using Object = UnityEngine.Object;
 
 namespace MiraAPI.Utilities;
@@ -22,7 +26,102 @@ public static class Helpers
     /// <returns>A list of alive players.</returns>
     public static List<PlayerControl> GetAlivePlayers()
     {
-        return [.. GameData.Instance.AllPlayers.ToArray().Where(x => !x.IsDead && !x.Disconnected && x.Object).Select(x=>x.Object)];
+        return [.. GameData.Instance.AllPlayers.ToArray().Where(x => !x.IsDead && !x.Disconnected && x.Object).Select(x => x.Object)];
+    }
+
+    internal static GameObject CreateKeybindIcon(GameObject button, KeyboardKeyCode keyCode, Vector3 localPos)
+    {
+        var keybindIcon = Object.Instantiate(HudManager.Instance.AbilityButton.usesRemainingSprite.gameObject, button.transform);
+        keybindIcon.GetComponent<SpriteRenderer>().sprite = MiraAssets.KeybindButton.LoadAsset();
+        keybindIcon.transform.GetComponentInChildren<TextMeshPro>().text = keyCode.ToString();
+        keybindIcon.name = "KeybindIcon";
+        keybindIcon.transform.localPosition = localPos;
+        return keybindIcon;
+    }
+
+    public static MethodBase? GetStateMachineMoveNext<T>(string methodName)
+    {
+        var typeName = typeof(T).FullName;
+        var showRoleStateMachine =
+            typeof(T)
+                .GetNestedTypes()
+                .FirstOrDefault(x=>x.Name.Contains(methodName));
+
+        if (showRoleStateMachine == null)
+        {
+            Error($"Failed to find {methodName} state machine for {typeName}");
+            return null;
+        }
+
+        var moveNext = AccessTools.Method(showRoleStateMachine, "MoveNext");
+        if (moveNext == null)
+        {
+            Error($"Failed to find MoveNext method for {typeName}.{methodName}");
+            return null;
+        }
+
+        Info($"Found {methodName}.MoveNext");
+        return moveNext;
+    }
+
+    /// <summary>
+    /// Creates a draggable scroller. Add items into the scroller.Inner transform. This does not automatically position children.
+    /// </summary>
+    /// <param name="parent">Where the scroller should be parented to.</param>
+    /// <param name="hitBoxCollider">The collider of the scroller. Used to drag.</param>
+    /// <returns>The created scroller object.</returns>
+    public static Scroller CreateScroller(Transform parent, BoxCollider2D hitBoxCollider)
+    {
+        var scrollObj = new GameObject("Scroller");
+        scrollObj.transform.SetParent(parent);
+        scrollObj.transform.localScale = new Vector3(1, 1, 1);
+
+        var inner = new GameObject("Inner");
+        inner.transform.SetParent(scrollObj.transform);
+        inner.transform.localScale = new Vector3(1, 1, 1);
+        inner.transform.localPosition = new Vector3(0, 0, 2);
+
+        var scroller = scrollObj.AddComponent<Scroller>();
+        scroller.allowX = false;
+        scroller.allowY = true;
+        scroller.DragScrollSpeed = 1f;
+        scroller.Colliders = new Il2CppReferenceArray<Collider2D>([hitBoxCollider]);
+        scroller.Inner = inner.transform;
+
+        return scroller;
+    }
+
+    /// <summary>
+    /// Divides a button/etc by a certain amount by resizing colliders and renderer sizes.
+    /// </summary>
+    /// <param name="obj">The object you want to divide.</param>
+    /// <param name="amount">How much you want to divide by.</param>
+    public static void DivideSize(GameObject obj, float amount)
+    {
+        foreach (var collider in obj.GetComponentsInChildren<Collider2D>(true))
+        {
+            if (collider.TryCast<BoxCollider2D>() is { } col)
+            {
+                col.size = new Vector2(col.size.x / amount, col.size.y);
+            }
+        }
+
+        foreach (var rend in obj.GetComponentsInChildren<SpriteRenderer>(true))
+        {
+            rend.size = new Vector2(rend.size.x / amount, rend.size.y);
+        }
+    }
+
+    /// <summary>
+    /// Gets the keybind for an action with ReInput.
+    /// </summary>
+    /// <param name="actionId">The action ID.</param>
+    /// <returns>The keyboard key code.</returns>
+    public static KeyboardKeyCode GetKeybindByActionId(int actionId)
+    {
+        var player = ReInput.players.GetPlayer(0);
+        return player.controllers.maps.GetFirstElementMapWithAction(ControllerType.Keyboard, actionId, false)
+            .keyboardKeyCode;
     }
 
     /// <summary>
@@ -39,10 +138,10 @@ public static class Helpers
             case 100:
                 return true;
             default:
-            {
-                var num = UnityEngine.Random.RandomRangeInt(1, 101);
-                return num <= probability;
-            }
+                {
+                    var num = Random.RandomRangeInt(1, 101);
+                    return num <= probability;
+                }
         }
     }
 
@@ -378,7 +477,6 @@ public static class Helpers
             MiraNumberSuffixes.Multiplier => "x",
             MiraNumberSuffixes.Seconds => "s",
             MiraNumberSuffixes.Percent => "%",
-            MiraNumberSuffixes.Distance => MiraApiPlugin.DistanceSuffix?.Value ?? "unit",
             _ => string.Empty,
         };
     }
@@ -401,80 +499,41 @@ public static class Helpers
     /// <returns>The random string.</returns>
     public static string RandomString(int length, string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789")
     {
-        return new string([.. Enumerable.Repeat(chars, length).Select(s => s[UnityEngine.Random.RandomRangeInt(0, s.Length)])]);
+        return new string(Enumerable.Repeat(chars, length)
+            .Select(s => s[Random.RandomRangeInt(0, s.Length)]).ToArray());
     }
 
     /// <summary>
-    /// Shorthand for <see cref="string.Split(char, StringSplitOptions)"/> that removes empty entries and trims leading and ending spaces.
+    /// Returns the formated value using the specified suffix and format string.
     /// </summary>
-    /// <param name="value">The string to split.</param>
-    /// <param name="separator">The separator.</param>
-    /// <returns>An array of substrings.</returns>
-    public static string[] TrueSplit(this string value, char separator) => value.Split(separator, StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
-
-    /// <summary>
-    /// Joins a collection of items that are separated by a character.
-    /// </summary>
-    /// <param name="separator">The separator.</param>
-    /// <param name="items">The collection of items to string together.</param>
-    /// <typeparam name="T">The type of the items.</typeparam>
-    /// <returns>A string formed by concatenating the ToString results of each item, each separated by a separator.</returns>
-    public static string Join<T>(char separator, IEnumerable<T> items) => Join(separator.ToString(), items);
-
-    /// <inheritdoc cref="Join{T}(char, IEnumerable{T})"/>
-    public static string Join<T>(string separator, IEnumerable<T> items)
+    /// <param name="value">The value to format.</param>
+    /// <param name="suffix">The suffix to add.</param>
+    /// <param name="formatString">The format string to use to format.</param>
+    /// <returns>The formated value.</returns>
+    public static string FormatValue(float value, MiraNumberSuffixes suffix = MiraNumberSuffixes.None, string formatString = "0.0")
     {
-        if (!items.Any())
-            return string.Empty;
-
-        var result = string.Empty;
-        items.Do(x => result += $"{separator}{x}");
-        return result[separator.Length..];
+        return suffix switch
+        {
+            MiraNumberSuffixes.None => value.ToString(formatString, NumberFormatInfo.InvariantInfo),
+            MiraNumberSuffixes.Multiplier => value.ToString(formatString, NumberFormatInfo.InvariantInfo) + "x",
+            MiraNumberSuffixes.Percent => value.ToString(formatString, NumberFormatInfo.InvariantInfo) + "%",
+            _ => TranslationController.Instance.GetString(
+                StringNames.GameSecondsAbbrev,
+                (Il2CppSystem.Object[])[value.ToString(formatString, CultureInfo.InvariantCulture)]),
+        };
     }
 
     /// <summary>
-    /// Shorthand helper for overriding the on click listeners for PassiveButton.
+    /// Returns the string of a role.
     /// </summary>
-    /// <param name="passive">The PassiveButton being modified.</param>
-    /// <param name="action">The action that's replacing the original listeners.</param>
-    public static void OverrideOnClickListeners(this PassiveButton passive, Action action)
+    /// <param name="role">The role to find.</param>
+    /// <returns>The role name.</returns>
+    public static string GetRoleName(this RoleBehaviour role)
     {
-        if (!passive)
-            return;
-
-        passive.OnClick?.RemoveAllListeners();
-        passive.OnClick = new();
-        passive.OnClick.AddListener(action);
-        passive.enabled = true;
-    }
-
-    /// <summary>
-    /// Shorthand helper for overriding the on mouse over listeners for PassiveButton.
-    /// </summary>
-    /// <inheritdoc cref="OverrideOnClickListeners"/>
-    public static void OverrideOnMouseOverListeners(this PassiveButton passive, Action action)
-    {
-        if (!passive)
-            return;
-
-        passive.OnMouseOver?.RemoveAllListeners();
-        passive.OnMouseOver = new();
-        passive.OnMouseOver.AddListener(action);
-        passive.enabled = true;
-    }
-
-    /// <summary>
-    /// Shorthand helper for overriding the on mouse out listeners for PassiveButton.
-    /// </summary>
-    /// <inheritdoc cref="OverrideOnClickListeners"/>
-    public static void OverrideOnMouseOutListeners(this PassiveButton passive, Action action)
-    {
-        if (!passive)
-            return;
-
-        passive.OnMouseOut?.RemoveAllListeners();
-        passive.OnMouseOut = new();
-        passive.OnMouseOut.AddListener(action);
-        passive.enabled = true;
+        if (role is ICustomRole custom)
+        {
+            return custom.RoleName;
+        }
+        return role.NiceName;
     }
 }

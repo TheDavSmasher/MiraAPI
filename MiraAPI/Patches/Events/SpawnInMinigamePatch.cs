@@ -9,7 +9,12 @@ internal static class SpawnInMinigamePatch
 {
     public static void Postfix()
     {
-        var @event = new RoundStartEvent(false);
+        var @event = new BeforeRoundStartEvent(false);
         MiraEventManager.InvokeEvent(@event);
+
+        if (@event.IsCancelled) return;
+
+        var @event2 = new RoundStartEvent(false);
+        MiraEventManager.InvokeEvent(@event2);
     }
 }

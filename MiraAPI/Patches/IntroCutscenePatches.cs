@@ -1,8 +1,12 @@
-﻿using HarmonyLib;
+﻿using System.Linq;
+using System.Reflection;
+using HarmonyLib;
+using Il2CppInterop.Runtime.InteropTypes;
 using MiraAPI.Events;
 using MiraAPI.Events.Vanilla.Gameplay;
 using MiraAPI.Roles;
 using MiraAPI.Utilities;
+using Reactor.Utilities;
 
 namespace MiraAPI.Patches;
 
@@ -27,6 +31,31 @@ public static class IntroCutscenePatches
     {
         var @event = new IntroBeginEvent(__instance);
         MiraEventManager.InvokeEvent(@event);
+    }
+
+    [HarmonyPatch]
+    public static class IntroCutsceneShowRolePatch
+    {
+        public static MethodBase TargetMethod()
+        {
+            return Helpers.GetStateMachineMoveNext<IntroCutscene>(nameof(IntroCutscene.ShowRole))!;
+        }
+
+        public static void Postfix(Il2CppObjectBase __instance)
+        {
+            var wrapper = new StateMachineWrapper<IntroCutscene>(__instance);
+            // run before the first yield
+            if (wrapper.GetState() != 1)
+            {
+                return;
+            }
+
+            var introCutscene = wrapper.Instance;
+
+            Info("IntroCutscene ShowRole reached");
+            var @event = new IntroRoleRevealEvent(introCutscene);
+            MiraEventManager.InvokeEvent(@event);
+        }
     }
 
     [HarmonyPrefix]
@@ -56,11 +85,54 @@ public static class IntroCutscenePatches
         }
     }
 
-    [HarmonyPostfix]
-    [HarmonyPatch(nameof(IntroCutscene.OnDestroy))]
-    public static void GameBeginPatch(IntroCutscene __instance)
+    [HarmonyPatch]
+    public static class IntroCutsceneDestroyPatch
     {
-        MiraEventManager.InvokeEvent(new IntroEndEvent(__instance));
-        MiraEventManager.InvokeEvent(new RoundStartEvent(true));
+        private static bool _usedFallback;
+
+        public static MethodBase TargetMethod()
+        {
+            var onDestroy = AccessTools.Method(typeof(IntroCutscene), "OnDestroy");
+            if (onDestroy != null)
+            {
+                _usedFallback = false;
+                Info("Using OnDestroy for IntroCutsceneDestroyPatch");
+                return onDestroy;
+            }
+
+            _usedFallback = true;
+            return Helpers.GetStateMachineMoveNext<IntroCutscene>(nameof(IntroCutscene.CoBegin))!;
+        }
+
+        public static void Postfix(Il2CppObjectBase __instance)
+        {
+            IntroCutscene introCutscene;
+
+            if (_usedFallback)
+            {
+                var wrapper = new StateMachineWrapper<IntroCutscene>(__instance);
+                // run after the final yield
+                if (wrapper.GetState() != -1)
+                {
+                    return;
+                }
+                introCutscene = wrapper.Instance;
+            }
+            else
+            {
+                introCutscene = __instance.Cast<IntroCutscene>();
+            }
+
+
+            Info("IntroCutscene ended");
+
+            MiraEventManager.InvokeEvent(new IntroEndEvent(introCutscene));
+
+            var @event = new BeforeRoundStartEvent(true);
+            MiraEventManager.InvokeEvent(@event);
+
+            if (@event.IsCancelled) return;
+            MiraEventManager.InvokeEvent(new RoundStartEvent(true));
+        }
     }
 }

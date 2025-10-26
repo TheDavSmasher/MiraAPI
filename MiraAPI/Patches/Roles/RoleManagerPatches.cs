@@ -14,6 +14,8 @@ public static class RoleManagerPatches
 {
     [HarmonyPrefix]
     [HarmonyPatch(nameof(RoleManager.SetRole))]
+    // NOTE: As of 2025.5.20 update, this is INLINED in ONE place: GameManager::ReviveEveryoneFreeplay(void).
+    // Should not affect normal gameplay, but may cause issues in Freeplay.
     public static bool SetRolePatch(RoleManager __instance, PlayerControl targetPlayer, RoleTypes roleType)
     {
         if (!targetPlayer)
@@ -23,7 +25,7 @@ public static class RoleManagerPatches
         var data = targetPlayer.Data;
         if (data == null)
         {
-            Debug.LogError("It shouldn't be possible, but " + targetPlayer.name + " still doesn't have PlayerData during role selection.");
+            Error("It shouldn't be possible, but " + targetPlayer.name + " still doesn't have PlayerData during role selection.");
             return false;
         }
         if (data.Role)
@@ -31,7 +33,7 @@ public static class RoleManagerPatches
             data.Role.Deinitialize(targetPlayer);
             Object.Destroy(data.Role.gameObject);
         }
-        var roleBehaviour = Object.Instantiate<RoleBehaviour>(__instance.AllRoles.First(r => r.Role == roleType), data.gameObject.transform);
+        var roleBehaviour = Object.Instantiate<RoleBehaviour>(__instance.AllRoles.ToArray().First(r => r.Role == roleType), data.gameObject.transform);
         roleBehaviour.Initialize(targetPlayer);
         targetPlayer.Data.Role = roleBehaviour;
         targetPlayer.Data.RoleType = roleType;
@@ -63,7 +65,7 @@ public static class RoleManagerPatches
     [HarmonyPatch(nameof(RoleManager.SelectRoles))]
     public static void ModifierSelectionPatches(RoleManager __instance)
     {
-        if (!AmongUsClient.Instance.AmHost)
+        if (!AmongUsClient.Instance.AmHost || !ModifierManager.MiraAssignsModifiers)
         {
             return;
         }
