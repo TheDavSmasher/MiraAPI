@@ -86,6 +86,7 @@ public static class LogicRoleSelectionHnsPatch
         }
         else if (team == RoleTeamTypes.Impostor)
         {
+            Error($"MiraAPI.Patches.Roles.LogicRoleSelectionHnsPatch - AssignRolesForTeam: Before Guaranteed Assignment");
             var newImpostors = new List<NetworkedPlayerInfo>();
             // Specified Seeker
             if (__instance.hnsManager.LogicOptionsHnS.HasImpostorPlayerID() &&
@@ -96,6 +97,7 @@ public static class LogicRoleSelectionHnsPatch
                     .First(p => p.PlayerId == __instance.hnsManager.LogicOptionsHnS.ImpostorPlayerID());
                 players.Remove(networkedPlayerInfo);
                 newImpostors.Add(networkedPlayerInfo);
+                Error($"MiraAPI.Patches.Roles.LogicRoleSelectionHnsPatch - AssignRolesForTeam: Seeker is {networkedPlayerInfo.PlayerName}, ID: {networkedPlayerInfo.PlayerId}");
             }
             // Random Seeker
             else
@@ -113,8 +115,10 @@ public static class LogicRoleSelectionHnsPatch
                     players.Remove(networkedPlayerInfo);
                     newImpostors.Add(networkedPlayerInfo);
                     num2++;
+                    Error($"MiraAPI.Patches.Roles.LogicRoleSelectionHnsPatch - AssignRolesForTeam: Seeker is {networkedPlayerInfo.PlayerName}, ID: {networkedPlayerInfo.PlayerId}");
                 }
             }
+            Error($"MiraAPI.Patches.Roles.LogicRoleSelectionHnsPatch - AssignRolesForTeam: After Guaranteed Assignment");
             foreach (RoleManager.RoleAssignmentData roleAssignmentData in guaranteedRoles.Select((x) =>
                          new RoleManager.RoleAssignmentData(x, roleOptions.GetNumPerGame(x.Role), 100)))
             {
@@ -131,7 +135,7 @@ public static class LogicRoleSelectionHnsPatch
                     list.Add(roleAssignmentData.Role.Role);
                 }
             }
-            AssignRolesFromList(players, teamMax, list, ref num);
+            AssignRolesFromList(newImpostors, teamMax, list, ref num);
 
             var list2 = source.Where(x => !x.IsDead).Select(role =>
                 new RoleManager.RoleAssignmentData(
@@ -151,14 +155,14 @@ public static class LogicRoleSelectionHnsPatch
                 }
             }
 
-            AssignRolesFromList(players, teamMax, list, ref num);
+            AssignRolesFromList(newImpostors, teamMax, list, ref num);
             var basicRole = RoleTypes.Impostor;
-            while (list.Count < players.Count && list.Count + num < teamMax)
+            while (list.Count < newImpostors.Count && list.Count + num < teamMax)
             {
                 list.Add(basicRole);
             }
 
-            AssignRolesFromList(players, teamMax, list, ref num);
+            AssignRolesFromList(newImpostors, teamMax, list, ref num);
         }
         return false;
     }
