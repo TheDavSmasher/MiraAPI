@@ -219,7 +219,7 @@ public abstract class CustomActionButton
                 Helpers.CreateKeybindIcon(
                     Button.gameObject,
                     Keybind.CurrentKey,
-                    new Vector3(MaxUses <= 0 ? -0.4f : 0.4f, 0.45f, -9f)
+                    new Vector3(0.4f, 0.45f, -9f)
                 );
             KeybindText = KeybindIcon.transform.GetChild(0).GetComponent<TextMeshPro>();
             HudManagerPatches.ModdedKeybindIcons.Add(KeybindText);
