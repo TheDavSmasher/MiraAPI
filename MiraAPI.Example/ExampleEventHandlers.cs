@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System.Globalization;
+using System.Linq;
 using MiraAPI.Events;
 using MiraAPI.Events.Mira;
 using MiraAPI.Events.Vanilla.Gameplay;
@@ -17,7 +18,7 @@ public static class ExampleEventHandlers
 {
     public static void Initialize()
     {
-        // You can register event handlers with the MiraEventManager class.
+        // You can register event handlers with the MiraEventManager class
         var handle = MiraEventManager.RegisterEventHandler<BeforeMurderEvent>(@event =>
         {
             Logger<ExamplePlugin>.Info($"{@event.Source.Data.PlayerName} is about to kill {@event.Target.Data.PlayerName}");
@@ -35,6 +36,21 @@ public static class ExampleEventHandlers
 
         // You can also unregister event handlers using the handle returned from RegisterEventHandler.
         MiraEventManager.UnregisterEventHandler(handle);
+    }
+
+    // If you want to check vanilla buttons, use something like this!
+    [RegisterEvent]
+    public static void VanillaButtonClickHandler(VanillaButtonClickEvent @event)
+    {
+        Logger<ExamplePlugin>.Info($"{@event.Button.buttonLabelText.text} is being used!");
+        if (@event.PlayerTarget != null)
+        {
+            Logger<ExamplePlugin>.Info($"{@event.PlayerTarget.Data.PlayerName} is being targeted!");
+        }
+        else if (@event.VentTarget != null)
+        {
+            Logger<ExamplePlugin>.Info($"Vent with id {@event.VentTarget.Id.ToString(CultureInfo.InvariantCulture)} is being targeted!");
+        }
     }
 
     // If you want to add extra votes to a player, do something like this.
