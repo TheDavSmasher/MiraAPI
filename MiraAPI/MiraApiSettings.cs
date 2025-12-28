@@ -54,20 +54,20 @@ public class MiraApiSettings(ConfigFile config) : LocalSettingsTab(config)
     /// Gets whether the modifiers hud should be on the left side of the screen (under roles/task tab). Recommended for streamers.
     /// </summary>
     [LocalToggleSetting]
-    public ConfigEntry<bool> ModifiersHudLeftSide { get; private set; } = config.Bind("Displays", "Show Modifiers HUD on Left Side", false);
+    public ConfigEntry<bool> ModifiersHudLeftSide { get; private set; } = config.Bind("Visuals/UI", "Show Modifiers HUD on Left Side", false);
 
     /// <summary>
     /// Gets whether to show keybinds on buttons.
     /// </summary>
     [LocalToggleSetting]
-    public ConfigEntry<bool> ShowKeybinds { get; private set; } = config.Bind("Buttons", "Show Keybinds on Buttons", true);
+    public ConfigEntry<bool> ShowKeybinds { get; private set; } = config.Bind("Visuals/UI", "Show Keybinds on Buttons", true);
 
     /// <summary>
     /// Gets the scale of the buttons.
     /// </summary>
     [LocalSliderSetting(min: 0.5f, max: 1.5f, suffixType: MiraNumberSuffixes.Multiplier, formatString: "0.00", displayValue: true)]
     public ConfigEntry<float> ButtonUIFactorSlider { get; private set; } =
-        config.Bind("Buttons", "Button Scale Factor", 0.75f);
+        config.Bind("Visuals/UI", "Button Scale Factor", 0.75f);
 
     /// <summary>
     /// Gets whether to apply cosmetic changes to the TaskAdder.
