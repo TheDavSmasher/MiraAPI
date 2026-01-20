@@ -16,6 +16,24 @@ public sealed class BeforeMurderEvent : MiraCancelableEvent
     public PlayerControl Target { get; }
 
     /// <summary>
+    /// Gets whether the murder was meant to be done in a meeting.
+    /// </summary>
+    public bool? InMeeting { get; }
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="BeforeMurderEvent"/> class.
+    /// </summary>
+    /// <param name="source">The player that is killing the target.</param>
+    /// <param name="target">The player that is being killed.</param>
+    /// <param name="inMeeting">Whether the murder is intended to be triggered in a meeting.</param>
+    public BeforeMurderEvent(PlayerControl source, PlayerControl target, bool inMeeting)
+    {
+        Source = source;
+        Target = target;
+        InMeeting = inMeeting;
+    }
+
+    /// <summary>
     /// Initializes a new instance of the <see cref="BeforeMurderEvent"/> class.
     /// </summary>
     /// <param name="source">The player that is killing the target.</param>
@@ -24,5 +42,6 @@ public sealed class BeforeMurderEvent : MiraCancelableEvent
     {
         Source = source;
         Target = target;
+        InMeeting = null;
     }
 }
