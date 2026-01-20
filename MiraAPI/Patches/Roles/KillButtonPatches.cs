@@ -58,7 +58,7 @@ public static class KillButtonPatches
             return false;
         }
 
-        PlayerControl.LocalPlayer.RpcCustomMurder(__instance.currentTarget);
+        PlayerControl.LocalPlayer.RpcAltCustomMurder(__instance.currentTarget, false);
         __instance.SetTarget(null);
 
         return false;
