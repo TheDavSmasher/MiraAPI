@@ -147,7 +147,7 @@ Logger<MyPlugin>.Info(myGroup.MyNumberOption); // prints the value of the option
 
 ### Option Attributes
 
-这是在使用Option Attribute with a property的示例：
+这是使用Option Attribute with a property的示例：
 ```csharp
 // 第一个参数始终是选项的名称。其余的取决于选项的类型。
 [ModdedNumberOption("Sussy level", min: 0, max: 10)]
