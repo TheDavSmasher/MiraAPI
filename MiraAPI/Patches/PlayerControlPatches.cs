@@ -117,6 +117,20 @@ internal static class PlayerControlPatches
         __instance.RpcMurderPlayer(target, true);
     }
 
+    [HarmonyPrefix]
+    [HarmonyPatch(nameof(PlayerControl.RpcMurderPlayer))]
+    [HarmonyPatch(nameof(PlayerControl.MurderPlayer))]
+    // ReSharper disable once InconsistentNaming
+    public static bool MurderPlayerPrefix(PlayerControl __instance)
+    {
+        if (LobbyBehaviour.Instance)
+        {
+            return false;
+        }
+
+        return true;
+    }
+
     [HarmonyPostfix]
     [HarmonyPatch(nameof(PlayerControl.FixedUpdate))]
     // ReSharper disable once InconsistentNaming
