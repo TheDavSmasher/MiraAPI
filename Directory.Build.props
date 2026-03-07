@@ -8,8 +8,8 @@
 
         <RestorePackagesWithLockFile>true</RestorePackagesWithLockFile>
 
-        <VersionPrefix>0.3.8</VersionPrefix>
-        <VersionSuffix>dev</VersionSuffix>
+        <VersionPrefix>0.3.9</VersionPrefix>
+        <VersionSuffix>wip</VersionSuffix>
 
         <Authors>All Of Us, XtraCube, Angxl</Authors>
         <Company>All Of Us</Company>
