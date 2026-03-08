@@ -139,7 +139,7 @@ public class ModdedStringOption : ModdedOption<string>
     /// <inheritdoc />
     public override float GetFloatData()
     {
-        return Convert.ToSingle(Value, NumberFormatInfo.InvariantInfo);
+        return Values.IndexOf(Value);
     }
 
     /// <inheritdoc />
