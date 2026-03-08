@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Text;
-using HarmonyLib;
 using Il2CppInterop.Runtime.InteropTypes.Arrays;
 using MiraAPI.Networking;
 using Reactor.Localization.Utilities;
@@ -52,19 +51,14 @@ public class ModdedStringOption : ModdedOption<string>
         if (!Values.Contains(value))
         {
             if (index <= -1)
-            {
-                Values.AddItem(value);
-                StringNameValues.AddItem(CustomStringName.CreateAndRegister(value));
-            }
-            else
-            {
-                var newVals = Values.ToList();
-                newVals.Insert(index, value);
-                Values = newVals.ToArray();
-                var newStrVals = StringNameValues.ToList();
-                newStrVals.Insert(index, CustomStringName.CreateAndRegister(value));
-                StringNameValues = newStrVals.ToArray();
-            }
+                index = Values.Length;
+
+            var newVals = Values.ToList();
+            newVals.Insert(index, value);
+            Values = newVals.ToArray();
+            var newStrVals = StringNameValues.ToList();
+            newStrVals.Insert(index, CustomStringName.CreateAndRegister(value));
+            StringNameValues = newStrVals.ToArray();
         }
 
         if (Data != null)
