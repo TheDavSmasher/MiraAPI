@@ -13,19 +13,24 @@ namespace MiraAPI.Colors;
 public sealed class CustomColor(StringNames name, Color32 mainColor, Color32 shadowColor)
 {
     /// <summary>
-    /// Gets the main color.
+    /// Gets or sets the main color.
     /// </summary>
-    public Color32 MainColor { get; } = mainColor;
+    public Color32 MainColor { get; set; } = mainColor;
 
     /// <summary>
-    /// Gets the shadow color.
+    /// Gets or sets the shadow color.
     /// </summary>
-    public Color32 ShadowColor { get; } = shadowColor;
+    public Color32 ShadowColor { get; set; } = shadowColor;
 
     /// <summary>
-    /// Gets the name of the color.
+    /// Gets or sets the name of the color.
     /// </summary>
-    public StringNames Name { get; } = name;
+    public StringNames Name { get; set; } = name;
+
+    /// <summary>
+    /// Gets or sets whether the color is lighter or darker. Can be used to help with colorblind stuff.
+    /// </summary>
+    public CustomColorBrightness ColorBrightness { get; set; } = CustomColorBrightness.Darker;
 
     /// <inheritdoc />
     public CustomColor(StringNames name, Color32 mainColor) : this(name, mainColor, mainColor.GetShadowColor(60))
@@ -41,4 +46,20 @@ public sealed class CustomColor(StringNames name, Color32 mainColor, Color32 sha
     public CustomColor(string name, Color32 mainColor, Color32 shadowColor) : this(CustomStringName.CreateAndRegister(name), mainColor, shadowColor)
     {
     }
+}
+
+/// <summary>
+/// Can be used to help with colorblind stuff.
+/// </summary>
+public enum CustomColorBrightness
+{
+    /// <summary>
+    /// A lighter color.
+    /// </summary>
+    Lighter,
+
+    /// <summary>
+    /// A darker color.
+    /// </summary>
+    Darker,
 }

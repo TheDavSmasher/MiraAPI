@@ -1,5 +1,7 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Linq;
+using AmongUs.Data;
 using AmongUs.GameOptions;
 using Assets.CoreScripts;
 using BepInEx.Unity.IL2CPP.Utils;
@@ -7,8 +9,10 @@ using MiraAPI.Events;
 using MiraAPI.Events.Vanilla.Gameplay;
 using Reactor.Networking.Attributes;
 using Reactor.Networking.Rpc;
+using Reactor.Utilities;
 using Reactor.Utilities.Extensions;
 using UnityEngine;
+using Object = UnityEngine.Object;
 
 namespace MiraAPI.Networking;
 
@@ -28,7 +32,6 @@ public static class CustomMurderRpc
     /// <param name="teleportMurderer">Should the killer be snapped to the dead player.</param>
     /// <param name="showKillAnim">Should the kill animation be shown.</param>
     /// <param name="playKillSound">Should the kill sound be played.</param>
-    [MethodRpc((uint)MiraRpc.CustomMurder, LocalHandling = RpcLocalHandling.Before, SendImmediately = true)]
     public static void RpcCustomMurder(
         this PlayerControl source,
         PlayerControl target,
@@ -39,10 +42,54 @@ public static class CustomMurderRpc
         bool showKillAnim = true,
         bool playKillSound = true)
     {
+        source.RpcCustomMurder(
+            target,
+            MeetingCheck.Ignore,
+            didSucceed,
+            resetKillTimer,
+            createDeadBody,
+            teleportMurderer,
+            showKillAnim,
+            playKillSound);
+    }
+
+    /// <summary>
+    /// Networked Custom Murder method, which checks for meetings as well.
+    /// </summary>
+    /// <param name="source">The killer.</param>
+    /// <param name="target">The player to murder.</param>
+    /// <param name="inMeeting">Whether the murder is intended to be triggered in a meeting.</param>
+    /// <param name="didSucceed">Whether the murder was successful or not.</param>
+    /// <param name="resetKillTimer">Should the kill timer be reset.</param>
+    /// <param name="createDeadBody">Should a dead body be created.</param>
+    /// <param name="teleportMurderer">Should the killer be snapped to the dead player.</param>
+    /// <param name="showKillAnim">Should the kill animation be shown.</param>
+    /// <param name="playKillSound">Should the kill sound be played.</param>
+    [MethodRpc((uint)MiraRpc.CustomMurder, LocalHandling = RpcLocalHandling.Before)]
+    public static void RpcCustomMurder(
+        this PlayerControl source,
+        PlayerControl target,
+        MeetingCheck inMeeting,
+        bool didSucceed = true,
+        bool resetKillTimer = true,
+        bool createDeadBody = true,
+        bool teleportMurderer = true,
+        bool showKillAnim = true,
+        bool playKillSound = true)
+    {
+        if (LobbyBehaviour.Instance)
+        {
+            return;
+        }
         var murderResultFlags = didSucceed ? MurderResultFlags.Succeeded : MurderResultFlags.FailedError;
 
-        var beforeMurderEvent = new BeforeMurderEvent(source, target);
+        var beforeMurderEvent = new BeforeMurderEvent(source, target, inMeeting);
         MiraEventManager.InvokeEvent(beforeMurderEvent);
+        var isMeetingActive = MeetingHud.Instance != null || ExileController.Instance != null;
+        if ((inMeeting is MeetingCheck.ForMeeting && !isMeetingActive) || (inMeeting is MeetingCheck.OutsideMeeting && isMeetingActive))
+        {
+            beforeMurderEvent.Cancel();
+        }
 
         if (beforeMurderEvent.IsCancelled)
         {
@@ -83,8 +130,7 @@ public static class CustomMurderRpc
         bool playKillSound = true)
     {
         source.isKilling = false;
-        var data = target.Data;
-        if (resultFlags.HasFlag(MurderResultFlags.FailedError))
+        if (resultFlags.HasFlag(MurderResultFlags.FailedError) || LobbyBehaviour.Instance)
         {
             return;
         }
@@ -96,7 +142,7 @@ public static class CustomMurderRpc
             var flag = PlayerControl.LocalPlayer.Data.Role.Role == RoleTypes.GuardianAngel;
             if (flag && PlayerControl.LocalPlayer.Data.PlayerId == target.protectedByGuardianId)
             {
-                StatsManager.Instance.IncrementStat(StringNames.StatsGuardianAngelCrewmatesProtected);
+                DataManager.Player.Stats.IncrementStat(StatID.Role_GuardianAngel_CrewmatesProtected);
                 AchievementManager.Instance.OnProtectACrewmate();
             }
 
@@ -127,14 +173,14 @@ public static class CustomMurderRpc
         DebugAnalytics.Instance.Analytics.Kill(target.Data, source.Data);
         if (source.AmOwner)
         {
-            StatsManager.Instance.IncrementStat(
+            DataManager.Player.Stats.IncrementStat(
                 GameManager.Instance.IsHideAndSeek()
-                    ? StringNames.StatsImpostorKills_HideAndSeek
-                    : StringNames.StatsImpostorKills);
+                    ? StatID.HideAndSeek_ImpostorKills
+                    : StatID.ImpostorKills);
 
             if (source.CurrentOutfitType == PlayerOutfitType.Shapeshifted)
             {
-                StatsManager.Instance.IncrementStat(StringNames.StatsShapeshifterShiftedKills);
+                DataManager.Player.Stats.IncrementStat(StatID.Role_Shapeshifter_ShiftedKills);
             }
 
             if (Constants.ShouldPlaySfx() && playKillSound)
@@ -152,7 +198,7 @@ public static class CustomMurderRpc
         target.gameObject.layer = LayerMask.NameToLayer("Ghost");
         if (target.AmOwner)
         {
-            StatsManager.Instance.IncrementStat(StringNames.StatsTimesMurdered);
+            DataManager.Player.Stats.IncrementStat(StatID.TimesMurdered);
             if (Minigame.Instance)
             {
                 try
@@ -168,7 +214,14 @@ public static class CustomMurderRpc
 
             if (showKillAnim)
             {
-                HudManager.Instance.KillOverlay.ShowKillAnimation(source.Data, data);
+                try
+                {
+                    HudManager.Instance.KillOverlay.ShowKillAnimation(source.Data, target.Data);
+                }
+                catch (Exception e)
+                {
+                    Error($"Error with kill animation: {e.ToString()}");
+                }
             }
 
             target.cosmetics.SetNameMask(false);
@@ -200,8 +253,12 @@ public static class CustomMurderRpc
         bool createDeadBody = true,
         bool teleportMurderer = true)
     {
+        if (LobbyBehaviour.Instance)
+        {
+            yield break;
+        }
         var cam = Camera.main?.GetComponent<FollowerCamera>();
-        var isParticipant = PlayerControl.LocalPlayer == source || PlayerControl.LocalPlayer == target;
+        var isParticipant = source.AmOwner || target.AmOwner;
         var sourcePhys = source.MyPhysics;
 
         if (teleportMurderer)
@@ -221,7 +278,7 @@ public static class CustomMurderRpc
 
         if (createDeadBody)
         {
-            deadBody = Object.Instantiate(GameManager.Instance.DeadBodyPrefab);
+            deadBody = Object.Instantiate(GameManager.Instance.GetDeadBody(source.Data.Role));
             deadBody.enabled = false;
             deadBody.ParentId = target.PlayerId;
             deadBody.bodyRenderers.ToList().ForEach(target.SetPlayerMaterialColors);
@@ -231,6 +288,13 @@ public static class CustomMurderRpc
             vector.z = vector.y / 1000f;
             deadBody.transform.position = vector;
         }
+
+        source.Data.Role.KillAnimSpecialSetup(deadBody, source, target);
+        target.Data.Role.KillAnimSpecialSetup(deadBody, source, target);
+
+        // no idea if this causes bugs, but innersloth is brain-dead
+        // I HATE INNERSCUFF I HATE INNERSCUFF I HATE INNERSCUFF I HATE INNERSCUFF I HATE INNERSCUFF I HATE INNERSCUFF
+        PlayerControl.LocalPlayer.Data.Role.KillAnimSpecialSetup(deadBody, source, target);
 
         if (isParticipant)
         {
@@ -263,7 +327,7 @@ public static class CustomMurderRpc
             deadBody.enabled = true;
         }
 
-        var afterMurderEvent = new AfterMurderEvent(source, target);
+        var afterMurderEvent = new AfterMurderEvent(source, target, deadBody);
         MiraEventManager.InvokeEvent(afterMurderEvent);
 
         if (!isParticipant)
@@ -279,4 +343,25 @@ public static class CustomMurderRpc
         PlayerControl.LocalPlayer.isKilling = false;
         source.isKilling = false;
     }
+}
+
+/// <summary>
+/// Checks for custom murders.
+/// </summary>
+public enum MeetingCheck
+{
+    /// <summary>
+    /// Checks for meetings.
+    /// </summary>
+    ForMeeting,
+
+    /// <summary>
+    /// Checks for a meeting to not be active.
+    /// </summary>
+    OutsideMeeting,
+
+    /// <summary>
+    /// Doesn't check for a meeting at all.
+    /// </summary>
+    Ignore,
 }

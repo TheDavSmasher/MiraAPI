@@ -1,9 +1,10 @@
-﻿using System;
+using System;
 using AmongUs.GameOptions;
 using MiraAPI.GameModes;
+using Il2CppInterop.Runtime.Attributes;
+using MiraAPI.Patches.Freeplay;
 using MiraAPI.Utilities.Assets;
 using UnityEngine;
-
 namespace MiraAPI.Roles;
 
 /// <summary>
@@ -11,6 +12,16 @@ namespace MiraAPI.Roles;
 /// </summary>
 public record struct CustomRoleConfiguration
 {
+#pragma warning disable S1133
+    [Obsolete("Default constructor is not supported. Please use the constructor that takes an ICustomRole parameter.")]
+#pragma warning restore S1133
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
+    public CustomRoleConfiguration()
+#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member
+    {
+        throw new NotImplementedException("Default constructor is not supported. Please use the constructor that takes an ICustomRole parameter.");
+    }
+
     /// <summary>
     /// Initializes a new instance of the <see cref="CustomRoleConfiguration"/> struct.
     /// </summary>
@@ -34,7 +45,15 @@ public record struct CustomRoleConfiguration
         TasksCountForProgress = role.Team is ModdedRoleTeams.Crewmate;
         HideSettings = roleBehaviour?.IsDead == true;
         ShowInFreeplay = roleBehaviour?.IsDead == false;
-        OptionsScreenshot = null;
+        FreeplayFolder = role.Team switch
+        {
+            ModdedRoleTeams.Crewmate => TranslationController.Instance.GetString(StringNames.Crewmate),
+            ModdedRoleTeams.Impostor => TranslationController.Instance.GetString(StringNames.Impostor),
+            _ => TaskAdderPatches.NeutralName,
+        };
+        IntroSound = role.Team is ModdedRoleTeams.Crewmate
+            ? CustomRoleManager.CrewmateIntroSound
+            : CustomRoleManager.ImpostorIntroSound;
     }
 
     /// <summary>
@@ -60,12 +79,20 @@ public record struct CustomRoleConfiguration
     /// <summary>
     /// Gets or sets the Sprite used for the Role Options menu screenshot.
     /// </summary>
-    public LoadableAsset<Sprite>? OptionsScreenshot { get; set; }
+    [HideFromIl2Cpp]
+    public LoadableAsset<Sprite>? OptionsScreenshot { get; set; } = null;
 
     /// <summary>
     /// Gets or sets the Sprite used for the Role Icon.
     /// </summary>
-    public LoadableAsset<Sprite> Icon { get; set; } = MiraAssets.Empty;
+    [HideFromIl2Cpp]
+    public LoadableAsset<Sprite>? Icon { get; set; } = null;
+
+    /// <summary>
+    /// Gets or sets the Intro sound for the Role.
+    /// </summary>
+    [HideFromIl2Cpp]
+    public LoadableAsset<AudioClip>? IntroSound { get; set; } = null;
 
     /// <summary>
     /// Gets or sets the associated game mode for this role. This is used to determine if the role should be available in a specific game mode.
@@ -111,6 +138,11 @@ public record struct CustomRoleConfiguration
     /// Gets or sets a value indicating whether the role should show up in the Freeplay Role Selection menu.
     /// </summary>
     public bool ShowInFreeplay { get; set; }
+
+    /// <summary>
+    /// Gets or sets a freeplay folder this role belongs to. Defaults to team folder.
+    /// </summary>
+    public string FreeplayFolder { get; set; }
 
     /// <summary>
     /// Gets or sets the outline color for the KillButton if <see cref="UseVanillaKillButton"/> is true.

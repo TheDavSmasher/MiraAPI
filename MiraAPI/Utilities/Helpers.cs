@@ -2,10 +2,16 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
-using System.Text;
+using AmongUs.GameOptions;
+using HarmonyLib;
+using Il2CppInterop.Runtime.InteropTypes.Arrays;
 using MiraAPI.Roles;
+using MiraAPI.Utilities.Assets;
+using Reactor.Utilities;
+using Rewired;
 using TMPro;
 using UnityEngine;
+using MethodBase = System.Reflection.MethodBase;
 using Object = UnityEngine.Object;
 
 namespace MiraAPI.Utilities;
@@ -21,7 +27,219 @@ public static class Helpers
     /// <returns>A list of alive players.</returns>
     public static List<PlayerControl> GetAlivePlayers()
     {
-        return PlayerControl.AllPlayerControls.ToArray().Where(x => !x.Data.IsDead).ToList();
+        return [.. GameData.Instance.AllPlayers.ToArray().Where(x => !x.IsDead && !x.Disconnected && x.Object).Select(x => x.Object)];
+    }
+
+    internal static GameObject CreateKeybindIcon(GameObject button, KeyboardKeyCode keyCode, Vector3 localPos)
+    {
+        var keybindIcon = Object.Instantiate(HudManager.Instance.AbilityButton.usesRemainingSprite.gameObject, button.transform);
+        keybindIcon.GetComponent<SpriteRenderer>().sprite = MiraAssets.KeybindButton.LoadAsset();
+        keybindIcon.transform.GetComponentInChildren<TextMeshPro>().text = keyCode.ToString();
+        keybindIcon.name = "KeybindIcon";
+        keybindIcon.transform.localPosition = localPos;
+        return keybindIcon;
+    }
+
+    public static MethodBase? GetStateMachineMoveNext<T>(string methodName)
+    {
+        var typeName = typeof(T).FullName;
+        var showRoleStateMachine =
+            typeof(T)
+                .GetNestedTypes()
+                .FirstOrDefault(x=>x.Name.Contains(methodName));
+
+        if (showRoleStateMachine == null)
+        {
+            Error($"Failed to find {methodName} state machine for {typeName}");
+            return null;
+        }
+
+        var moveNext = AccessTools.Method(showRoleStateMachine, "MoveNext");
+        if (moveNext == null)
+        {
+            Error($"Failed to find MoveNext method for {typeName}.{methodName}");
+            return null;
+        }
+
+        Info($"Found {methodName}.MoveNext");
+        return moveNext;
+    }
+
+    /// <summary>
+    /// Creates a draggable scroller. Add items into the scroller.Inner transform. This does not automatically position children.
+    /// </summary>
+    /// <param name="parent">Where the scroller should be parented to.</param>
+    /// <param name="hitBoxCollider">The collider of the scroller. Used to drag.</param>
+    /// <returns>The created scroller object.</returns>
+    public static Scroller CreateScroller(Transform parent, BoxCollider2D hitBoxCollider)
+    {
+        var scrollObj = new GameObject("Scroller");
+        scrollObj.transform.SetParent(parent);
+        scrollObj.transform.localScale = new Vector3(1, 1, 1);
+
+        var inner = new GameObject("Inner");
+        inner.transform.SetParent(scrollObj.transform);
+        inner.transform.localScale = new Vector3(1, 1, 1);
+        inner.transform.localPosition = new Vector3(0, 0, 2);
+
+        var scroller = scrollObj.AddComponent<Scroller>();
+        scroller.allowX = false;
+        scroller.allowY = true;
+        scroller.DragScrollSpeed = 1f;
+        scroller.Colliders = new Il2CppReferenceArray<Collider2D>([hitBoxCollider]);
+        scroller.Inner = inner.transform;
+
+        return scroller;
+    }
+
+    /// <summary>
+    /// Divides a button/etc by a certain amount by resizing colliders and renderer sizes.
+    /// </summary>
+    /// <param name="obj">The object you want to divide.</param>
+    /// <param name="amount">How much you want to divide by.</param>
+    public static void DivideSize(GameObject obj, float amount)
+    {
+        foreach (var collider in obj.GetComponentsInChildren<Collider2D>(true))
+        {
+            if (collider.TryCast<BoxCollider2D>() is { } col)
+            {
+                col.size = new Vector2(col.size.x / amount, col.size.y);
+            }
+        }
+
+        foreach (var rend in obj.GetComponentsInChildren<SpriteRenderer>(true))
+        {
+            rend.size = new Vector2(rend.size.x / amount, rend.size.y);
+        }
+    }
+
+    /// <summary>
+    /// Gets the keybind for an action with ReInput.
+    /// </summary>
+    /// <param name="actionId">The action ID.</param>
+    /// <returns>The keyboard key code.</returns>
+    public static KeyboardKeyCode GetKeybindByActionId(int actionId)
+    {
+        var player = ReInput.players.GetPlayer(0);
+        return player.controllers.maps.GetFirstElementMapWithAction(ControllerType.Keyboard, actionId, false)
+            .keyboardKeyCode;
+    }
+
+    /// <summary>
+    /// Determines whether a given probability check succeeds.
+    /// </summary>
+    /// <param name="probability">An integer value representing the success probability (0-100).</param>
+    /// <returns>True if the number falls in the range, false if not.</returns>
+    public static bool CheckChance(int probability)
+    {
+        switch (probability)
+        {
+            case 0:
+                return false;
+            case 100:
+                return true;
+            default:
+                {
+                    var num = Random.RandomRangeInt(1, 101);
+                    return num <= probability;
+                }
+        }
+    }
+
+    /// <summary>
+    /// Retrieves a vent from the ID.
+    /// </summary>
+    /// <param name="id">The vent ID.</param>
+    /// <returns>The vent.</returns>
+    public static Vent? GetVentById(int id)
+    {
+        return ShipStatus.Instance.AllVents.FirstOrDefault(vent => vent.Id == id);
+    }
+
+    /// <summary>
+    /// Creates an arrow.
+    /// </summary>
+    /// <param name="parent">The arrow gameObject's parent.</param>
+    /// <param name="color">The color of the arrow.</param>
+    /// <returns>The created ArrowBehaviour.</returns>
+    public static ArrowBehaviour CreateArrow(Transform parent, Color color)
+    {
+        var prefab = Object.FindObjectOfType<ArrowBehaviour>(true);
+        var arrow = Object.Instantiate(prefab, parent);
+        arrow.image = arrow.gameObject.GetComponent<SpriteRenderer>();
+        arrow.image.color = color;
+        arrow.gameObject.layer = 5;
+        arrow.gameObject.SetActive(true);
+        return arrow;
+    }
+
+    /// <summary>
+    /// Get the closest object of a specific type.
+    /// </summary>
+    /// <param name="objectList">A list of all the objects you'd like to check the distance for.</param>
+    /// <param name="position">The position of where you want to check from. For example: PlayerControl.LocalPlayer.transform.position.</param>
+    /// <typeparam name="T">The object type.</typeparam>
+    /// <returns>The closest object.</returns>
+    public static T? FindClosestObjectOfType<T>(List<T> objectList, Vector3 position) where T : MonoBehaviour
+    {
+        T? closest = null;
+        var closestDistanceSqr = Mathf.Infinity;
+
+        foreach (var obj in objectList)
+        {
+            if (obj == null)
+            {
+                continue;
+            }
+
+            var sqrDistance = (obj.transform.position - position).sqrMagnitude;
+            if (sqrDistance < closestDistanceSqr)
+            {
+                closestDistanceSqr = sqrDistance;
+                closest = obj;
+            }
+        }
+
+        return closest;
+    }
+
+    /// <summary>
+    /// Creates and shows a notification.
+    /// </summary>
+    /// <param name="text">The text you want to display.</param>
+    /// <param name="color">The color of the text and image.</param>
+    /// <param name="clip">The sound you want to play with the notification.</param>
+    /// <param name="spr">The sprite beside the notification.</param>
+    /// <returns>The created notification.</returns>
+    public static LobbyNotificationMessage CreateAndShowNotification(string text, Color color, AudioClip? clip = null, Sprite? spr = null)
+    {
+        return CreateAndShowNotification(text, color, new Vector3(0f, 0f, -2f), clip, spr);
+    }
+
+    /// <summary>
+    /// Creates and shows a notification.
+    /// </summary>
+    /// <param name="text">The text you want to display.</param>
+    /// <param name="color">The color of the text and image.</param>
+    /// <param name="localPos">The position of the notification.</param>
+    /// <param name="clip">The sound you want to play with the notification.</param>
+    /// <param name="spr">The sprite beside the notification.</param>
+    /// <returns>The created notification.</returns>
+    public static LobbyNotificationMessage CreateAndShowNotification(string text, Color color, Vector3 localPos, AudioClip? clip = null, Sprite? spr = null)
+    {
+        var popper = HudManager.Instance.Notifier;
+        var newMessage = Object.Instantiate(popper.notificationMessageOrigin, Vector3.zero, Quaternion.identity, popper.transform);
+        newMessage.transform.localPosition = localPos;
+        newMessage.SetUp(text, spr ?? null, color, new System.Action(() => popper.OnMessageDestroy(newMessage)));
+        popper.lastMessageKey = -1;
+        popper.ShiftMessages();
+        popper.AddMessageToQueue(newMessage);
+
+        if (clip == null) return newMessage;
+        SoundManager.Instance.StopSound(clip);
+        SoundManager.Instance.PlaySound(clip, false, 2f);
+
+        return newMessage;
     }
 
     /// <summary>
@@ -265,16 +483,69 @@ public static class Helpers
     }
 
     /// <summary>
-    /// Creates a string builder for the Role Tab.
+    /// Converts the first letter of a string to uppercase.
     /// </summary>
-    /// <param name="role">The ICustomRole object.</param>
-    /// <returns>A StringBuilder.</returns>
-    public static StringBuilder CreateForRole(ICustomRole role)
+    /// <param name="str">The string.</param>
+    /// <returns>The fixed string.</returns>
+    public static string FirstLetterToUpper(string str)
     {
-        var taskStringBuilder = new StringBuilder();
-        taskStringBuilder.AppendLine(CultureInfo.InvariantCulture, $"{role.RoleColor.ToTextColor()}You are a <b>{role.RoleName}.</b></color>");
-        taskStringBuilder.Append("<size=70%>");
-        taskStringBuilder.AppendLine(CultureInfo.InvariantCulture, $"{role.RoleLongDescription}");
-        return taskStringBuilder;
+        return CultureInfo.CurrentCulture.TextInfo.ToTitleCase(str.ToLower(CultureInfo.InvariantCulture));
+    }
+
+    /// <summary>
+    /// Gets a random string based on characters.
+    /// </summary>
+    /// <param name="length">The length of the string.</param>
+    /// <param name="chars">The characters in the random string.</param>
+    /// <returns>The random string.</returns>
+    public static string RandomString(int length, string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789")
+    {
+        return new string(Enumerable.Repeat(chars, length)
+            .Select(s => s[Random.RandomRangeInt(0, s.Length)]).ToArray());
+    }
+
+    /// <summary>
+    /// Returns the formated value using the specified suffix and format string.
+    /// </summary>
+    /// <param name="value">The value to format.</param>
+    /// <param name="suffix">The suffix to add.</param>
+    /// <param name="formatString">The format string to use to format.</param>
+    /// <returns>The formated value.</returns>
+    public static string FormatValue(float value, MiraNumberSuffixes suffix = MiraNumberSuffixes.None, string formatString = "0.0")
+    {
+        return suffix switch
+        {
+            MiraNumberSuffixes.None => value.ToString(formatString, NumberFormatInfo.InvariantInfo),
+            MiraNumberSuffixes.Multiplier => value.ToString(formatString, NumberFormatInfo.InvariantInfo) + "x",
+            MiraNumberSuffixes.Percent => value.ToString(formatString, NumberFormatInfo.InvariantInfo) + "%",
+            _ => TranslationController.Instance.GetString(
+                StringNames.GameSecondsAbbrev,
+                (Il2CppSystem.Object[])[value.ToString(formatString, CultureInfo.InvariantCulture)]),
+        };
+    }
+
+    /// <summary>
+    /// Returns the string of a role.
+    /// </summary>
+    /// <param name="role">The role to find.</param>
+    /// <returns>The role name.</returns>
+    public static string GetRoleName(this RoleBehaviour role)
+    {
+        if (role is ICustomRole custom)
+        {
+            return custom.RoleName;
+        }
+        return role.NiceName;
+    }
+
+    /// <summary>
+    /// Returns whether the role is blacklisted from appearing and spawning. (Only applicable to vanilla roles)
+    /// </summary>
+    /// <param name="role">The role to check.</param>
+    /// <returns>The role's blacklist status.</returns>
+    public static bool IsRoleBlacklisted(this RoleBehaviour role)
+    {
+        // This should be patchable by mods when a vanilla role is meant to be replaced by a custom role.
+        return false;
     }
 }

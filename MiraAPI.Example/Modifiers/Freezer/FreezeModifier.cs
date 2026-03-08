@@ -15,7 +15,7 @@ public class FreezeModifier : TimedModifier
 
     public override void OnActivate()
     {
-        if (Player?.AmOwner == true)
+        if (Player.AmOwner)
         {
             Player.moveable = false;
         }
@@ -25,15 +25,15 @@ public class FreezeModifier : TimedModifier
     {
         base.FixedUpdate();
 
-        if (Player?.AmOwner == true || PlayerControl.LocalPlayer.Data.Role is FreezerRole)
+        if (Player.AmOwner || PlayerControl.LocalPlayer.Data.Role is FreezerRole)
         {
-            Player?.cosmetics.SetOutline(true, new Nullable<Color>(Palette.LightBlue));
+            Player.cosmetics.SetOutline(true, new Nullable<Color>(Palette.LightBlue));
         }
     }
 
     public override void OnTimerComplete()
     {
-        if (Player?.AmOwner == true)
+        if (Player.AmOwner)
         {
             Player.moveable = true;
         }

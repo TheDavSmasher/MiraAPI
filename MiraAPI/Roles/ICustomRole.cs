@@ -1,9 +1,9 @@
-﻿using System.Text;
+﻿using System;
+using System.Text;
 using BepInEx.Configuration;
 using MiraAPI.GameOptions;
 using MiraAPI.Modifiers;
 using MiraAPI.PluginLoading;
-using MiraAPI.Utilities;
 using Reactor.Utilities;
 using UnityEngine;
 
@@ -33,6 +33,11 @@ public interface ICustomRole : IOptionable
     /// Gets the color of the role.
     /// </summary>
     Color RoleColor { get; }
+
+    /// <summary>
+    /// Gets the color that should be used in the options menu.
+    /// </summary>
+    Color OptionsMenuColor => RoleColor;
 
     /// <summary>
     /// Gets the team of the role.
@@ -69,16 +74,47 @@ public interface ICustomRole : IOptionable
     /// </summary>
     MiraPluginInfo ParentMod => CustomRoleManager.FindParentMod(this);
 
-    /// <summary>
-    /// This method runs on the PlayerControl.FixedUpdate method for ALL players with this role.
-    /// </summary>
-    /// <param name="playerControl">The PlayerControl that has this role.</param>
-    void PlayerControlFixedUpdate(PlayerControl playerControl)
-    {
-    }
-
     internal ConfigDefinition NumConfigDefinition => new("Roles", $"Num {GetType().FullName}");
     internal ConfigDefinition ChanceConfigDefinition => new("Roles", $"Chance {GetType().FullName}");
+
+    /// <summary>
+    /// Binds the configuration options for this role to the provided ConfigFile.
+    /// </summary>
+    /// <param name="config">The ConfigFile to bind the options to.</param>
+    public virtual void BindConfig(ConfigFile config)
+    {
+        config.Bind(NumConfigDefinition, Configuration.DefaultRoleCount);
+        config.Bind(ChanceConfigDefinition, Configuration.DefaultChance);
+    }
+
+    /// <summary>
+    /// Saves the role's configuration to a preset ConfigFile.
+    /// </summary>
+    /// <param name="presetConfig">The ConfigFile to save the preset configuration to.</param>
+    /// <param name="useDefault">Whether to use the default values for the configuration.</param>
+    public virtual void SaveToPreset(ConfigFile presetConfig, bool useDefault=false)
+    {
+        BindConfig(presetConfig);
+        presetConfig[NumConfigDefinition].BoxedValue = useDefault ? Configuration.DefaultRoleCount : GetCount();
+        presetConfig[ChanceConfigDefinition].BoxedValue = useDefault ? Configuration.DefaultChance : GetChance();
+    }
+
+    /// <summary>
+    /// Loads the role's configuration from a preset ConfigFile.
+    /// </summary>
+    /// <param name="presetConfig">The ConfigFile containing the preset configuration.</param>
+    public virtual void LoadFromPreset(ConfigFile presetConfig)
+    {
+        if (presetConfig.TryGetEntry(NumConfigDefinition, out ConfigEntry<int> numEntry))
+        {
+            SetCount(numEntry.Value);
+        }
+
+        if (presetConfig.TryGetEntry(ChanceConfigDefinition, out ConfigEntry<int> chanceEntry))
+        {
+            SetChance(chanceEntry.Value);
+        }
+    }
 
     /// <summary>
     /// Gets the role chance option.
@@ -121,7 +157,7 @@ public interface ICustomRole : IOptionable
     {
         if (!Configuration.CanModifyChance)
         {
-            Logger<MiraApiPlugin>.Error($"Cannot modify chance for role: {RoleName}");
+            Error($"Cannot modify chance for role: {RoleName}");
             return;
         }
 
@@ -131,7 +167,7 @@ public interface ICustomRole : IOptionable
             return;
         }
 
-        Logger<MiraApiPlugin>.Error($"Error getting chance configuration for role: {RoleName}");
+        Error($"Error getting chance configuration for role: {RoleName}");
     }
 
     /// <summary>
@@ -146,7 +182,7 @@ public interface ICustomRole : IOptionable
             return;
         }
 
-        Logger<MiraApiPlugin>.Error($"Error getting count configuration for role: {RoleName}");
+        Error($"Error getting count configuration for role: {RoleName}");
     }
 
     /// <summary>
@@ -180,14 +216,6 @@ public interface ICustomRole : IOptionable
     }
 
     /// <summary>
-    /// This method runs on the HudManager.Update method ONLY when the LOCAL player has this role.
-    /// </summary>
-    /// <param name="hudManager">Reference to HudManager instance.</param>
-    void HudUpdate(HudManager hudManager)
-    {
-    }
-
-    /// <summary>
     /// Gets a custom ejection message for the role. Return null to use the default message.
     /// </summary>
     /// <param name="player">The NetworkedPlayerInfo object for this player.</param>
@@ -201,7 +229,7 @@ public interface ICustomRole : IOptionable
     /// Get the custom Role Tab text for this role.
     /// </summary>
     /// <returns>A StringBuilder with the role tab text.</returns>
-    StringBuilder SetTabText() => Helpers.CreateForRole(this);
+    StringBuilder SetTabText() => CustomRoleUtils.CreateForRole(this);
 
     /// <summary>
     /// Determine whether a given modifier can be applied to this role.
@@ -212,4 +240,15 @@ public interface ICustomRole : IOptionable
     {
         return true;
     }
+
+    /// <summary>
+    /// Determines whether the role can spawn in general, accounting for gamemodes and everything else.
+    /// </summary>
+    /// <returns>True if the role is able to spawn, otherwise false.</returns>
+    public virtual bool CanSpawnOnCurrentMode() => !GameManager.Instance.IsHideAndSeek();
+
+    /// <summary>
+    /// Gets the function that determines whether the role should be toggled on or off in the game settings.
+    /// </summary>
+    public virtual Func<bool> VisibleInSettings => () => true;
 }

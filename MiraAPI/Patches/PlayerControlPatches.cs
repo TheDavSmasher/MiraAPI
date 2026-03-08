@@ -1,11 +1,14 @@
-﻿using System.Linq;
+﻿using System.Globalization;
+using System.Linq;
 using HarmonyLib;
 using MiraAPI.Events;
 using MiraAPI.Events.Vanilla.Gameplay;
 using MiraAPI.Events.Vanilla.Player;
 using MiraAPI.Hud;
 using MiraAPI.Modifiers;
-using MiraAPI.Roles;
+using MiraAPI.Utilities;
+using MiraAPI.Voting;
+using Reactor.Utilities;
 using Reactor.Utilities.Extensions;
 
 namespace MiraAPI.Patches;
@@ -14,33 +17,33 @@ namespace MiraAPI.Patches;
 /// General patches for the PlayerControl class.
 /// </summary>
 [HarmonyPatch(typeof(PlayerControl))]
-public static class PlayerControlPatches
+internal static class PlayerControlPatches
 {
-    /// <summary>
-    /// Adds the modifier component to the player on start.
-    /// </summary>
-    /// <param name="__instance">PlayerControl instance.</param>
     [HarmonyPostfix]
     [HarmonyPatch(nameof(PlayerControl.Start))]
+    // ReSharper disable once InconsistentNaming
     public static void PlayerControlStartPostfix(PlayerControl __instance)
     {
-        if (__instance.gameObject.TryGetComponent<ModifierComponent>(out var comp))
+        if (__instance.gameObject.TryGetComponent<ModifierComponent>(out var modifierComp))
         {
-            comp.DestroyImmediate();
+            modifierComp.DestroyImmediate();
+        }
+
+        if (__instance.gameObject.TryGetComponent<PlayerVoteData>(out var voteComp))
+        {
+            voteComp.DestroyImmediate();
         }
 
         __instance.gameObject.AddComponent<ModifierComponent>();
+        __instance.gameObject.AddComponent<PlayerVoteData>();
     }
 
-    /// <summary>
-    /// Calls the OnDeath method for all active modifiers.
-    /// </summary>
-    /// <param name="__instance">PlayerControl instance.</param>
     [HarmonyPostfix]
     [HarmonyPatch(nameof(PlayerControl.Die))]
+    // ReSharper disable once InconsistentNaming
     public static void PlayerControlDiePostfix(PlayerControl __instance, DeathReason reason)
     {
-        var deathEvent = new PlayerDeathEvent(__instance, reason);
+        var deathEvent = new PlayerDeathEvent(__instance, reason, Helpers.GetBodyById(__instance.PlayerId));
         MiraEventManager.InvokeEvent(deathEvent);
 
         var modifiersComponent = __instance.GetComponent<ModifierComponent>();
@@ -51,13 +54,9 @@ public static class PlayerControlPatches
         }
     }
 
-    /// <summary>
-    /// Used to trigger the <see cref="CompleteTaskEvent"/>.
-    /// </summary>
-    /// <param name="__instance">PlayerControl instance.</param>
-    /// <param name="idx">The task id.</param>
     [HarmonyPostfix]
     [HarmonyPatch(nameof(PlayerControl.CompleteTask))]
+    // ReSharper disable once InconsistentNaming
     public static void PlayerCompleteTaskPostfix(PlayerControl __instance, uint idx)
     {
         var playerTask = __instance.myTasks.ToArray().First(playerTask => playerTask.Id == idx);
@@ -68,64 +67,102 @@ public static class PlayerControlPatches
         }
     }
 
-    /// <summary>
-    /// Used to trigger the <see cref="BeforeMurderEvent"/>.
-    /// </summary>
-    /// <param name="__instance">The source player.</param>
-    /// <param name="target">The target.</param>
-    /// <param name="didSucceed">Whether the kill succeeded.</param>
     [HarmonyPrefix]
-    [HarmonyPatch(nameof(PlayerControl.RpcMurderPlayer))]
-    public static void PlayerControlMurderPrefix(PlayerControl __instance, PlayerControl target, ref bool didSucceed)
+    [HarmonyPatch(nameof(PlayerControl.CheckMurder))]
+    public static void PlayerControlCheckMurderPrefix(PlayerControl __instance, PlayerControl target, ref bool __runOriginal)
     {
+        __runOriginal = false;
+
+        __instance.logger.Debug($"Checking if {__instance.PlayerId} murdered {(target == null ? "null player" : target.PlayerId.ToString(NumberFormatInfo.InvariantInfo))}");
+
+        __instance.isKilling = false;
+        if (AmongUsClient.Instance.IsGameOver || !AmongUsClient.Instance.AmHost)
+        {
+            return;
+        }
+
+        if (!target || __instance.Data.IsDead || !__instance.Data.Role.IsImpostor || __instance.Data.Disconnected)
+        {
+            int num = target ? target!.PlayerId : -1;
+            __instance.logger.Warning($"Bad kill from {__instance.PlayerId} to {num}");
+            __instance.RpcMurderPlayer(target, false);
+            return;
+        }
+
+        NetworkedPlayerInfo data = target!.Data;
+        if (data == null || data.IsDead || target.inVent || target.MyPhysics.Animations.IsPlayingEnterVentAnimation() ||
+            target.MyPhysics.Animations.IsPlayingAnyLadderAnimation() || target.inMovingPlat)
+        {
+            __instance.logger.Warning("Invalid target data for kill");
+            __instance.RpcMurderPlayer(target, false);
+            return;
+        }
+
+        if (MeetingHud.Instance)
+        {
+            __instance.logger.Warning("Tried to kill while a meeting was starting");
+            __instance.RpcMurderPlayer(target, false);
+            return;
+        }
+
         var beforeMurderEvent = new BeforeMurderEvent(__instance, target);
         MiraEventManager.InvokeEvent(beforeMurderEvent);
 
-        didSucceed = beforeMurderEvent.IsCancelled;
-    }
-
-    /// <summary>
-    /// FixedUpdate handler for custom roles and custom buttons.
-    /// </summary>
-    /// <param name="__instance">PlayerControl instance.</param>
-    [HarmonyPostfix]
-    [HarmonyPatch(nameof(PlayerControl.FixedUpdate))]
-    public static void PlayerControlFixedUpdatePostfix(PlayerControl __instance)
-    {
-        if (__instance.Data?.Role is ICustomRole customRole)
+        if (beforeMurderEvent.IsCancelled)
         {
-            customRole.PlayerControlFixedUpdate(__instance);
+            return;
         }
 
+        __instance.isKilling = true;
+        __instance.RpcMurderPlayer(target, true);
+    }
+
+    [HarmonyPrefix]
+    [HarmonyPatch(nameof(PlayerControl.RpcMurderPlayer))]
+    [HarmonyPatch(nameof(PlayerControl.MurderPlayer))]
+    // ReSharper disable once InconsistentNaming
+    public static bool MurderPlayerPrefix(PlayerControl __instance)
+    {
+        if (LobbyBehaviour.Instance)
+        {
+            return false;
+        }
+
+        return true;
+    }
+
+    [HarmonyPostfix]
+    [HarmonyPatch(nameof(PlayerControl.FixedUpdate))]
+    // ReSharper disable once InconsistentNaming
+    public static void PlayerControlFixedUpdatePostfix(PlayerControl __instance)
+    {
         if (!__instance.AmOwner)
         {
             return;
         }
 
+        var role = __instance.Data?.Role;
         foreach (var button in CustomButtonManager.CustomButtons)
         {
-            if (__instance.Data?.Role == null)
+            if (role == null)
             {
                 continue;
             }
 
-            if (!button.Enabled(__instance.Data?.Role))
+            try
             {
-                continue;
-            }
+                if (!button.Enabled(role))
+                {
+                    button.SetActive(false, role);
+                    continue;
+                }
 
-            button.FixedUpdateHandler(__instance);
+                button.FixedUpdateHandler(__instance);
+            }
+            catch (System.Exception e)
+            {
+                Error($"Failed to update custom button {button.GetType().Name}: {e}");
+            }
         }
-    }
-
-    /// <summary>
-    /// Clear from modifier component cache.
-    /// </summary>
-    /// <param name="__instance">PlayerControl instance.</param>
-    [HarmonyPrefix]
-    [HarmonyPatch(nameof(PlayerControl.OnDestroy))]
-    public static void PlayerControlOnDestroyPrefix(PlayerControl __instance)
-    {
-        ModifierExtensions.ModifierComponents.Remove(__instance);
     }
 }

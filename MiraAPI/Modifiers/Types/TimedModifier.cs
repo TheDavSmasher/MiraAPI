@@ -47,12 +47,12 @@ public abstract class TimedModifier : BaseModifier
     public override bool HideOnUi => !TimerActive;
 
     /// <summary>
-    /// Gets the HUD information for Timed Modifier, including the time remaining.
+    /// Gets the HUD description for Timed Modifier, including the time remaining.
     /// </summary>
-    /// <returns>A string with the hud information + timer.</returns>
-    public override string GetHudString()
+    /// <returns>A string with the time remaining.</returns>
+    public override string GetDescription()
     {
-        return base.GetHudString() + $" <size=70%>({Math.Round(Duration - TimeRemaining, 0)}s/{Duration}s)</size>";
+        return $"Remaining Time: {Math.Round(Duration - TimeRemaining, 0)}s/{Duration}s";
     }
 
     /// <summary>
@@ -82,7 +82,7 @@ public abstract class TimedModifier : BaseModifier
     {
         if (TimerActive)
         {
-            Logger<MiraApiPlugin>.Error("Can't start a timer that has already been started.");
+            Error("Can't start a timer that has already been started.");
             return;
         }
 

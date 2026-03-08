@@ -46,7 +46,7 @@ public static class KillButtonPatches
     }
 
     /// <summary>
-    /// Use Custom Murder if player is custom role.
+    /// Use Custom Murder instead of Murder Player from vanilla.
     /// </summary>
     [HarmonyPrefix]
     [HarmonyPatch(nameof(KillButton.DoClick))]
@@ -58,7 +58,7 @@ public static class KillButtonPatches
             return false;
         }
 
-        PlayerControl.LocalPlayer.RpcCustomMurder(__instance.currentTarget);
+        PlayerControl.LocalPlayer.RpcCustomMurder(__instance.currentTarget, MeetingCheck.OutsideMeeting);
         __instance.SetTarget(null);
 
         return false;

@@ -5,8 +5,11 @@ using BepInEx.Configuration;
 using MiraAPI.GameModes;
 using MiraAPI.GameOptions;
 using MiraAPI.Hud;
+using MiraAPI.LocalSettings;
 using MiraAPI.Modifiers;
+using MiraAPI.Presets;
 
+// ReSharper disable UnusedAutoPropertyAccessor.Global
 namespace MiraAPI.PluginLoading;
 
 /// <summary>
@@ -23,40 +26,24 @@ public class MiraPluginInfo
     }
 
     /// <summary>
-    /// Get a read only collection of this plugin's modifiers. This is probably not safe because they are uninitialized.
+    /// Gets a read only collection of this plugin's modifiers. This is not safe for modifiers with constructors.
     /// </summary>
-    /// <returns>Readonly collection of modifiers.</returns>
-    public IReadOnlyCollection<BaseModifier> GetModifiers()
-    {
-        return Modifiers.AsReadOnly();
-    }
+    public IReadOnlyCollection<BaseModifier> Modifiers { get; private set; } = null!;
 
     /// <summary>
-    /// Get a read only collection of this plugin's Option Groups.
+    /// Gets a read only collection of this plugin's Option Groups.
     /// </summary>
-    /// <returns>Readonly collection of option groups.</returns>
-    public IReadOnlyCollection<AbstractOptionGroup> GetOptionGroups()
-    {
-        return OptionGroups.AsReadOnly();
-    }
+    public IReadOnlyCollection<AbstractOptionGroup> OptionGroups { get; private set; } = null!;
 
     /// <summary>
     /// Gets a read only collection of this plugin's options.
     /// </summary>
-    /// <returns>Read only collection of options.</returns>
-    public IReadOnlyCollection<IModdedOption> GetOptions()
-    {
-        return Options.AsReadOnly();
-    }
+    public IReadOnlyCollection<IModdedOption> Options { get; private set; } = null!;
 
     /// <summary>
     /// Gets a read only dictionary of Role IDs and the RoleBehaviour object they are associated with.
     /// </summary>
-    /// <returns>Read only dictionary of IDs and Roles.</returns>
-    public ReadOnlyDictionary<ushort, RoleBehaviour> GetRoles()
-    {
-        return new ReadOnlyDictionary<ushort, RoleBehaviour>(CustomRoles);
-    }
+    public ReadOnlyDictionary<ushort, RoleBehaviour> Roles { get; private set; } = null!;
 
     /// <summary>
     /// Gets a read only dictionary of Game Mode IDs and the AbstractGameMode object they are associated with.
@@ -70,23 +57,35 @@ public class MiraPluginInfo
     /// <summary>
     /// Gets a read only collection of this plugin's custom buttons.
     /// </summary>
-    /// <returns>Read only collection of buttons.</returns>
-    public IReadOnlyCollection<CustomActionButton> GetButtons()
+    public IReadOnlyCollection<CustomActionButton> Buttons { get; private set; } = null!;
+
+    /// <summary>
+    /// Gets a read only dictionary of this plugin's custom presets.
+    /// </summary>
+    public IReadOnlyCollection<OptionPreset> Presets { get; internal set; } = null!;
+
+    internal void SavePublicCollections()
     {
-        return Buttons.AsReadOnly();
+        Presets = [..InternalPresets];
+        Modifiers = [..InternalModifiers];
+        OptionGroups = [..InternalOptionGroups];
+        Options = [..InternalOptions];
+        Roles = new ReadOnlyDictionary<ushort, RoleBehaviour>(InternalRoles);
+        Buttons = [..InternalButtons];
     }
 
-    internal List<AbstractOptionGroup> OptionGroups { get; } = [];
+    internal List<OptionPreset> InternalPresets { get; } = [];
 
-    internal List<IModdedOption> Options { get; } = [];
+    internal List<AbstractOptionGroup> InternalOptionGroups { get; } = [];
 
-    internal List<BaseModifier> Modifiers { get; } = [];
+    internal List<IModdedOption> InternalOptions { get; } = [];
 
-    internal Dictionary<ushort, RoleBehaviour> CustomRoles { get; } = [];
+    internal List<BaseModifier> InternalModifiers { get; } = [];
 
     internal Dictionary<uint, AbstractGameMode> GameModes { get; } = [];
+    internal Dictionary<ushort, RoleBehaviour> InternalRoles { get; } = [];
 
-    internal List<CustomActionButton> Buttons { get; } = [];
+    internal List<CustomActionButton> InternalButtons { get; } = [];
 
     /// <summary>
     /// Gets the plugin's ID, as defined in the plugin's BepInEx metadata.

@@ -12,14 +12,16 @@ public static class CanUsePatches
     public static IEnumerable<MethodBase> TargetMethods()
     {
         yield return AccessTools.Method(typeof(Console), nameof(Console.CanUse));
-        yield return AccessTools.Method(typeof(MapConsole), nameof(MapConsole.CanUse));
-        yield return AccessTools.Method(typeof(SystemConsole), nameof(SystemConsole.CanUse));
-        yield return AccessTools.Method(typeof(Ladder), nameof(Ladder.CanUse));
-        yield return AccessTools.Method(typeof(PlatformConsole), nameof(PlatformConsole.CanUse));
-        yield return AccessTools.Method(typeof(OpenDoorConsole), nameof(OpenDoorConsole.CanUse));
+        yield return AccessTools.Method(typeof(DeconControl), nameof(DeconControl.CanUse));
         yield return AccessTools.Method(typeof(DoorConsole), nameof(DoorConsole.CanUse));
+        yield return AccessTools.Method(typeof(Ladder), nameof(Ladder.CanUse));
+        yield return AccessTools.Method(typeof(MapConsole), nameof(MapConsole.CanUse));
+        yield return AccessTools.Method(typeof(OpenDoorConsole), nameof(OpenDoorConsole.CanUse));
         yield return AccessTools.Method(typeof(OptionsConsole), nameof(OptionsConsole.CanUse));
+        yield return AccessTools.Method(typeof(PlatformConsole), nameof(PlatformConsole.CanUse));
+        yield return AccessTools.Method(typeof(SystemConsole), nameof(SystemConsole.CanUse));
         yield return AccessTools.Method(typeof(ZiplineConsole), nameof(ZiplineConsole.CanUse));
+        // vent is not necessary as it has its own patch
     }
 
     [HarmonyPriority(Priority.Last)]

@@ -4,6 +4,7 @@ using System.Collections.ObjectModel;
 using System.Reflection;
 using MiraAPI.Events.Mira;
 using MiraAPI.PluginLoading;
+using UnityEngine;
 
 namespace MiraAPI.Hud;
 
@@ -29,9 +30,11 @@ public static class CustomButtonManager
         }
 
         CustomButtons.Add(button);
-        pluginInfo.Buttons.Add(button);
+        pluginInfo.InternalButtons.Add(button);
         typeof(CustomButtonSingleton<>).MakeGenericType(buttonType)
+#pragma warning disable S3011
             .GetField("_instance", BindingFlags.Static | BindingFlags.NonPublic)!
+#pragma warning restore S3011
             .SetValue(null, button);
 
         ButtonEventTypes.Add(buttonType, typeof(MiraButtonClickEvent<>).MakeGenericType(buttonType));

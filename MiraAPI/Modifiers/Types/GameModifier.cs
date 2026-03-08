@@ -37,9 +37,15 @@ public abstract class GameModifier : BaseModifier
     public virtual bool IsModifierValidOn(RoleBehaviour role) => true;
 
     /// <summary>
-    /// Determines whether the player won the game with this modifier.
+    /// Determines whether the player won the game with this modifier. The modifier with the highest priority will override other modifiers.
     /// </summary>
     /// <param name="reason">The reason why the game ended.</param>
     /// <returns>True if the player won, false if they lost. Return null to use the player's default win condition.</returns>
     public virtual bool? DidWin(GameOverReason reason) => null;
+
+    /// <summary>
+    /// Determines whether the modifier can spawn in general, accounting for gamemodes and everything else.
+    /// </summary>
+    /// <returns>True if the modifier is able to spawn, otherwise false.</returns>
+    public virtual bool CanSpawnOnCurrentMode() => !GameManager.Instance.IsHideAndSeek();
 }

@@ -30,7 +30,7 @@ public static class ModifierExtensions
         _ = ModifierManager.GetModifierType(typeId) ?? throw new InvalidOperationException(
             $"Modifier with ID {typeId} is not registered.");
 
-        Rpc<AddModifierRpc>.Instance.Send(target, new ModifierData(typeId, Guid.NewGuid(), args));
+        Rpc<AddModifierRpc>.Instance.Send(target, new ModifierData(typeId, Guid.NewGuid(), args), true);
     }
 
     /// <summary>
@@ -83,7 +83,7 @@ public static class ModifierExtensions
         var modifier = target.GetModifier(typeId, predicate);
         if (modifier is null)
         {
-            Logger<MiraApiPlugin>.Error($"Player {target.PlayerId} does not have modifier with type ID {typeId}.");
+            Error($"Player {target.PlayerId} does not have modifier with type ID {typeId}.");
             return;
         }
 
@@ -189,6 +189,30 @@ public static class ModifierExtensions
     public static bool HasModifier(this PlayerControl player, Guid uniqueId)
     {
         return player.GetModifierComponent().HasModifier(uniqueId);
+    }
+
+    /// <summary>
+    /// Clears all modifiers from a player.
+    /// </summary>
+    /// <param name="plr">The player you want to clear modifiers for.</param>
+    public static void ClearModifiers(this PlayerControl plr)
+    {
+        foreach (var mod in plr.GetModifierComponent().ActiveModifiers)
+        {
+            plr.RemoveModifier(mod);
+        }
+    }
+
+    /// <summary>
+    /// Clears all modifiers from a player.
+    /// </summary>
+    /// <param name="plr">The player you want to clear modifiers for.</param>
+    public static void RpcClearModifiers(this PlayerControl plr)
+    {
+        foreach (var mod in plr.GetModifierComponent().ActiveModifiers)
+        {
+            plr.RpcRemoveModifier(mod.UniqueId);
+        }
     }
 
     /// <summary>

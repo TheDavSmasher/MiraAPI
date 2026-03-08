@@ -2,15 +2,14 @@
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Diagnostics.CodeAnalysis;
-using System.Globalization;
 using System.Linq;
-using System.Text;
 using Il2CppInterop.Runtime.Attributes;
+using MiraAPI.LocalSettings;
+using MiraAPI.Modifiers.ModifierDisplay;
 using MiraAPI.Modifiers.Types;
-using MiraAPI.Utilities;
+using MiraAPI.Patches.Roles;
 using Reactor.Utilities;
 using Reactor.Utilities.Attributes;
-using TMPro;
 using UnityEngine;
 
 namespace MiraAPI.Modifiers;
@@ -25,14 +24,14 @@ public class ModifierComponent(IntPtr cppPtr) : MonoBehaviour(cppPtr)
     /// Gets the active modifiers on the player.
     /// </summary>
     [HideFromIl2Cpp]
-    public ImmutableList<BaseModifier> ActiveModifiers => Modifiers.ToImmutableList();
+    public ImmutableList<BaseModifier> ActiveModifiers { get; private set; } = ImmutableList<BaseModifier>.Empty;
+
+    private ModifierDisplayComponent? ModifierDisplay { get; set; }
 
     [HideFromIl2Cpp]
     private List<BaseModifier> Modifiers { get; set; } = [];
 
-    private PlayerControl? _player;
-
-    private TextMeshPro? _modifierText;
+    private PlayerControl _player = null!;
 
     private readonly List<BaseModifier> _toRemove = [];
 
@@ -43,9 +42,18 @@ public class ModifierComponent(IntPtr cppPtr) : MonoBehaviour(cppPtr)
         _toRemove.AddRange(Modifiers);
     }
 
-    private void Start()
+    private void Awake()
     {
         _player = GetComponent<PlayerControl>();
+        if (_player == null)
+        {
+            Error("ModifierComponent could not find PlayerControl on the same GameObject.");
+            Destroy(this);
+            return;
+        }
+
+        ModifierExtensions.ModifierComponents.Add(_player, this);
+
         Modifiers = [];
 
         if (!_player.AmOwner)
@@ -53,23 +61,42 @@ public class ModifierComponent(IntPtr cppPtr) : MonoBehaviour(cppPtr)
             return;
         }
 
-        _modifierText = Helpers.CreateTextLabel("ModifierText", HudManager.Instance.transform, AspectPosition.EdgeAlignments.RightTop, new Vector3(10.1f, 3.5f, 0), textAlignment: TextAlignmentOptions.Right);
-        _modifierText.verticalAlignment = VerticalAlignmentOptions.Top;
+        ModifierDisplay = ModifierDisplayComponent.CreateDisplay();
+        ModifierDisplay?.UpdateModifiersList(Modifiers);
     }
 
     private void FixedUpdate()
     {
-        foreach (var modifier in _toRemove)
+        var removed = _toRemove.Count > 0;
+        foreach (var modifier in _toRemove.ToArray())
         {
-            modifier.OnDeactivate();
+            _toRemove.Remove(modifier);
+            try
+            {
+                modifier.OnDeactivate();
+            }
+            catch (Exception e)
+            {
+                Error($"Error while deactivating modifier {modifier.ModifierName}: {e.ToString()}");
+            }
+
             Modifiers.Remove(modifier);
         }
 
-        foreach (var modifier in _toAdd)
+        var added = _toAdd.Count > 0;
+        foreach (var modifier in _toAdd.ToArray())
         {
+            _toAdd.Remove(modifier);
             Modifiers.Add(modifier);
             modifier.Initialized = true;
-            modifier.OnActivate();
+            try
+            {
+                modifier.OnActivate();
+            }
+            catch (Exception e)
+            {
+                Error($"Error while activating modifier {modifier.ModifierName}: {e.ToString()}");
+            }
 
             if (modifier is TimedModifier { AutoStart: true } timer)
             {
@@ -77,49 +104,64 @@ public class ModifierComponent(IntPtr cppPtr) : MonoBehaviour(cppPtr)
             }
         }
 
-        if (_toAdd.Count > 0 || _toRemove.Count > 0)
+        if (removed || added)
         {
-            if (_player?.AmOwner == true)
+            if (_player.AmOwner && HudManager.InstanceExists)
             {
-                HudManager.Instance?.SetHudActive(_player, _player.Data.Role, HudManager.Instance.TaskPanel.isActiveAndEnabled);
+                ModifierDisplay?.UpdateModifiersList(Modifiers);
             }
-            _toAdd.Clear();
-            _toRemove.Clear();
+
+            ActiveModifiers = Modifiers.ToImmutableList();
         }
 
-        foreach (var modifier in Modifiers)
+        foreach (var modifier in ActiveModifiers)
         {
-            modifier.FixedUpdate();
+            try
+            {
+                modifier.FixedUpdate();
+            }
+            catch (Exception e)
+            {
+                Error($"Error while (fixed) updating modifier {modifier.ModifierName}: {e.ToString()}");
+            }
+        }
+
+        if (_player.AmOwner && ModifierDisplay && HudManager.InstanceExists)
+        {
+            var taskPanelOpen = HudManager.Instance.TaskPanel.open;
+            var roleTabOpen = HudManagerPatches.RoleTab != null && HudManagerPatches.RoleTab.open;
+            var leftSideHud = LocalSettingsTabSingleton<MiraApiSettings>.Instance.ModifiersHudLeftSide.Value;
+
+            if (leftSideHud && (taskPanelOpen || roleTabOpen))
+            {
+                ModifierDisplay!.gameObject.SetActive(false);
+            }
+            else
+            {
+                ModifierDisplay!.gameObject.SetActive(MeetingHud.Instance || HudManager.Instance.TaskPanel.isActiveAndEnabled);
+            }
         }
     }
 
     private void Update()
     {
-        foreach (var modifier in Modifiers)
+        foreach (var modifier in ActiveModifiers)
         {
-            modifier.Update();
-        }
-
-        if (!_modifierText || _player?.AmOwner == false)
-        {
-            return;
-        }
-
-        var filteredModifiers = Modifiers.Where(mod => !mod.HideOnUi).ToArray();
-
-        if (filteredModifiers.Length != 0 && !MeetingHud.Instance)
-        {
-            var stringBuild = new StringBuilder();
-            foreach (var mod in filteredModifiers)
+            try
             {
-                stringBuild.Append(CultureInfo.InvariantCulture, $"\n{mod.GetHudString()}");
+                modifier.Update();
             }
-            _modifierText!.text = $"<b><size=130%>Modifiers:</b></size>{stringBuild}";
+            catch (Exception e)
+            {
+                Error($"Error while updating modifier {modifier.ModifierName}: {e.ToString()}");
+            }
         }
-        else if (_modifierText!.text != string.Empty)
-        {
-            _modifierText.text = string.Empty;
-        }
+    }
+
+    private void OnDestroy()
+    {
+        // Remove this component from the global list when destroyed
+        ModifierExtensions.ModifierComponents.Remove(_player);
     }
 
     /// <summary>
@@ -131,7 +173,7 @@ public class ModifierComponent(IntPtr cppPtr) : MonoBehaviour(cppPtr)
     [HideFromIl2Cpp]
     public IEnumerable<T> GetModifiers<T>(Func<T, bool>? predicate=null) where T : BaseModifier
     {
-        return Modifiers.OfType<T>().Where(x => predicate == null || predicate(x));
+        return ActiveModifiers.OfType<T>().Where(x => predicate == null || predicate(x));
     }
 
     /// <summary>
@@ -143,7 +185,7 @@ public class ModifierComponent(IntPtr cppPtr) : MonoBehaviour(cppPtr)
     [HideFromIl2Cpp]
     public IEnumerable<BaseModifier> GetModifiers(Type type, Func<BaseModifier, bool>? predicate=null)
     {
-        return Modifiers.Where(x => x.GetType() == type && (predicate == null || predicate(x)));
+        return ActiveModifiers.Where(x => x.GetType() == type && (predicate == null || predicate(x)));
     }
 
     /// <summary>
@@ -263,7 +305,7 @@ public class ModifierComponent(IntPtr cppPtr) : MonoBehaviour(cppPtr)
     [HideFromIl2Cpp]
     public BaseModifier? GetModifier(Guid modifierGuid)
     {
-        return Modifiers.Find(x => x.UniqueId == modifierGuid);
+        return ActiveModifiers.Find(x => x.UniqueId == modifierGuid);
     }
 
     /// <summary>
@@ -285,7 +327,7 @@ public class ModifierComponent(IntPtr cppPtr) : MonoBehaviour(cppPtr)
     [HideFromIl2Cpp]
     public void RemoveModifier(Type type, Func<BaseModifier, bool>? predicate = null)
     {
-        var modifiers = Modifiers.Where(x => x.GetType() == type && (predicate == null || predicate(x))).ToList();
+        var modifiers = ActiveModifiers.Where(x => x.GetType() == type && (predicate == null || predicate(x))).ToList();
         if (modifiers.Count > 1)
         {
             throw new InvalidOperationException($"Cannot remove modifier {type.Name} because there are multiple instances of that modifier.");
@@ -294,7 +336,7 @@ public class ModifierComponent(IntPtr cppPtr) : MonoBehaviour(cppPtr)
         var modifier = modifiers.FirstOrDefault();
         if (modifier is null)
         {
-            Logger<MiraApiPlugin>.Error($"Cannot remove modifier {type.Name} because it is not active.");
+            Error($"Cannot remove modifier {type.Name} because it is not active.");
             return;
         }
 
@@ -308,9 +350,9 @@ public class ModifierComponent(IntPtr cppPtr) : MonoBehaviour(cppPtr)
     [HideFromIl2Cpp]
     public void RemoveModifier(BaseModifier modifier)
     {
-        if (!Modifiers.Contains(modifier))
+        if (!ActiveModifiers.Contains(modifier))
         {
-            Logger<MiraApiPlugin>.Error($"Cannot remove modifier {modifier.ModifierName} because it is not active on this player.");
+            Error($"Cannot remove modifier {modifier.ModifierName} because it is not active on this player.");
             return;
         }
 
@@ -340,7 +382,7 @@ public class ModifierComponent(IntPtr cppPtr) : MonoBehaviour(cppPtr)
         var modifier = GetModifier(uniqueId);
         if (modifier == null)
         {
-            Logger<MiraApiPlugin>.Error($"Cannot remove modifier with unique id {uniqueId} because it is not active.");
+            Error($"Cannot remove modifier with unique id {uniqueId} because it is not active.");
             return;
         }
 
@@ -370,19 +412,19 @@ public class ModifierComponent(IntPtr cppPtr) : MonoBehaviour(cppPtr)
         // TODO: Make a proper synchronization system.
         if (LobbyBehaviour.Instance)
         {
-            Logger<MiraApiPlugin>.Warning($"Modifiers added in the lobby won't sync to new players!");
+            Warning($"Modifiers added in the lobby won't sync to new players!");
         }
 
         var id = modifier.TypeId;
-        if (modifier.Unique && Modifiers.Find(x => x.TypeId == id) != null)
+        if (modifier.Unique && ActiveModifiers.Find(x => x.TypeId == id) != null)
         {
-            Logger<MiraApiPlugin>.Error($"Player already has modifier with id {id}!");
+            Error($"Player already has modifier with id {id}!");
             return null;
         }
 
-        if (Modifiers.Contains(modifier))
+        if (ActiveModifiers.Contains(modifier))
         {
-            Logger<MiraApiPlugin>.Error($"Player already has this modifier!");
+            Error($"Player already has this modifier!");
             return null;
         }
 
@@ -446,7 +488,7 @@ public class ModifierComponent(IntPtr cppPtr) : MonoBehaviour(cppPtr)
     [HideFromIl2Cpp]
     public bool HasModifier<T>(Func<T, bool>? predicate=null) where T : BaseModifier
     {
-        return Modifiers.Exists(x => x is T modifier && (predicate == null || predicate(modifier)));
+        return ActiveModifiers.Exists(x => x is T modifier && (predicate == null || predicate(modifier)));
     }
 
     /// <summary>
@@ -458,7 +500,7 @@ public class ModifierComponent(IntPtr cppPtr) : MonoBehaviour(cppPtr)
     [HideFromIl2Cpp]
     public bool HasModifier(Type type, Func<BaseModifier, bool>? predicate=null)
     {
-        return Modifiers.Exists(x => x.GetType() == type && (predicate == null || predicate(x)));
+        return ActiveModifiers.Exists(x => x.GetType() == type && (predicate == null || predicate(x)));
     }
 
     /// <summary>
@@ -484,6 +526,63 @@ public class ModifierComponent(IntPtr cppPtr) : MonoBehaviour(cppPtr)
     [HideFromIl2Cpp]
     public bool HasModifier(Guid id)
     {
-        return Modifiers.Exists(x => x.UniqueId == id);
+        return ActiveModifiers.Exists(x => x.UniqueId == id);
+    }
+
+    /// <summary>
+    /// Checks if a player has an active modifier by its type.
+    /// </summary>
+    /// <param name="checkInactive">Whether to check inactive modifiers (those pending to be added).</param>
+    /// <param name="predicate">The predicate to check the modifier.</param>
+    /// <typeparam name="T">The Type of the Modifier.</typeparam>
+    /// <returns>True if the Modifier is present, false otherwise.</returns>
+    [HideFromIl2Cpp]
+    public bool HasModifier<T>(bool checkInactive, Func<T, bool>? predicate=null) where T : BaseModifier
+    {
+        return ActiveModifiers.Exists(MatchExpr) || (checkInactive && _toAdd.Exists(MatchExpr));
+        bool MatchExpr(BaseModifier bm) => bm is T modifier && (predicate == null || predicate(modifier));
+    }
+
+    /// <summary>
+    /// Checks if a player has an active modifier by its type.
+    /// </summary>
+    /// <param name="type">The modifier type.</param>
+    /// <param name="checkInactive">Whether to check inactive modifiers (those pending to be added).</param>
+    /// <param name="predicate">The predicate to check the modifier.</param>
+    /// <returns>True if the Modifier is present, false otherwise.</returns>
+    [HideFromIl2Cpp]
+    public bool HasModifier(Type type, bool checkInactive, Func<BaseModifier, bool>? predicate=null)
+    {
+        return ActiveModifiers.Exists(MatchExpr) || (checkInactive && _toAdd.Exists(MatchExpr));
+        bool MatchExpr(BaseModifier bm) => bm.GetType() == type && (predicate == null || predicate(bm));
+    }
+
+    /// <summary>
+    /// Checks if a player has an active modifier by its type ID.
+    /// </summary>
+    /// <param name="id">The modifier's type ID.</param>
+    /// <param name="checkInactive">Whether to check inactive modifiers (those pending to be added).</param>
+    /// <param name="predicate">The predicate to check the modifier.</param>
+    /// <returns>True if the modifier is present, false otherwise.</returns>
+    [HideFromIl2Cpp]
+    public bool HasModifier(uint id, bool checkInactive, Func<BaseModifier, bool>? predicate=null)
+    {
+        var type = ModifierManager.GetModifierType(id) ?? throw new InvalidOperationException(
+            $"Cannot get modifier with id {id} because it is not registered.");
+
+        return HasModifier(type, checkInactive, predicate);
+    }
+
+    /// <summary>
+    /// Checks if a player has an active modifier by its unique ID.
+    /// </summary>
+    /// <param name="id">The modifier's guid.</param>
+    /// <param name="checkInactive">Whether to check inactive modifiers (those pending to be added).</param>
+    /// <returns>True if the modifier is present, false otherwise.</returns>
+    [HideFromIl2Cpp]
+    public bool HasModifier(Guid id, bool checkInactive)
+    {
+        return ActiveModifiers.Exists(MatchExpr) || (checkInactive && _toAdd.Exists(MatchExpr));
+        bool MatchExpr(BaseModifier bm) => bm.UniqueId == id;
     }
 }

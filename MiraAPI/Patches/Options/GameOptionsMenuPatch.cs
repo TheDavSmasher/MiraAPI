@@ -1,8 +1,11 @@
 using System;
 using System.Linq;
+using AmongUs.GameOptions;
 using HarmonyLib;
+using Il2CppInterop.Runtime.Attributes;
 using MiraAPI.GameOptions;
 using MiraAPI.Modifiers;
+using MiraAPI.Presets;
 using MiraAPI.Utilities;
 using MiraAPI.Utilities.Assets;
 using Reactor.Localization.Utilities;
@@ -10,22 +13,31 @@ using Reactor.Utilities.Extensions;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Events;
+using UnityEngine.UI;
 using Object = UnityEngine.Object;
 
 namespace MiraAPI.Patches.Options;
 
-/// <summary>
-/// Patches the GameOptionsMenu to add custom options.
-/// </summary>
 [HarmonyPatch(typeof(GameOptionsMenu))]
-public static class GameOptionsMenuPatch
+internal static class GameOptionsMenuPatch
 {
-    /// <summary>
-    /// Update patch for the GameOptionsMenu.
-    /// </summary>
-    /// <param name="__instance">The GameOptionsMenu instance.</param>
+    [HarmonyPostfix]
+    [HarmonyPatch(nameof(GameOptionsMenu.OnEnable))]
+    public static void OpenPatch(GameOptionsMenu __instance)
+    {
+        HudManager.Instance.PlayerCam.OverrideScreenShakeEnabled = false;
+    }
+
+    [HarmonyPostfix]
+    [HarmonyPatch(nameof(GameOptionsMenu.OnDisable))]
+    public static void ClosePatch(GameOptionsMenu __instance)
+    {
+        HudManager.Instance.PlayerCam.OverrideScreenShakeEnabled = true;
+    }
+
     [HarmonyPostfix]
     [HarmonyPatch(nameof(GameOptionsMenu.Update))]
+    // ReSharper disable once InconsistentNaming
     public static void UpdatePatch(GameOptionsMenu __instance)
     {
         if (GameSettingMenuPatches.SelectedModIdx == 0)
@@ -38,11 +50,20 @@ public static class GameOptionsMenuPatch
         {
             ModifiersUpdate(ref num);
         }
+        else if (__instance.name == "CUSTOM TAB 1")
+        {
+            CustomMenuOneUpdate(ref num);
+        }
+        else if (__instance.name == "CUSTOM TAB 2")
+        {
+            CustomMenuTwoUpdate(ref num);
+        }
         else
         {
             var filteredGroups =
-                GameSettingMenuPatches.SelectedMod?.OptionGroups
-                    .Where(x => x.OptionableType == null) ?? [];
+                GameSettingMenuPatches.SelectedMod?.InternalOptionGroups
+                    .Where(x => x.OptionableType == null &&
+                                !x.ShowInModifiersMenu && x.ParentMenu == MenuCategory.Roles) ?? [];
 
             foreach (var group in filteredGroups)
             {
@@ -105,10 +126,52 @@ public static class GameOptionsMenuPatch
         }
     }
 
+    private static void CustomMenuOneUpdate(ref float num)
+    {
+        var groups = GameSettingMenuPatches.SelectedMod?.InternalOptionGroups
+            .Where(x => x.ParentMenu == MenuCategory.CustomOne) ?? [];
+
+        foreach (var modGroup in groups)
+        {
+            UpdateGroup(modGroup, ref num);
+        }
+    }
+
+    private static void CustomMenuOneCreate(GameOptionsMenu menu)
+    {
+        var groups = GameSettingMenuPatches.SelectedMod?.InternalOptionGroups
+            .Where(x => x.ParentMenu == MenuCategory.CustomOne) ?? [];
+        foreach (var group in groups)
+        {
+            CreateGroup(menu, group);
+        }
+    }
+
+    private static void CustomMenuTwoUpdate(ref float num)
+    {
+        var groups = GameSettingMenuPatches.SelectedMod?.InternalOptionGroups
+            .Where(x => x.ParentMenu == MenuCategory.CustomTwo) ?? [];
+
+        foreach (var modGroup in groups)
+        {
+            UpdateGroup(modGroup, ref num);
+        }
+    }
+
+    private static void CustomMenuTwoCreate(GameOptionsMenu menu)
+    {
+        var groups = GameSettingMenuPatches.SelectedMod?.InternalOptionGroups
+            .Where(x => x.ParentMenu == MenuCategory.CustomTwo) ?? [];
+        foreach (var group in groups)
+        {
+            CreateGroup(menu, group);
+        }
+    }
+
     private static void ModifiersUpdate(ref float num)
     {
-        var groups = GameSettingMenuPatches.SelectedMod?.OptionGroups
-            .Where(x => x.ShowInModifiersMenu || x.OptionableType?.IsAssignableTo(typeof(BaseModifier))==true) ?? [];
+        var groups = GameSettingMenuPatches.SelectedMod?.InternalOptionGroups
+            .Where(x => x.ShowInModifiersMenu || x.OptionableType?.IsAssignableTo(typeof(BaseModifier)) == true) ?? [];
 
         foreach (var modGroup in groups)
         {
@@ -118,8 +181,8 @@ public static class GameOptionsMenuPatch
 
     private static void ModifiersCreate(GameOptionsMenu menu)
     {
-        var groups = GameSettingMenuPatches.SelectedMod?.OptionGroups
-            .Where(x => x.ShowInModifiersMenu || x.OptionableType?.IsAssignableTo(typeof(BaseModifier))==true) ?? [];
+        var groups = GameSettingMenuPatches.SelectedMod?.InternalOptionGroups
+            .Where(x => x.ShowInModifiersMenu || x.OptionableType?.IsAssignableTo(typeof(BaseModifier)) == true) ?? [];
         foreach (var group in groups)
         {
             CreateGroup(menu, group);
@@ -128,6 +191,7 @@ public static class GameOptionsMenuPatch
 
     [HarmonyPrefix]
     [HarmonyPatch(nameof(GameOptionsMenu.CreateSettings))]
+    // ReSharper disable once InconsistentNaming
     public static bool SettingsPatch(GameOptionsMenu __instance)
     {
         if (GameSettingMenuPatches.SelectedModIdx == 0)
@@ -142,9 +206,19 @@ public static class GameOptionsMenuPatch
             ModifiersCreate(__instance);
             return false;
         }
+        else if (__instance.name == "CUSTOM TAB 1")
+        {
+            CustomMenuOneCreate(__instance);
+            return false;
+        }
+        else if (__instance.name == "CUSTOM TAB 2")
+        {
+            CustomMenuTwoCreate(__instance);
+            return false;
+        }
 
-        var filteredGroups = GameSettingMenuPatches.SelectedMod?.OptionGroups
-            .Where(x => x.OptionableType == null) ?? [];
+        var filteredGroups = GameSettingMenuPatches.SelectedMod?.InternalOptionGroups
+            .Where(x => x.OptionableType == null && !x.ShowInModifiersMenu && x.ParentMenu == MenuCategory.Roles) ?? [];
 
         foreach (var group in filteredGroups)
         {
@@ -156,6 +230,7 @@ public static class GameOptionsMenuPatch
 
     [HarmonyPrefix]
     [HarmonyPatch(nameof(GameOptionsMenu.Initialize))]
+    // ReSharper disable once InconsistentNaming
     public static bool InitPatch(GameOptionsMenu __instance)
     {
         if (__instance.Children != null && __instance.Children.Count != 0)
@@ -198,16 +273,21 @@ public static class GameOptionsMenuPatch
             menu.settingsContainer);
 
         categoryHeaderMasked.SetHeader(CustomStringName.CreateAndRegister(group.GroupName), 20);
-        if (group.GroupColor != Color.clear)
-        {
-            categoryHeaderMasked.Background.color = group.GroupColor;
-            categoryHeaderMasked.Divider.color = group.GroupColor;
-            categoryHeaderMasked.Title.color = group.GroupColor.GetAlternateColor();
-        }
+        categoryHeaderMasked.Background.color = group.GroupColor;
+        categoryHeaderMasked.Divider.color = group.GroupColor;
+        categoryHeaderMasked.Title.color = group.GroupColor.Equals(MiraApiPlugin.DefaultHeaderColor)
+            ? Color.white
+            : group.GroupColor.FindAlternateColor();
 
+        categoryHeaderMasked.Background.sprite = MiraAssets.CategoryHeader.LoadAsset();
+        categoryHeaderMasked.Background.sprite.texture.filterMode = FilterMode.Bilinear;
+        categoryHeaderMasked.Background.sprite.texture.wrapMode = TextureWrapMode.Clamp;
+
+        categoryHeaderMasked.Background.transform.localPosition = new Vector3(0.5f, -0.1833f, 0);
         categoryHeaderMasked.Background.size = new Vector2(
             categoryHeaderMasked.Background.size.x + 1.5f,
             categoryHeaderMasked.Background.size.y);
+
         categoryHeaderMasked.gameObject.SetActive(false);
         group.Header = categoryHeaderMasked;
 
@@ -216,12 +296,20 @@ public static class GameOptionsMenuPatch
         newText.transform.localPosition = new Vector3(2.6249f, -0.165f, 0f);
         newText.gameObject.GetComponent<TextTranslatorTMP>().Destroy();
 
-        var options = group.Options.Select(
-            opt => opt.CreateOption(
-                menu.checkboxOrigin,
-                menu.numberOptionOrigin,
-                menu.stringOptionOrigin,
-                menu.settingsContainer));
+        var options = group.Options.Select(opt => opt.CreateOption(
+            menu.checkboxOrigin,
+            menu.numberOptionOrigin,
+            menu.stringOptionOrigin,
+            menu.playerOptionOrigin,
+            menu.settingsContainer));
+
+        OptionPreset? defaultPreset = null;
+        if (GameSettingMenuPatches.SelectedMod != null && PresetManager.DefaultPresets.TryGetValue(
+                GameSettingMenuPatches.SelectedMod,
+                out var preset))
+        {
+            defaultPreset = preset;
+        }
 
         foreach (var newOpt in options)
         {
@@ -230,12 +318,12 @@ public static class GameOptionsMenuPatch
             SpriteRenderer[] componentsInChildren = newOpt.GetComponentsInChildren<SpriteRenderer>(true);
             foreach (var renderer in componentsInChildren)
             {
-                if (group.GroupColor != Color.clear)
+                if (group.GroupColor != MiraApiPlugin.DefaultHeaderColor)
                 {
-                    renderer.color = group.GroupColor.GetAlternateColor();
+                    renderer.color = group.GroupColor.FindAlternateColor();
                     if (renderer.transform.parent.TryGetComponent<GameOptionButton>(out var btn))
                     {
-                        btn.interactableColor = group.GroupColor.GetAlternateColor();
+                        btn.interactableColor = group.GroupColor.FindAlternateColor();
                         btn.interactableHoveredColor = Color.white;
                     }
                 }
@@ -245,7 +333,7 @@ public static class GameOptionsMenuPatch
 
             foreach (var textMeshPro in newOpt.GetComponentsInChildren<TextMeshPro>(true))
             {
-                if (group.GroupColor != Color.clear)
+                if (group.GroupColor != MiraApiPlugin.DefaultHeaderColor)
                 {
                     textMeshPro.color = group.GroupColor;
                 }
@@ -257,15 +345,79 @@ public static class GameOptionsMenuPatch
             if (newOpt is ToggleOption toggle)
             {
                 toggle.CheckMark.sprite = MiraAssets.Checkmark.LoadAsset();
-                toggle.CheckMark.color =
-                    group.GroupColor != Color.clear ? group.GroupColor : MiraAssets.AcceptedTeal;
+                toggle.CheckMark.color = group.GroupColor != MiraApiPlugin.DefaultHeaderColor
+                    ? group.GroupColor
+                    : MiraAssets.AcceptedTeal;
                 var rend = toggle.CheckMark.transform.parent.FindChild("ActiveSprite")
                     .GetComponent<SpriteRenderer>();
                 rend.sprite = MiraAssets.CheckmarkBox.LoadAsset();
-                rend.color = group.GroupColor != Color.clear ? group.GroupColor : MiraAssets.AcceptedTeal;
+                rend.color = group.GroupColor != MiraApiPlugin.DefaultHeaderColor
+                    ? group.GroupColor
+                    : MiraAssets.AcceptedTeal;
             }
 
             menu.Children.Add(newOpt);
+            var resetBtn = new GameObject("ResetOption");
+            resetBtn.transform.parent = newOpt.transform;
+            resetBtn.transform.localScale = new(.5f, .5f, 1);
+            resetBtn.layer = LayerMask.NameToLayer("UI");
+            resetBtn.transform.localPosition = new Vector3(-3.1f, 0f, -2f);
+            var resetRend = resetBtn.AddComponent<SpriteRenderer>();
+            resetRend.sprite = MiraAssets.ResetButton.LoadAsset();
+            resetRend.maskInteraction = SpriteMaskInteraction.VisibleInsideMask;
+            resetRend.color = group.GroupColor.Equals(MiraApiPlugin.DefaultHeaderColor)
+                ? Color.white
+                : group.GroupColor.FindAlternateColor();
+            var resetBoxCol = resetBtn.gameObject.AddComponent<BoxCollider2D>();
+            resetBoxCol.size = new Vector2(1f, 1f);
+            resetBoxCol.offset = new Vector2(0, 0);
+            var passiveButton = resetBtn.AddComponent<PassiveButton>();
+            passiveButton.OnClick = new Button.ButtonClickedEvent();
+            passiveButton.ClickSound = menu.BackButton.GetComponent<PassiveButton>().ClickSound;
+            passiveButton.OnMouseOver = new UnityEvent();
+            passiveButton.OnMouseOver.AddListener(
+                (UnityAction)(() =>
+                {
+                    resetRend.color = group.GroupColor != MiraApiPlugin.DefaultHeaderColor
+                        ? group.GroupColor
+                        : MiraAssets.AcceptedTeal;
+                }));
+            passiveButton.OnMouseOut = new UnityEvent();
+            passiveButton.OnMouseOut.AddListener(
+                (UnityAction)(() =>
+                {
+                    resetRend.color = group.GroupColor.Equals(MiraApiPlugin.DefaultHeaderColor)
+                        ? Color.white
+                        : group.GroupColor.FindAlternateColor();
+                }));
+            if (newOpt is ToggleOption toggleOpt)
+            {
+                passiveButton.OnClick.AddListener(
+                    (UnityAction)(() =>
+                    {
+                        defaultPreset!.ResetOption(toggleOpt);
+                    }));
+            }
+            else if (newOpt is NumberOption numOpt)
+            {
+                passiveButton.OnClick.AddListener(
+                    (UnityAction)(() =>
+                    {
+                        defaultPreset!.ResetOption(numOpt);
+                    }));
+            }
+            else if (newOpt is StringOption strOpt)
+            {
+                passiveButton.OnClick.AddListener(
+                    (UnityAction)(() =>
+                    {
+                        defaultPreset!.ResetOption(strOpt);
+                    }));
+            }
+            if (!defaultPreset!.IsOptionInPreset(newOpt))
+            {
+                resetBtn.Destroy();
+            }
 
             newOpt.Initialize();
             newOpt.gameObject.SetActive(false);

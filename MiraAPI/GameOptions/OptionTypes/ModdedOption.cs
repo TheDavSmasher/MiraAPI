@@ -4,6 +4,7 @@ using MiraAPI.Networking;
 using MiraAPI.PluginLoading;
 using Reactor.Localization.Utilities;
 using Reactor.Networking.Rpc;
+using Reactor.Utilities;
 using UnityEngine;
 
 namespace MiraAPI.GameOptions.OptionTypes;
@@ -16,29 +17,19 @@ public abstract class ModdedOption<T> : IModdedOption
 {
     private IMiraPlugin? _parentMod;
 
-    /// <summary>
-    /// Gets the unique identifier of the option.
-    /// </summary>
+    /// <inheritdoc />
     public uint Id { get; }
 
-    /// <summary>
-    /// Gets the title of the option.
-    /// </summary>
-    public string Title { get; }
+    /// <inheritdoc />
+    public string Title { get; set; }
 
-    /// <summary>
-    /// Gets the StringName object of the option.
-    /// </summary>
+    /// <inheritdoc />
     public StringNames StringName { get; }
 
-    /// <summary>
-    /// Gets the BaseGameSetting data of the option.
-    /// </summary>
-    public BaseGameSetting Data { get; protected init; }
+    /// <inheritdoc />
+    public BaseGameSetting Data { get; protected set; } = null!;
 
-    /// <summary>
-    /// Gets or sets the parent mod of the option.
-    /// </summary>
+    /// <inheritdoc />
     public IMiraPlugin? ParentMod
     {
         get => _parentMod;
@@ -46,6 +37,7 @@ public abstract class ModdedOption<T> : IModdedOption
         {
             if (_parentMod != null || value == null) return;
             _parentMod = value;
+
             var entry = _parentMod.GetConfigFile().Bind(ConfigDefinition, DefaultValue);
             Value = entry.Value;
         }
@@ -66,37 +58,25 @@ public abstract class ModdedOption<T> : IModdedOption
     /// </summary>
     public Action<T>? ChangedEvent { get; set; }
 
-    /// <summary>
-    /// Gets or sets the visibility of the option.
-    /// </summary>
+    /// <inheritdoc />
     public Func<bool> Visible { get; set; }
 
-    /// <summary>
-    /// Gets or sets the option behaviour of the option.
-    /// </summary>
+    /// <inheritdoc />
+    public bool IncludeInPreset { get; set; }
+
+    /// <inheritdoc />
     public OptionBehaviour? OptionBehaviour { get; protected set; }
 
-    /// <summary>
-    /// Gets or sets the config definition of the option.
-    /// </summary>
-    public ConfigDefinition? ConfigDefinition
-    {
-        get => _configDefinition;
-        set
-        {
-            if (_configDefinition is not null) return;
-            _configDefinition = value;
-        }
-    }
-
-    private ConfigDefinition? _configDefinition;
+    /// <inheritdoc />
+    public ConfigDefinition? ConfigDefinition { get; set; }
 
     /// <summary>
     /// Initializes a new instance of the <see cref="ModdedOption{T}"/> class.
     /// </summary>
     /// <param name="title">The option title.</param>
     /// <param name="defaultValue">The default value.</param>
-    protected ModdedOption(string title, T defaultValue)
+    /// <param name="includeInPreset">Whether to include the option in the preset.</param>
+    protected ModdedOption(string title, T defaultValue, bool includeInPreset = true)
     {
         Id = ModdedOptionsManager.NextId;
         Title = title;
@@ -104,6 +84,7 @@ public abstract class ModdedOption<T> : IModdedOption
         Value = defaultValue;
         StringName = CustomStringName.CreateAndRegister(Title);
         Visible = () => true;
+        IncludeInPreset = includeInPreset;
     }
 
     internal void ValueChanged(OptionBehaviour optionBehaviour)
@@ -115,7 +96,8 @@ public abstract class ModdedOption<T> : IModdedOption
     /// Sets the value of the option.
     /// </summary>
     /// <param name="newValue">The new value.</param>
-    public void SetValue(T newValue)
+    /// <param name="sendRpc">Whether to send the value to other players.</param>
+    public void SetValue(T newValue, bool sendRpc = true)
     {
         var oldVal = Value;
         Value = newValue;
@@ -125,7 +107,7 @@ public abstract class ModdedOption<T> : IModdedOption
             ChangedEvent?.Invoke(Value);
         }
 
-        if (AmongUsClient.Instance.AmHost)
+        if (sendRpc && AmongUsClient.Instance.AmHost)
         {
             if (ParentMod?.GetConfigFile().TryGetEntry<T>(ConfigDefinition, out var entry) == true)
             {
@@ -138,22 +120,44 @@ public abstract class ModdedOption<T> : IModdedOption
         OnValueChanged(newValue);
     }
 
-    /// <summary>
-    /// Gets the float data of the option.
-    /// </summary>
-    /// <returns>A float object representing the option's value.</returns>
+    /// <inheritdoc />
+    public void SaveToPreset(ConfigFile presetConfig, bool saveDefault=false)
+    {
+        if (ConfigDefinition is null)
+        {
+            Error($"Attempted to save {Title} to preset, but ConfigDefinition is null.");
+            return;
+        }
+        Bind(presetConfig);
+        presetConfig[ConfigDefinition].BoxedValue = saveDefault ? DefaultValue : Value;
+    }
+
+    /// <inheritdoc />
+    public void Bind(ConfigFile config)
+    {
+        config.Bind(ConfigDefinition, DefaultValue);
+    }
+
+    /// <inheritdoc />
+    public void LoadFromPreset(ConfigFile presetConfig)
+    {
+        if (presetConfig.TryGetEntry(ConfigDefinition, out ConfigEntry<T> entry))
+        {
+            SetValue(entry.Value, false);
+        }
+        else
+        {
+            Error($"Attempted to load {Title} from preset, but ConfigDefinition is not found in preset.");
+        }
+    }
+
+    /// <inheritdoc />
     public abstract float GetFloatData();
 
-    /// <summary>
-    /// Gets the net data of the option.
-    /// </summary>
-    /// <returns>A NetData object representing this option's data.</returns>
+    /// <inheritdoc />
     public abstract NetData GetNetData();
 
-    /// <summary>
-    /// Handles incoming net data.
-    /// </summary>
-    /// <param name="data">The NetData's byte array.</param>
+    /// <inheritdoc />
     public abstract void HandleNetData(byte[] data);
 
     /// <summary>
@@ -169,18 +173,12 @@ public abstract class ModdedOption<T> : IModdedOption
     /// <returns>The value.</returns>
     public abstract T GetValueFromOptionBehaviour(OptionBehaviour optionBehaviour);
 
-    /// <summary>
-    /// Creates the option behaviour.
-    /// </summary>
-    /// <param name="toggleOpt">The ToggleOption prefab.</param>
-    /// <param name="numberOpt">The NumberOption prefab.</param>
-    /// <param name="stringOpt">The StringOption prefab.</param>
-    /// <param name="container">The options container.</param>
-    /// <returns>A new OptionBehaviour for this modded option.</returns>
+    /// <inheritdoc />
     public abstract OptionBehaviour CreateOption(
         ToggleOption toggleOpt,
         NumberOption numberOpt,
         StringOption stringOpt,
+        PlayerOption playerOpt,
         Transform container);
 
     /// <summary>

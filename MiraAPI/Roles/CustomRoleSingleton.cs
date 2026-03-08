@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System.Diagnostics.CodeAnalysis;
+using System.Linq;
 
 namespace MiraAPI.Roles;
 
@@ -8,12 +9,11 @@ namespace MiraAPI.Roles;
 /// <typeparam name="T">The role you are trying to access.</typeparam>
 public static class CustomRoleSingleton<T> where T : ICustomRole
 {
-    private static ICustomRole? _instance;
+    private static T? _instance;
 
     /// <summary>
     /// Gets the instance of the role.
     /// </summary>
-#pragma warning disable CA1000
-    public static ICustomRole Instance => _instance ??= CustomRoleManager.CustomRoles.Values.OfType<T>().Single();
-#pragma warning restore CA1000
+    [SuppressMessage("Design", "CA1000:Do not declare static members on generic types", Justification = "This is a utility class to get the instance of a custom role.")]
+    public static T Instance => _instance ??= CustomRoleManager.CustomRoles.Values.OfType<T>().Single();
 }

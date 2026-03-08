@@ -1,5 +1,6 @@
 ﻿using HarmonyLib;
 using MiraAPI.Events;
+using MiraAPI.Events.Vanilla.Gameplay;
 using MiraAPI.Events.Vanilla.Meeting;
 using MiraAPI.Roles;
 
@@ -9,7 +10,7 @@ namespace MiraAPI.Patches.Roles;
 /// Patches for custom ejection messages.
 /// </summary>
 [HarmonyPatch(typeof(ExileController))]
-public static class EjectionPatches
+internal static class EjectionPatches
 {
     [HarmonyPostfix]
     [HarmonyPatch(nameof(ExileController.Begin))]
@@ -24,11 +25,26 @@ public static class EjectionPatches
             return;
         }
 
-        if (role.GetCustomEjectionMessage(__instance.initData.networkedPlayer) == null)
+        if (!GameManager.Instance.LogicOptions.GetConfirmImpostor() || role.GetCustomEjectionMessage(__instance.initData.networkedPlayer) == null)
         {
             return;
         }
 
         __instance.completeString = role.GetCustomEjectionMessage(__instance.initData.networkedPlayer);
+    }
+
+    [HarmonyPatch(typeof(ExileController), nameof(ExileController.ReEnableGameplay))]
+    public static class ReEnableGameplayPatch
+    {
+        public static void Postfix()
+        {
+            var @event = new BeforeRoundStartEvent(false);
+            MiraEventManager.InvokeEvent(@event);
+
+            if (@event.IsCancelled) return;
+
+            var @event2 = new RoundStartEvent(false);
+            MiraEventManager.InvokeEvent(@event2);
+        }
     }
 }

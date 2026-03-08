@@ -3,6 +3,7 @@ using MiraAPI.Example.Options.Roles;
 using MiraAPI.Example.Roles;
 using MiraAPI.GameOptions;
 using MiraAPI.Hud;
+using MiraAPI.Keybinds;
 using MiraAPI.Modifiers;
 using MiraAPI.Utilities;
 using MiraAPI.Utilities.Assets;
@@ -15,10 +16,10 @@ public class FreezeButton : CustomActionButton<PlayerControl>
     public override string Name => "Freeze";
 
     public override float Cooldown => OptionGroupSingleton<FreezerRoleSettings>.Instance.FreezeDuration;
-
-    public override int MaxUses => (int)OptionGroupSingleton<FreezerRoleSettings>.Instance.FreezeUses;
+    public override bool PauseTimerInVent => true;
 
     public override LoadableAsset<Sprite> Sprite => ExampleAssets.ExampleButton;
+    public override MiraKeybind? Keybind => MiraGlobalKeybinds.PrimaryAbility;
 
     protected override void OnClick()
     {

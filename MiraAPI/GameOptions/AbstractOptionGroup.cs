@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using MiraAPI.Modifiers;
 using UnityEngine;
 
 namespace MiraAPI.GameOptions;
@@ -12,6 +14,11 @@ public abstract class AbstractOptionGroup
     internal List<IModdedOption> Options { get; } = [];
 
     /// <summary>
+    /// Gets a list of the options which are a part of this group.
+    /// </summary>
+    public ReadOnlyCollection<IModdedOption> Children => new(Options);
+
+    /// <summary>
     /// Gets the name of the group. Visible in options menu.
     /// </summary>
     public abstract string GroupName { get; }
@@ -22,10 +29,15 @@ public abstract class AbstractOptionGroup
     public virtual Type? OptionableType => null;
 
     /// <summary>
-    /// Gets a value indicating whether the group should be shown in the modifiers menu.
+    /// Gets a value indicating whether the group should be shown in the modifiers menu. This is deprecated, please use ParentMenu!
     /// </summary>
     // TODO: make this not a boolean
     public virtual bool ShowInModifiersMenu => false;
+
+    /// <summary>
+    /// Gets a value indicating which menu the group is in.
+    /// </summary>
+    public virtual MenuCategory ParentMenu => MenuCategory.Roles;
 
     /// <summary>
     /// Gets the function that determines whether the group should be visible or not.
@@ -35,7 +47,7 @@ public abstract class AbstractOptionGroup
     /// <summary>
     /// Gets the group color. This is used to color the group in the options menu.
     /// </summary>
-    public virtual Color GroupColor => Color.clear;
+    public virtual Color GroupColor => MiraApiPlugin.DefaultHeaderColor;
 
     /// <summary>
     /// Gets the group priority. This is used to determine the order in which groups are displayed in the options menu.
@@ -56,4 +68,33 @@ public abstract class AbstractOptionGroup<T> : AbstractOptionGroup where T : IOp
 {
     /// <inheritdoc />
     public override Type OptionableType => typeof(T);
+
+    /// <summary>
+    /// Gets a value indicating which menu the group is in.
+    /// </summary>
+    public override MenuCategory ParentMenu
+    {
+        get
+        {
+            var type = typeof(T);
+            if (type == typeof(BaseModifier))
+            {
+                return MenuCategory.Modifiers;
+            }
+            else if (type == typeof(RoleBehaviour))
+            {
+                return MenuCategory.Roles;
+            }
+            return MenuCategory.Game;
+        }
+    }
+}
+
+public enum MenuCategory
+{
+    Game,
+    Roles,
+    Modifiers,
+    CustomOne,
+    CustomTwo
 }

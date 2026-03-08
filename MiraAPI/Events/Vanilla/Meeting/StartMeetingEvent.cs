@@ -1,35 +1,22 @@
 ﻿namespace MiraAPI.Events.Vanilla.Meeting;
 
 /// <summary>
-/// The event that is invoked when a meeting is called.
+/// The event that is invoked when a meeting is called. This event is not cancelable.
+/// This event is called after Mira resets votes, so if you plan on adding votes to a specific player, do it with this event.
 /// </summary>
-public class StartMeetingEvent : MiraCancelableEvent
+public class StartMeetingEvent : MiraEvent
 {
     /// <summary>
-    /// Gets the player that is calling the meeting.
+    /// Gets the MeetingHud instance.
     /// </summary>
-    public PlayerControl Reporter { get; }
-
-    /// <summary>
-    /// Gets the player that is being reported. Will be null for emergency meeting.
-    /// </summary>
-    public NetworkedPlayerInfo? Target { get; }
-
-    /// <summary>
-    /// Gets the body that is being reported. Will be null for emergency meeting.
-    /// </summary>
-    public DeadBody? Body { get; }
+    public MeetingHud MeetingHud { get; }
 
     /// <summary>
     /// Initializes a new instance of the <see cref="StartMeetingEvent"/> class.
     /// </summary>
-    /// <param name="reporter">The player who reported the body.</param>
-    /// <param name="target">The player being reported.</param>
-    /// <param name="body">The body being reported.</param>
-    public StartMeetingEvent(PlayerControl reporter, NetworkedPlayerInfo? target, DeadBody? body)
+    /// <param name="meetingHud">The MeetingHud instance.</param>
+    public StartMeetingEvent(MeetingHud meetingHud)
     {
-        Reporter = reporter;
-        Target = target;
-        Body = body;
+        MeetingHud = meetingHud;
     }
 }

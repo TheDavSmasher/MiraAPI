@@ -31,6 +31,7 @@ public static class CustomGameModeManager
     {
         if (!typeof(AbstractGameMode).IsAssignableFrom(gameModeType))
         {
+            Warning($"{gameModeType.Name} does not inherit CustomGameMode!");
             return;
         }
 
@@ -38,6 +39,7 @@ public static class CustomGameModeManager
 
         if (instance is not AbstractGameMode mode)
         {
+            Error($"Failed to create instance of {gameModeType.Name}");
             return;
         }
 

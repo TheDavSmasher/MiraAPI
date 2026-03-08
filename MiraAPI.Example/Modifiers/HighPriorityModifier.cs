@@ -6,6 +6,11 @@ public class HighPriorityModifier : GameModifier
 {
     public override string ModifierName => "High Priority";
 
+    public override string GetDescription()
+    {
+        return "You are high priority! Idrk what this means either tbh...";
+    }
+
     public override int GetAssignmentChance()
     {
         return 100;

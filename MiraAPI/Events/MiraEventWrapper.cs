@@ -13,7 +13,7 @@ public class MiraEventWrapper
     public Delegate EventHandler { get; }
 
     /// <summary>
-    /// Gets the priority of the handler. Higher values are called first.
+    /// Gets the priority of the handler. Lower values are called first.
     /// </summary>
     public int Priority { get; }
 

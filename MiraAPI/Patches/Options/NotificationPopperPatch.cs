@@ -2,6 +2,7 @@
 using HarmonyLib;
 using Il2CppSystem;
 using MiraAPI.Roles;
+using Object = Il2CppSystem.Object;
 
 namespace MiraAPI.Patches.Options;
 
@@ -23,15 +24,13 @@ public static class NotificationPopperPatch
             return true;
         }
 
-        var text = teamType == RoleTeamTypes.Crewmate
-            ? Palette.CrewmateSettingChangeText.ToTextColor()
-            : Palette.ImpostorRed.ToTextColor();
+        var textColor = customRole.OptionsMenuColor.ToTextColor();
 
         var item = TranslationController.Instance.GetString(
             StringNames.LobbyChangeSettingNotificationRole,
             string.Concat(
                 "<font=\"Barlow-Black SDF\" material=\"Barlow-Black Outline\">",
-                text,
+                textColor,
                 TranslationController.Instance.GetString(key, Array.Empty<Object>()),
                 "</color></font>"
             ),

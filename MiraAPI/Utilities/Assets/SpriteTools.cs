@@ -11,14 +11,18 @@ namespace MiraAPI.Utilities.Assets;
 public static class SpriteTools
 {
     /// <summary>
-    /// Load a sprite from a resource path.
+    /// Loads and returns a texture from a resource path using the specified assembly.
     /// </summary>
-    /// <param name="resourcePath">The path to the resource.</param>
-    /// <returns>A sprite made from the resource.</returns>
-    /// <exception cref="Exception">The resource cannot be found.</exception>
-    public static Sprite LoadSpriteFromPath(string resourcePath, Assembly assembly, float pixelsPerUnit)
+    /// <param name="resourcePath">The path to the resource within the assembly.</param>
+    /// <param name="assembly">The assembly from which to load the resource.</param>
+    /// <returns>A <see cref="Texture2D"/> object loaded from the specified resource path.</returns>
+    /// <exception cref="ArgumentException">Thrown when the resource cannot be found in the specified assembly.</exception>
+    public static Texture2D LoadTextureFromResourcePath(string resourcePath, Assembly assembly)
     {
-        var tex = new Texture2D(1, 1, TextureFormat.ARGB32, false);
+        var tex = new Texture2D(1, 1, TextureFormat.ARGB32, false)
+        {
+            wrapMode = TextureWrapMode.Clamp,
+        };
         var myStream = assembly.GetManifestResourceStream(resourcePath);
         if (myStream != null)
         {
@@ -30,6 +34,22 @@ public static class SpriteTools
             throw new ArgumentException($"Resource not found: {resourcePath}");
         }
 
-        return Sprite.Create(tex, new Rect(0, 0, tex.width, tex.height), new Vector2(0.5f, 0.5f), pixelsPerUnit);
+        tex.name = resourcePath;
+        return tex;
+    }
+
+    /// <summary>
+    /// Loads and returns a <see cref="Sprite"/> from a resource path using the specified assembly.
+    /// </summary>
+    /// <param name="resourcePath">The path to the resource within the assembly.</param>
+    /// <param name="assembly">The assembly from which to load the resource.</param>
+    /// <param name="pixelsPerUnit">The number of pixels per unit for the sprite.</param>
+    /// <returns>A <see cref="Sprite"/> object created from the texture loaded from the specified resource path.</returns>
+    public static Sprite LoadSpriteFromPath(string resourcePath, Assembly assembly, float pixelsPerUnit)
+    {
+        var tex = LoadTextureFromResourcePath(resourcePath, assembly);
+        var sprite = Sprite.Create(tex, new Rect(0, 0, tex.width, tex.height), new Vector2(0.5f, 0.5f), pixelsPerUnit);
+        sprite.name = resourcePath;
+        return sprite;
     }
 }
