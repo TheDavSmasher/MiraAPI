@@ -103,7 +103,6 @@ public static class CustomMurderRpc
             PlayerControl.LocalPlayer,
             source,
             target,
-            inMeeting,
             murderResultFlags,
             resetKillTimer,
             createDeadBody,
@@ -118,7 +117,6 @@ public static class CustomMurderRpc
     /// <param name="host">The game host.</param>
     /// <param name="source">The killer.</param>
     /// <param name="target">The player to murder.</param>
-    /// <param name="inMeeting">Whether the murder is intended to be triggered in a meeting.</param>
     /// <param name="murderResultFlags">End result for the murder.</param>
     /// <param name="resetKillTimer">Should the kill timer be reset.</param>
     /// <param name="createDeadBody">Should a dead body be created.</param>
@@ -130,7 +128,6 @@ public static class CustomMurderRpc
         this PlayerControl host,
         PlayerControl source,
         PlayerControl target,
-        MeetingCheck inMeeting,
         MurderResultFlags murderResultFlags,
         bool resetKillTimer = true,
         bool createDeadBody = true,
