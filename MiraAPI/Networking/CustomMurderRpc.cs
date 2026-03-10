@@ -7,10 +7,12 @@ using Assets.CoreScripts;
 using BepInEx.Unity.IL2CPP.Utils;
 using MiraAPI.Events;
 using MiraAPI.Events.Vanilla.Gameplay;
+using MiraAPI.Utilities;
 using Reactor.Networking.Attributes;
 using Reactor.Networking.Rpc;
 using Reactor.Utilities;
 using Reactor.Utilities.Extensions;
+using Rewired;
 using UnityEngine;
 using Object = UnityEngine.Object;
 
@@ -22,7 +24,7 @@ namespace MiraAPI.Networking;
 public static class CustomMurderRpc
 {
     /// <summary>
-    /// Networked Custom Murder method.
+    /// Networked Custom Murder method, ran by clients for the host to confirm kills.
     /// </summary>
     /// <param name="source">The killer.</param>
     /// <param name="target">The player to murder.</param>
@@ -54,7 +56,7 @@ public static class CustomMurderRpc
     }
 
     /// <summary>
-    /// Networked Custom Murder method, which checks for meetings as well.
+    /// Networked Custom Murder method, which checks for meetings as well, ran by clients for the host to confirm kills.
     /// </summary>
     /// <param name="source">The killer.</param>
     /// <param name="target">The player to murder.</param>
@@ -94,6 +96,52 @@ public static class CustomMurderRpc
         if (beforeMurderEvent.IsCancelled)
         {
             murderResultFlags = MurderResultFlags.FailedError;
+        }
+
+        if (!PlayerControl.LocalPlayer.IsHost())
+        {
+            return;
+        }
+
+        RpcConfirmCustomMurder(
+            PlayerControl.LocalPlayer,
+            source,
+            target,
+            murderResultFlags,
+            resetKillTimer,
+            createDeadBody,
+            teleportMurderer,
+            showKillAnim,
+            playKillSound);
+    }
+
+    /// <summary>
+    /// Networked Custom Murder method, which checks for meetings as well, ran by clients for the host to confirm kills.
+    /// </summary>
+    /// <param name="host">The game host.</param>
+    /// <param name="source">The killer.</param>
+    /// <param name="target">The player to murder.</param>
+    /// <param name="murderResultFlags">End result for the murder.</param>
+    /// <param name="resetKillTimer">Should the kill timer be reset.</param>
+    /// <param name="createDeadBody">Should a dead body be created.</param>
+    /// <param name="teleportMurderer">Should the killer be snapped to the dead player.</param>
+    /// <param name="showKillAnim">Should the kill animation be shown.</param>
+    /// <param name="playKillSound">Should the kill sound be played.</param>
+    [MethodRpc((uint)MiraRpc.ConfirmCustomMurder, LocalHandling = RpcLocalHandling.Before)]
+    public static void RpcConfirmCustomMurder(
+        this PlayerControl host,
+        PlayerControl source,
+        PlayerControl target,
+        MurderResultFlags murderResultFlags,
+        bool resetKillTimer = true,
+        bool createDeadBody = true,
+        bool teleportMurderer = true,
+        bool showKillAnim = true,
+        bool playKillSound = true)
+    {
+        if (LobbyBehaviour.Instance || !host.IsHost() || target.Data.IsDead || target.Data.Disconnected)
+        {
+            return;
         }
 
         var murderResultFlags2 = MurderResultFlags.DecisionByHost | murderResultFlags;
