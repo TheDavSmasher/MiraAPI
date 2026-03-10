@@ -15,6 +15,10 @@ namespace MiraAPI.GameModes;
 [HarmonyPatch]
 public static class GameModeOption
 {
+    /// <summary>
+    /// Gets or Sets the current index of the Game Mode Option
+    /// For the value as an AbstractGameMode, see CustomGameModeManager.ActiveMode
+    /// </summary>
     public static int Value
     {
         get =>
