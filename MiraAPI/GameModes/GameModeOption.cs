@@ -45,7 +45,7 @@ public static class GameModeOption
     }
     [HarmonyPatch(typeof(GameOptionsMenu), nameof(GameOptionsMenu.CreateSettings))]
     [HarmonyPostfix]
-    public static void CreateSettingsPatch(GameOptionsMenu __instance)
+    private static void CreateSettingsPatch(GameOptionsMenu __instance)
     {
         float num = -9.5f;
         CategoryHeaderMasked categoryHeaderMasked = Object.Instantiate(__instance.categoryHeaderOrigin, Vector3.zero, Quaternion.identity, __instance.settingsContainer);
@@ -78,7 +78,7 @@ public static class GameModeOption
 
     [HarmonyPatch(typeof(GameOptionsMenu), nameof(GameOptionsMenu.ValueChanged))]
     [HarmonyPrefix]
-    public static bool ValueChanged(GameOptionsMenu __instance, OptionBehaviour option)
+    private static bool ValueChanged(GameOptionsMenu __instance, OptionBehaviour option)
     {
         return !OptionBehaviour.Equals(option);
     }
