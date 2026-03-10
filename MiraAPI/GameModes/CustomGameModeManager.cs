@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using MiraAPI.GameOptions;
 using MiraAPI.PluginLoading;
 using Reactor.Utilities;
 using Reactor.Utilities.Extensions;
@@ -45,7 +44,7 @@ public static class CustomGameModeManager
 
         IdToModeMap.Add(GetNextId(), mode);
         pluginInfo.GameModes.Add(LastId, mode);
-
+        GameModeOption.AddOption($"<color=#{mode.Color.ToHtmlStringRGBA()}>{mode.Name}</color>");
         mode.ID = LastId;
     }
 
@@ -53,7 +52,7 @@ public static class CustomGameModeManager
     /// Checks to see if the default game mode is on.
     /// </summary>
     /// <returns>True if the default mode is one.</returns>
-    public static bool IsDefault() => (uint)OptionGroupSingleton<GameModeOption>.Instance.CurrentMode.Value == 0;
+    public static bool IsDefault() => (uint) GameModeOption.Value == 0;
 
     /// <summary>
     /// Gets the current gamemode.
@@ -64,6 +63,8 @@ public static class CustomGameModeManager
     {
         var defaultMode = new DefaultMode();
         IdToModeMap.Add(0, defaultMode);
+        // no need to add to game mode option as it already contains it
+        // because we cannot have the option be created with no values
         defaultMode.ID = 0;
     }
 
@@ -76,19 +77,14 @@ public static class CustomGameModeManager
         else if (id != 0)
         {
             ActiveMode = IdToModeMap[0];
-            OptionGroupSingleton<GameModeOption>.Instance.CurrentMode.SetValue(0);
+            GameModeOption.Value = 0;
             Logger<MiraApiPlugin>.Warning($"Unable to find game mode of id {id}!");
-        }
-
-        if (OptionGroupSingleton<GameModeOption>.Instance.CurrentMode.OptionBehaviour != null && ActiveMode != null)
-        {
-            ((NumberOption)OptionGroupSingleton<GameModeOption>.Instance.CurrentMode.OptionBehaviour).TitleText.SetText($"Game Mode: <color=#{ActiveMode.Color.ToHtmlStringRGBA()}>{ActiveMode}</color>");
         }
     }
 
     internal static void GetAndSetGameMode()
     {
-        var id = (uint)OptionGroupSingleton<GameModeOption>.Instance.CurrentMode.Value;
+        var id = (uint)GameModeOption.Value;
 
         if (IdToModeMap.TryGetValue(id, out var mode))
         {

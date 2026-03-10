@@ -44,7 +44,6 @@ public sealed class MiraPluginManager
     internal void Initialize()
     {
         Instance = this;
-        ModdedOptionsManager.RegisterGroup(typeof(GameModeOption)); // TODO: dont do this
         CustomGameModeManager.RegisterDefaultMode();
         CustomGameModeManager.GetAndSetGameMode();
         IL2CPPChainloader.Instance.PluginLoad += RegisterPlugin;
@@ -67,6 +66,9 @@ public sealed class MiraPluginManager
                     continue;
                 }
                 dict.Add(value.Name, key);
+                if (((AmongUs.GameOptions.GameModes) key) == AmongUs.GameOptions.GameModes.Normal)
+                    return;
+                // 'Default' was still being registered twice and idk why
                 GameModesHelpers.ModeToName.Add((AmongUs.GameOptions.GameModes)key, CustomStringName.CreateAndRegister(value.Name));
             }
             EnumInjector.InjectEnumValues<AmongUs.GameOptions.GameModes>(dict);

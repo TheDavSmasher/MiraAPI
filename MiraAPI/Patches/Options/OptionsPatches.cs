@@ -1,15 +1,10 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using HarmonyLib;
+﻿using HarmonyLib;
 using Il2CppSystem;
 using MiraAPI.GameModes;
 using MiraAPI.GameOptions;
-using MiraAPI.Utilities;
-using Reactor.Utilities.Extensions;
-using MiraAPI.GameOptions;
-using MiraAPI.GameOptions.OptionTypes;
 using MiraAPI.Roles;
 using MiraAPI.Utilities;
+using Reactor.Utilities.Extensions;
 using UnityEngine;
 using Object = Il2CppSystem.Object;
 
@@ -206,17 +201,7 @@ public static class OptionsPatches
         {
             return true;
         }
-
-        if (__instance == OptionGroupSingleton<GameModeOption>.Instance.CurrentMode.OptionBehaviour)
-        {
-            __instance.TitleText.text =
-                TranslationController.Instance.GetString(__instance.Title, $"<color=#{CustomGameModeManager.ActiveMode?.Color.ToHtmlStringRGBA()}>{CustomGameModeManager.ActiveMode}</color>");
-        }
-        else
-        {
-            __instance.TitleText.text =
-                TranslationController.Instance.GetString(__instance.Title);
-        }
+        __instance.TitleText.text = TranslationController.Instance.GetString(__instance.Title);
 
         return false;
     }
