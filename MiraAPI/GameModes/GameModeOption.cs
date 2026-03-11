@@ -36,7 +36,7 @@ public static class GameModeOption
 
     internal static StringOption OptionBehaviour { get; private set; } = null!;
 
-    private static readonly List<String> Queue = [];
+    private static readonly List<string> Queue = [];
     // loading takes place before option creation
     internal static void AddOption(string opt)
     {
@@ -51,7 +51,15 @@ public static class GameModeOption
     [HarmonyPostfix]
     private static void CreateSettingsPatch(GameOptionsMenu __instance)
     {
-        float num = -9.5f;
+        if (GameManager.Instance.IsHideAndSeek())
+            return;
+        float num = 0.713f;
+        foreach (RulesCategory rulesCategory in GameManager.Instance.GameSettingsList.AllCategories)
+        {
+            num -= 0.63f;
+            foreach (BaseGameSetting a in rulesCategory.AllGameSettings)
+                num -= 0.45f;
+        }
         CategoryHeaderMasked categoryHeaderMasked = Object.Instantiate(__instance.categoryHeaderOrigin, Vector3.zero, Quaternion.identity, __instance.settingsContainer);
         categoryHeaderMasked.SetHeader(CustomStringName.CreateAndRegister("Custom"), 20);
         categoryHeaderMasked.transform.localScale = Vector3.one * 0.63f;
@@ -61,7 +69,8 @@ public static class GameModeOption
             Vector3.zero,
             Quaternion.identity,
             __instance.settingsContainer);
-        OptionBehaviour.transform.localPosition = new Vector3(0.952f, num - 0.63f, -2f);
+        num -= 0.63f;
+        OptionBehaviour.transform.localPosition = new Vector3(0.952f, num, -2f);
         OptionBehaviour.SetClickMask(__instance.ButtonClickMask);
         StringGameSetting setting = ScriptableObject.CreateInstance<StringGameSetting>();
         setting.Type = OptionTypes.MultipleChoice;
@@ -73,8 +82,9 @@ public static class GameModeOption
         {
             CustomGameModeManager.SetGameMode((uint)opt.GetInt());
         });
+        num -= 0.37f; // scrollbar offset
         __instance.Children.Add(OptionBehaviour);
-        __instance.scrollBar.SetYBoundsMax(9f);
+        __instance.scrollBar.SetYBoundsMax(-num - 1.65f);
         foreach (var str in Queue)
             AddOption(str);
         Queue.Clear();
