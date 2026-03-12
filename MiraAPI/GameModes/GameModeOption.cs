@@ -78,6 +78,7 @@ public static class GameModeOption
         setting.Index = 0;
         setting.Values = new Il2CppStructArray<StringNames>([CustomStringName.CreateAndRegister("Default")]);
         OptionBehaviour.SetUpFromData(setting, 20);
+        OptionBehaviour.TitleText.fontSize = 3;
         OptionBehaviour.OnValueChanged = (Action<OptionBehaviour>) ((OptionBehaviour opt) =>
         {
             CustomGameModeManager.SetGameMode((uint)opt.GetInt());

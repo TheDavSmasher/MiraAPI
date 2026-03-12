@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Text;
@@ -27,7 +26,7 @@ public class ModdedStringOption : ModdedOption<string>
     public StringNames[] StringNameValues { get; set; }
 
     /// <summary>
-    /// Gets the string's index
+    /// Gets the string's index.
     /// </summary>
     /// <param name="value">The option's string value.</param>
     /// <returns>The option's value in the index.</returns>
@@ -145,7 +144,7 @@ public class ModdedStringOption : ModdedOption<string>
     /// <inheritdoc />
     public override NetData GetNetData()
     {
-        return new NetData(Id, Encoding.Unicode.GetBytes(Convert.ToString(Value, NumberFormatInfo.InvariantInfo)!));
+        return new NetData(Id, Encoding.Unicode.GetBytes(Convert.ToString(Value, NumberFormatInfo.InvariantInfo)));
     }
 
     /// <inheritdoc />
