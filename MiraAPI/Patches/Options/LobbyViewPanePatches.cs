@@ -210,12 +210,19 @@ public static class LobbyViewPanePatches
                         list.Add(roleBehaviour);
                     }
 
+                    var color = (i == 0) ? Palette.CrewmateRoleBlue : Palette.ImpostorRoleRed;
+                    if (roleBehaviour is ICustomRole custom && (custom.Team is not ModdedRoleTeams.Crewmate &&
+                                                                custom.Team is not ModdedRoleTeams.Impostor))
+                    {
+                        color = Color.grey;
+                    }
+
                     viewSettingsInfoPanelRoleVariant.SetInfo(
                         roleBehaviour.NiceName,
                         numPerGame,
                         chancePerGame,
                         61,
-                        (i == 0) ? Palette.CrewmateRoleBlue : Palette.ImpostorRoleRed,
+                        color,
                         roleBehaviour.RoleIconSolid,
                         i == 0,
                         flag);
@@ -513,6 +520,34 @@ public static class LobbyViewPanePatches
         instance.scrollBar.SetYBoundsMax(-num);
     }
 
+    public static void SetModdedHeader(this CategoryHeaderRoleVariant header, StringNames roleName, int maskLayer, ModdedRoleTeams team, Sprite? roleIcon = null)
+    {
+        header.SetHeader(roleName, maskLayer);
+        if (team is ModdedRoleTeams.Crewmate)
+        {
+            header.Background.color = Palette.CrewmateRoleHeaderBlue;
+            header.Divider.color = Palette.CrewmateRoleHeaderBlue;
+            header.Title.color = Palette.CrewmateRoleHeaderTextBlue;
+        }
+        else if (team is ModdedRoleTeams.Impostor)
+        {
+            header.Background.color = Palette.ImpostorRoleHeaderRed;
+            header.Divider.color = Palette.ImpostorRoleHeaderRed;
+            header.Title.color = Palette.ImpostorRoleHeaderTextRed;
+        }
+        else
+        {
+            header.Background.color = Color.grey;
+            header.Divider.color = Color.grey;
+            header.Title.color = new Color32(50, 50, 50, 255);
+        }
+        if (roleIcon != null && header.icon != null)
+        {
+            header.icon.material.SetInt(PlayerMaterial.MaskLayer, maskLayer);
+            header.icon.sprite = roleIcon;
+        }
+    }
+
     private static float SetUpAdvancedRoleViewPanel(
         AdvancedRoleViewPanel viewPanel,
         Type roleType,
@@ -536,10 +571,10 @@ public static class LobbyViewPanePatches
             return 0;
         }
 
-        viewPanel.header.SetHeader(
+        viewPanel.header.SetModdedHeader(
             role.StringName,
             maskLayer,
-            role.TeamType == RoleTeamTypes.Crewmate,
+            customRole.Team,
             customRole.Configuration.Icon != null ? customRole.Configuration.Icon.LoadAsset() : MiraAssets.Empty.LoadAsset());
         viewPanel.header.icon.transform.localScale = new Vector3(0.465f, 0.465f, 1f);
         viewPanel.divider.material.SetInt(PlayerMaterial.MaskLayer, maskLayer);
