@@ -138,7 +138,7 @@ public class ModdedStringOption : ModdedOption<string>
     /// <inheritdoc />
     public override float GetFloatData()
     {
-        return Values.IndexOf(Value);
+        return Array.IndexOf(Values, Value);
     }
 
     /// <inheritdoc />
