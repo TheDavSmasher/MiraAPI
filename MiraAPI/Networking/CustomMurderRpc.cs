@@ -282,7 +282,7 @@ public static class CustomMurderRpc
             source.CurrentOutfitType == PlayerOutfitType.Shapeshifted,
             source.shapeshiftTargetPlayerId,
             target.PlayerId);
-        source.MyPhysics.StartCoroutine(source.KillAnimations.Random()!.CoPerformCustomKill(source, target, createDeadBody, teleportMurderer));
+        source.MyPhysics.StartCoroutine(source.KillAnimations.RandomSnapshot().CoPerformCustomKill(source, target, createDeadBody, teleportMurderer));
     }
 
     /// <summary>
