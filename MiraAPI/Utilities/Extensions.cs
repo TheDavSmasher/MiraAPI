@@ -133,6 +133,31 @@ public static class Extensions
     }
 
     /// <summary>
+    /// Returns a random element from the specified sequence.
+    /// </summary>
+    /// <param name="input">
+    /// The sequence to select an element from.
+    /// </param>
+    /// <typeparam name="T">
+    /// The type of elements in the sequence.
+    /// </typeparam>
+    /// <returns>
+    /// A randomly selected element from <paramref name="input"/>.
+    /// </returns>
+    /// <exception cref="InvalidOperationException">
+    /// Thrown when <paramref name="input"/> is empty.
+    /// </exception>
+    public static T RandomSnapshot<T>(this IEnumerable<T> input)
+    {
+        var list = input.ToList();
+
+        if (list.Count == 0)
+            throw new InvalidOperationException("Cannot get random element from an empty collection.");
+
+        return list[UnityEngine.Random.Range(0, list.Count)];
+    }
+
+    /// <summary>
     /// Gets a PlayerControl from their PlayerVoteArea in a meeting.
     /// </summary>
     /// <param name="state">The vote area.</param>
