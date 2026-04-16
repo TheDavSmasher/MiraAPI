@@ -21,6 +21,8 @@ namespace MiraAPI.GameOptions;
 public static class ModdedOptionsManager
 {
     private static readonly Dictionary<PropertyInfo, ModdedOptionAttribute> OptionAttributes = [];
+    private static readonly Dictionary<MethodBase, ModdedOptionAttribute> SetterAttributes = [];
+    private static readonly Dictionary<MethodBase, ModdedOptionAttribute> GetterAttributes = [];
     private static readonly Dictionary<Type, AbstractOptionGroup> TypeToGroup = [];
 
     internal static readonly Dictionary<OptionBehaviour, ModdedPlayerOption> CreatedPlayerOptions = [];
@@ -100,12 +102,20 @@ public static class ModdedOptionsManager
         }
 
         var setterOriginal = property.GetSetMethod();
-        var setterPatch = typeof(ModdedOptionsManager).GetMethod(nameof(PropertySetterPatch));
-        PluginSingleton<MiraApiPlugin>.Instance.Harmony.Patch(setterOriginal, postfix: new HarmonyMethod(setterPatch));
+        if (setterOriginal != null)
+        {
+            var setterPatch = typeof(ModdedOptionsManager).GetMethod(nameof(PropertySetterPatch));
+            PluginSingleton<MiraApiPlugin>.Instance.Harmony.Patch(setterOriginal, postfix: new HarmonyMethod(setterPatch));
+            SetterAttributes[setterOriginal] = attribute;
+        }
 
         var getterOriginal = property.GetGetMethod();
-        var getterPatch = typeof(ModdedOptionsManager).GetMethod(nameof(PropertyGetterPatch));
-        PluginSingleton<MiraApiPlugin>.Instance.Harmony.Patch(getterOriginal, prefix: new HarmonyMethod(getterPatch));
+        if (getterOriginal != null)
+        {
+            var getterPatch = typeof(ModdedOptionsManager).GetMethod(nameof(PropertyGetterPatch));
+            PluginSingleton<MiraApiPlugin>.Instance.Harmony.Patch(getterOriginal, prefix: new HarmonyMethod(getterPatch));
+            GetterAttributes[getterOriginal] = attribute;
+        }
 
         OptionAttributes.Add(property, attribute);
         attribute.HolderOption = option;
@@ -183,7 +193,11 @@ public static class ModdedOptionsManager
     public static void PropertySetterPatch(MethodBase __originalMethod, object value)
 #pragma warning restore CA1707
     {
-        var attribute = OptionAttributes.First(pair => pair.Key.GetSetMethod() == __originalMethod).Value;
+        if (!SetterAttributes.TryGetValue(__originalMethod, out var attribute))
+        {
+            return;
+        }
+
         attribute.SetValue(value);
     }
 
@@ -198,7 +212,11 @@ public static class ModdedOptionsManager
     public static bool PropertyGetterPatch(MethodBase __originalMethod, ref object __result)
 #pragma warning restore CA1707
     {
-        var attribute = OptionAttributes.First(pair => pair.Key.GetGetMethod() == __originalMethod).Value;
+        if (!GetterAttributes.TryGetValue(__originalMethod, out var attribute))
+        {
+            return true;
+        }
+
         __result = attribute.GetValue();
         return false;
     }

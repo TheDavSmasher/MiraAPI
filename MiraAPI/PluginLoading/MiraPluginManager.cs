@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 using BepInEx.Configuration;
 using BepInEx.Unity.IL2CPP;
 using MiraAPI.Colors;
@@ -30,6 +32,9 @@ namespace MiraAPI.PluginLoading;
 /// </summary>
 public sealed class MiraPluginManager
 {
+    private const BindingFlags DeclaredInstanceMembers = BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.DeclaredOnly;
+    private const BindingFlags DeclaredStaticMembers = BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.DeclaredOnly;
+
     private readonly Dictionary<Assembly, MiraPluginInfo> _registeredPlugins = [];
 
     internal MiraPluginInfo[] RegisteredPlugins { get; private set; } = null!;
@@ -49,41 +54,24 @@ public sealed class MiraPluginManager
 
             var info = new MiraPluginInfo(miraPlugin, pluginInfo);
             var roles = new List<Type>();
+            var registrationTimer = Stopwatch.StartNew();
 
             var oldConfigSetting = info.PluginConfig.SaveOnConfigSet;
             info.PluginConfig.SaveOnConfigSet = false;
 
-            foreach (var type in assembly.GetTypes())
+            foreach (var type in GetAssemblyTypes(assembly))
             {
+                if (type == null)
+                {
+                    continue;
+                }
+
                 if (type.GetCustomAttribute<MiraIgnoreAttribute>() != null)
                 {
                     continue;
                 }
 
-                foreach (var method in type.GetMethods())
-                {
-                    var eventAttribute = method.GetCustomAttribute<RegisterEventAttribute>();
-                    if (eventAttribute == null)
-                    {
-                        continue;
-                    }
-
-                    if (!method.IsStatic)
-                    {
-                        Error($"Event method {method.Name} in {type.Name} must be static.");
-                        continue;
-                    }
-
-                    var parameters = method.GetParameters();
-                    if (parameters.Length != 1 || !parameters[0].ParameterType.IsSubclassOf(typeof(MiraEvent)))
-                    {
-                        Error($"Invalid event registration method {method.Name} in {type.Name}");
-                        continue;
-                    }
-
-                    var paramType = parameters[0].ParameterType;
-                    MiraEventManager.RegisterEventHandler(paramType, method, eventAttribute.Priority);
-                }
+                RegisterEvents(type);
 
                 if (RegisterModifier(type, info))
                 {
@@ -131,7 +119,9 @@ public sealed class MiraPluginManager
             info.SavePublicCollections();
             PresetManager.CreateDefaultPreset(info);
             PresetManager.LoadPresets(info);
-            Info($"Registering mod {pluginInfo.Metadata.GUID} with Mira API.");
+
+            registrationTimer.Stop();
+            Info($"Registering mod {pluginInfo.Metadata.GUID} with Mira API in {registrationTimer.ElapsedMilliseconds}ms.");
         };
         IL2CPPChainloader.Instance.Finished += PaletteManager.RegisterAllColors;
         IL2CPPChainloader.Instance.Finished += () =>
@@ -157,6 +147,45 @@ public sealed class MiraPluginManager
     public static MiraPluginInfo? GetPluginByGuid(string pluginId)
     {
         return Instance._registeredPlugins.Values.FirstOrDefault(plugin => plugin.PluginId == pluginId);
+    }
+
+    private static void RegisterEvents(Type type)
+    {
+        foreach (var method in type.GetMethods(DeclaredStaticMembers))
+        {
+            var eventAttribute = method.GetCustomAttribute<RegisterEventAttribute>();
+            if (eventAttribute == null)
+            {
+                continue;
+            }
+
+            var parameters = method.GetParameters();
+            if (parameters.Length != 1 || !typeof(MiraEvent).IsAssignableFrom(parameters[0].ParameterType))
+            {
+                Error($"Invalid event registration method {method.Name} in {type.Name}");
+                continue;
+            }
+
+            MiraEventManager.RegisterEventHandler(parameters[0].ParameterType, method, eventAttribute.Priority);
+        }
+    }
+
+    private static Type?[] GetAssemblyTypes(Assembly assembly)
+    {
+        try
+        {
+            return assembly.GetTypes();
+        }
+        catch (ReflectionTypeLoadException exception)
+        {
+            return exception.Types;
+        }
+    }
+
+    private static bool IsAutoPropertyBackingField(FieldInfo field)
+    {
+        return field.IsDefined(typeof(CompilerGeneratedAttribute), false) &&
+               field.Name.Contains("k__BackingField", StringComparison.Ordinal);
     }
 
     private static bool RegisterGameOver(Type type)
@@ -186,7 +215,7 @@ public sealed class MiraPluginManager
                 return false;
             }
 
-            foreach (var property in type.GetProperties())
+            foreach (var property in type.GetProperties(DeclaredInstanceMembers))
             {
                 if (property.GetMethod?.IsStatic == true)
                 {
@@ -209,7 +238,7 @@ public sealed class MiraPluginManager
                 ModdedOptionsManager.RegisterAttributeOption(type, attribute, property, pluginInfo);
             }
 
-            foreach (var field in type.GetFields().Where(f => f.FieldType.IsAssignableTo(typeof(IModdedOption))))
+            foreach (var field in type.GetFields(DeclaredInstanceMembers).Where(f => !IsAutoPropertyBackingField(f) && f.FieldType.IsAssignableTo(typeof(IModdedOption))))
             {
                 Error($"{field.Name} is a field, not a property. Use properties for options.");
             }
@@ -264,7 +293,7 @@ public sealed class MiraPluginManager
                 return;
             }
 
-            foreach (var property in type.GetProperties())
+            foreach (var property in type.GetProperties(DeclaredStaticMembers))
             {
                 if (property.PropertyType != typeof(CustomColor))
                 {
@@ -280,7 +309,7 @@ public sealed class MiraPluginManager
                 PaletteManager.CustomColors.Add(color);
             }
 
-            foreach (var field in type.GetFields().Where(f => f.FieldType.IsAssignableTo(typeof(CustomColor))))
+            foreach (var field in type.GetFields(DeclaredStaticMembers).Where(f => !IsAutoPropertyBackingField(f) && f.FieldType.IsAssignableTo(typeof(CustomColor))))
             {
                 Error($"{field.Name} is a field, not a property. Use properties for colors.");
             }
@@ -332,13 +361,13 @@ public sealed class MiraPluginManager
                 return false;
             }
 
-            foreach (var property in type.GetProperties())
+            if (!LocalSettingsManager.TypeToTab.TryGetValue(type, out var tabInstance))
             {
-                if (LocalSettingsManager.TypeToTab[type] is not { } tabInstance)
-                {
-                    continue;
-                }
+                return false;
+            }
 
+            foreach (var property in type.GetProperties(DeclaredInstanceMembers))
+            {
                 if (property.GetCustomAttribute<LocalSettingsButtonAttribute>() != null &&
                     property.PropertyType.IsAssignableTo(typeof(LocalSettingsButton)))
                 {
@@ -374,7 +403,7 @@ public sealed class MiraPluginManager
                 attribute.CreateSetting(type, configEntry);
             }
 
-            foreach (var field in type.GetFields().Where(f => f.FieldType.IsAssignableTo(typeof(ConfigEntryBase)) && f.GetCustomAttribute<LocalSettingAttribute>() != null))
+            foreach (var field in type.GetFields(DeclaredInstanceMembers).Where(f => !IsAutoPropertyBackingField(f) && f.FieldType.IsAssignableTo(typeof(ConfigEntryBase)) && f.GetCustomAttribute<LocalSettingAttribute>() != null))
             {
                 Error($"{field.Name} is a field, not a property. Use properties for local settings.");
             }
@@ -404,7 +433,7 @@ public sealed class MiraPluginManager
                 return;
             }
 
-            foreach (var property in type.GetProperties())
+            foreach (var property in type.GetProperties(DeclaredStaticMembers))
             {
                 if (property.PropertyType != typeof(MiraKeybind))
                 {
@@ -428,7 +457,7 @@ public sealed class MiraPluginManager
                 }
             }
 
-            foreach (var field in type.GetFields().Where(f => f.FieldType.IsAssignableTo(typeof(MiraKeybind))))
+            foreach (var field in type.GetFields(DeclaredStaticMembers).Where(f => !IsAutoPropertyBackingField(f) && f.FieldType.IsAssignableTo(typeof(MiraKeybind))))
             {
                 Error($"{field.Name} is a field, not a property. Use properties for keybinds.");
             }

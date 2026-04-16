@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
 using System.Resources;
@@ -13,6 +14,8 @@ namespace MiraAPI.Utilities.Assets;
 /// <param name="path">The path of the wave file.</param>
 public class LoadableAudioResourceAsset(string path) : LoadableAsset<AudioClip>
 {
+    private static readonly object CacheLock = new();
+    private static readonly Dictionary<(Assembly Assembly, string Path), AudioClip> AudioClipCache = [];
     private readonly Assembly _assembly = Assembly.GetCallingAssembly();
 
     /// <summary>
@@ -23,6 +26,20 @@ public class LoadableAudioResourceAsset(string path) : LoadableAsset<AudioClip>
     /// <exception cref="MissingManifestResourceException">Stream failed to load. Check if the name of your asset was correct.</exception>
     public override AudioClip LoadAsset()
     {
+        if (LoadedAsset != null)
+        {
+            return LoadedAsset;
+        }
+
+        lock (CacheLock)
+        {
+            if (AudioClipCache.TryGetValue((_assembly, path), out var cachedClip) && cachedClip != null)
+            {
+                LoadedAsset = cachedClip;
+                return cachedClip;
+            }
+        }
+
         using var assetStream = _assembly.GetManifestResourceStream(path)
             ?? throw new MissingManifestResourceException($"Stream failed to load. Check if the asset name is correct: {path}");
 
@@ -91,6 +108,13 @@ public class LoadableAudioResourceAsset(string path) : LoadableAsset<AudioClip>
         // Create the AudioClip
         var audioClip = AudioClip.Create(path, samples.Length / channels, channels, sampleRate, false);
         audioClip.SetData(samples, 0);
+
+        LoadedAsset = audioClip;
+
+        lock (CacheLock)
+        {
+            AudioClipCache[(_assembly, path)] = audioClip;
+        }
 
         return audioClip;
     }

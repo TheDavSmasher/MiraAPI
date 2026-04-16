@@ -1,4 +1,5 @@
-﻿using System;
+using System;
+using System.Collections.Generic;
 using Reactor.Utilities.Extensions;
 using UnityEngine;
 
@@ -12,6 +13,9 @@ namespace MiraAPI.Utilities.Assets;
 /// <typeparam name="T">The type of the asset to be loaded.</typeparam>
 public class LoadableBundleAsset<T>(string name, AssetBundle bundle) : LoadableAsset<T> where T : UnityEngine.Object
 {
+    private static readonly object CacheLock = new();
+    private static readonly Dictionary<(int BundleId, Type AssetType, string Name), UnityEngine.Object> BundleAssetCache = [];
+
     /// <summary>
     /// Loads the asset from the asset bundle.
     /// </summary>
@@ -24,11 +28,26 @@ public class LoadableBundleAsset<T>(string name, AssetBundle bundle) : LoadableA
             return LoadedAsset;
         }
 
+        var cacheKey = (bundle.GetInstanceID(), typeof(T), name);
+        lock (CacheLock)
+        {
+            if (BundleAssetCache.TryGetValue(cacheKey, out var cachedAsset) && cachedAsset is T typedAsset)
+            {
+                LoadedAsset = typedAsset;
+                return typedAsset;
+            }
+        }
+
         LoadedAsset = bundle.LoadAsset<T>(name);
 
         if (LoadedAsset == null)
         {
             throw new InvalidOperationException($"INVALID ASSET: {name}");
+        }
+
+        lock (CacheLock)
+        {
+            BundleAssetCache[cacheKey] = LoadedAsset;
         }
 
         return LoadedAsset;

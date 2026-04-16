@@ -5,7 +5,6 @@ using HarmonyLib;
 using MiraAPI.GameOptions;
 using MiraAPI.Modifiers;
 using MiraAPI.PluginLoading;
-using MiraAPI.Presets;
 using MiraAPI.Utilities.Assets;
 using Reactor.Utilities.Extensions;
 using TMPro;
@@ -351,11 +350,6 @@ internal static class GameSettingMenuPatches
         _modifiersButton.name = "ModifiersButton";
 
         _modifierBtnOgPos = _modifiersButton.transform.localPosition;
-
-        foreach (var plugin in MiraPluginManager.Instance.RegisteredPlugins)
-        {
-            PresetManager.LoadPresets(plugin);
-        }
 
         UpdateText(__instance, __instance.GameSettingsTab, __instance.RoleSettingsTab);
     }

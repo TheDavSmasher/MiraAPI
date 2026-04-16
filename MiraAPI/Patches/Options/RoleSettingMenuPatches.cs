@@ -29,6 +29,7 @@ public static class RoleSettingMenuPatches
     private static Dictionary<RoleOptionsGroup, bool> RoleGroupHidden { get; set; } = [];
     private static List<GameObject> Headers { get; set; } = [];
     private static List<RoleOptionSetting> RoleOptionSettings { get; set; } = [];
+    private static Dictionary<RoleBehaviour, Sprite> RoleScreenshotSprites { get; } = [];
 
     private static float ScrollerNum { get; set; } = 0.522f;
 
@@ -506,11 +507,17 @@ public static class RoleSettingMenuPatches
             __instance.roleDescriptionText.transform.parent.localScale = new Vector3(0.0675f, 0.1494f, 0.5687f);
             labelBg.transform.localPosition = new Vector3(1.082f, 0.1054f, -2.5f);
 
-            __instance.roleScreenshot.sprite = Sprite.Create(
-                role.RoleScreenshot.texture,
-                new Rect(0, 0, 370, 230),
-                Vector2.one / 2,
-                100);
+            if (!RoleScreenshotSprites.TryGetValue(role, out var screenshotSprite) || screenshotSprite == null)
+            {
+                screenshotSprite = Sprite.Create(
+                    role.RoleScreenshot.texture,
+                    new Rect(0, 0, 370, 230),
+                    Vector2.one / 2,
+                    100);
+                RoleScreenshotSprites[role] = screenshotSprite;
+            }
+
+            __instance.roleScreenshot.sprite = screenshotSprite;
             __instance.roleScreenshot.drawMode = SpriteDrawMode.Sliced;
         }
 

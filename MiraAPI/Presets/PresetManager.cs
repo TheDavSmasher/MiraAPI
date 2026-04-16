@@ -4,7 +4,6 @@ using System.Linq;
 using BepInEx.Configuration;
 using MiraAPI.PluginLoading;
 using MiraAPI.Roles;
-using Reactor.Utilities;
 using UnityEngine;
 
 namespace MiraAPI.Presets;
@@ -79,8 +78,6 @@ public static class PresetManager
 
         foreach (var file in Directory.GetFiles(pluginPresetPath, "*.cfg"))
         {
-            var fileName = Path.GetFileName(file);
-            Info($"Loading preset file {fileName}");
             var presetName = Path.GetFileNameWithoutExtension(file);
             var presetConfig = new ConfigFile(file, false)
             {
@@ -131,9 +128,6 @@ public static class PresetManager
 
         foreach (var file in Directory.GetFiles(pluginPresetPath, "*.cfg"))
         {
-            var fileName = Path.GetFileName(file);
-            Info($"Loading preset file {fileName}");
-            var presetName = Path.GetFileNameWithoutExtension(file);
             var presetConfig = new ConfigFile(file, false)
             {
                 SaveOnConfigSet = false,
