@@ -1,7 +1,9 @@
 using System.Collections.Generic;
+using System.Linq;
 using HarmonyLib;
 using Il2CppInterop.Runtime.InteropTypes.Arrays;
 using Il2CppSystem;
+using MiraAPI.Patches.GameModes;
 using Reactor.Localization.Utilities;
 using UnityEngine;
 using UnityEngine.ProBuilder;
@@ -31,21 +33,23 @@ public static class GameModeOption
                 return;
             OptionBehaviour.Value = value;
             OptionBehaviour.UpdateValue();
+            _lastValue = value;
         }
     }
 
+    private static int _lastValue;
     internal static StringOption OptionBehaviour { get; private set; } = null!;
 
-    private static readonly List<string> Queue = [];
+    private static readonly Dictionary<string, StringNames> Values = new()
+    {
+        ["Default"] = CustomStringName.CreateAndRegister("Default"),
+    };
+
     // loading takes place before option creation
     internal static void AddOption(string opt)
     {
-        if (OptionBehaviour == null)
-        {
-            Queue.Add(opt);
-            return;
-        }
-        OptionBehaviour.Values = (Il2CppStructArray<StringNames>)OptionBehaviour.Values.Add(CustomStringName.CreateAndRegister(opt));
+        if (!Values.ContainsKey(opt))
+            Values.Add(opt, CustomStringName.CreateAndRegister(opt));
     }
     [HarmonyPatch(typeof(GameOptionsMenu), nameof(GameOptionsMenu.CreateSettings))]
     [HarmonyPostfix]
@@ -75,20 +79,21 @@ public static class GameModeOption
         StringGameSetting setting = ScriptableObject.CreateInstance<StringGameSetting>();
         setting.Type = OptionTypes.MultipleChoice;
         setting.Title = CustomStringName.CreateAndRegister("Gamemode");
-        setting.Index = 0;
-        setting.Values = new Il2CppStructArray<StringNames>([CustomStringName.CreateAndRegister("Default")]);
+        setting.Index = _lastValue;
+        setting.Values = new Il2CppStructArray<StringNames>([Values["Default"]]);
         OptionBehaviour.SetUpFromData(setting, 20);
         OptionBehaviour.TitleText.fontSize = 3;
         OptionBehaviour.OnValueChanged = (Action<OptionBehaviour>) ((OptionBehaviour opt) =>
         {
-            CustomGameModeManager.SetGameMode((uint)opt.GetInt());
+            _lastValue = opt.GetInt();
+            CustomGameModeManager.SetGameMode((uint)_lastValue);
+            HudPatches.SetGameModeText(Values.ElementAt(_lastValue).Key);
         });
         num -= 0.37f; // scrollbar offset
         __instance.Children.Add(OptionBehaviour);
         __instance.scrollBar.SetYBoundsMax(-num - 1.65f);
-        foreach (var str in Queue)
-            AddOption(str);
-        Queue.Clear();
+        for (var i = 1; i < Values.Count; i++)
+            OptionBehaviour.Values = (Il2CppStructArray<StringNames>)OptionBehaviour.Values.Add(Values.ElementAt(i).Value);
     }
 
     [HarmonyPatch(typeof(GameOptionsMenu), nameof(GameOptionsMenu.ValueChanged))]
