@@ -20,7 +20,6 @@ public static class MainMenuManagerPatches
     [HarmonyPostfix]
     public static void AwakePostfix()
     {
-        AddressablesLoader.LoadAll();
         Coroutines.Start(SetFps());
     }
 
