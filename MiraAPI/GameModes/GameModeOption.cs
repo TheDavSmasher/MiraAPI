@@ -36,10 +36,10 @@ public static class GameModeOption
             _lastValue = value;
         }
     }
-
-    private static int _lastValue;
     internal static StringOption OptionBehaviour { get; private set; } = null!;
-
+    private static int _lastValue;
+    private static readonly StringNames GamemodeName = CustomStringName.CreateAndRegister("Gamemode");
+    private static readonly StringNames CustomName = CustomStringName.CreateAndRegister("Custom"); 
     private static readonly Dictionary<string, StringNames> Values = new()
     {
         ["Classic"] = CustomStringName.CreateAndRegister("Classic"),
@@ -58,14 +58,14 @@ public static class GameModeOption
         if (GameManager.Instance.IsHideAndSeek())
             return;
         float num = 0.713f;
-        foreach (RulesCategory rulesCategory in GameManager.Instance.GameSettingsList.AllCategories)
+        foreach (var rulesCategory in GameManager.Instance.GameSettingsList.AllCategories)
         {
             num -= 0.63f;
-            foreach (BaseGameSetting a in rulesCategory.AllGameSettings)
+            foreach (var a in rulesCategory.AllGameSettings)
                 num -= 0.45f;
         }
         CategoryHeaderMasked categoryHeaderMasked = Object.Instantiate(__instance.categoryHeaderOrigin, Vector3.zero, Quaternion.identity, __instance.settingsContainer);
-        categoryHeaderMasked.SetHeader(CustomStringName.CreateAndRegister("Custom"), 20);
+        categoryHeaderMasked.SetHeader(CustomName, 20);
         categoryHeaderMasked.transform.localScale = Vector3.one * 0.63f;
         categoryHeaderMasked.transform.localPosition = new Vector3(-0.903f, num, -2f);
         OptionBehaviour = Object.Instantiate(
@@ -78,7 +78,7 @@ public static class GameModeOption
         OptionBehaviour.SetClickMask(__instance.ButtonClickMask);
         StringGameSetting setting = ScriptableObject.CreateInstance<StringGameSetting>();
         setting.Type = OptionTypes.MultipleChoice;
-        setting.Title = CustomStringName.CreateAndRegister("Gamemode");
+        setting.Title = GamemodeName;
         setting.Index = _lastValue;
         setting.Values = new Il2CppStructArray<StringNames>([Values["Classic"]]);
         OptionBehaviour.SetUpFromData(setting, 20);
