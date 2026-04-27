@@ -42,7 +42,7 @@ public static class GameModeOption
 
     private static readonly Dictionary<string, StringNames> Values = new()
     {
-        ["Default"] = CustomStringName.CreateAndRegister("Default"),
+        ["Classic"] = CustomStringName.CreateAndRegister("Classic"),
     };
 
     // loading takes place before option creation
@@ -80,7 +80,7 @@ public static class GameModeOption
         setting.Type = OptionTypes.MultipleChoice;
         setting.Title = CustomStringName.CreateAndRegister("Gamemode");
         setting.Index = _lastValue;
-        setting.Values = new Il2CppStructArray<StringNames>([Values["Default"]]);
+        setting.Values = new Il2CppStructArray<StringNames>([Values["Classic"]]);
         OptionBehaviour.SetUpFromData(setting, 20);
         OptionBehaviour.TitleText.fontSize = 3;
         OptionBehaviour.OnValueChanged = (Action<OptionBehaviour>) ((OptionBehaviour opt) =>
