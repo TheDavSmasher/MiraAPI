@@ -7,9 +7,11 @@ using System.Reflection;
 using BepInEx.Configuration;
 using BepInEx.Unity.IL2CPP;
 using HarmonyLib;
+using Il2CppInterop.Runtime.Injection;
 using MiraAPI.Colors;
 using MiraAPI.Events;
 using MiraAPI.GameEnd;
+using MiraAPI.GameModes;
 using MiraAPI.GameOptions;
 using MiraAPI.GameOptions.Attributes;
 using MiraAPI.Hud;
@@ -20,6 +22,7 @@ using MiraAPI.Modifiers;
 using MiraAPI.Presets;
 using MiraAPI.Roles;
 using MiraAPI.Utilities;
+using Reactor.Localization.Utilities;
 using Reactor.Networking;
 using Reactor.Utilities;
 
@@ -40,6 +43,8 @@ public sealed class MiraPluginManager
     internal void Initialize()
     {
         Instance = this;
+        CustomGameModeManager.RegisterDefaultMode();
+        CustomGameModeManager.GetAndSetGameMode();
         IL2CPPChainloader.Instance.PluginLoad += (pluginInfo, assembly, plugin) =>
         {
             if (plugin is not IMiraPlugin miraPlugin)
@@ -116,6 +121,11 @@ public sealed class MiraPluginManager
                     continue;
                 }
 
+                if (RegisterGameModeAttribute(type, info))
+                {
+                    continue;
+                }
+
                 RegisterColorClasses(type);
                 RegisterKeybinds(type, plugin);
             }
@@ -143,6 +153,21 @@ public sealed class MiraPluginManager
             RegisteredPlugins = [.. _registeredPlugins.Values];
 
             ModifierManager.Modifiers = new ReadOnlyCollection<BaseModifier>(ModifierManager.InternalModifiers);
+
+            var dict = new Dictionary<string, object>();
+            foreach (var (key, value) in CustomGameModeManager.IdToModeMap)
+            {
+                if (value is DefaultMode)
+                {
+                    continue;
+                }
+                dict.Add(value.Name, key);
+                if (((AmongUs.GameOptions.GameModes) key) == AmongUs.GameOptions.GameModes.Normal)
+                    return;
+                // 'Default' was still being registered twice and idk why
+                GameModesHelpers.ModeToName.Add((AmongUs.GameOptions.GameModes)key, CustomStringName.CreateAndRegister(value.Name));
+            }
+            EnumInjector.InjectEnumValues<AmongUs.GameOptions.GameModes>(dict);
         };
 
         RegisterKeybinds(typeof(MiraGlobalKeybinds), PluginSingleton<MiraApiPlugin>.Instance);
@@ -313,6 +338,25 @@ public sealed class MiraPluginManager
         catch (Exception e)
         {
             Error($"Failed to register button {type.Name}: {e}");
+        }
+
+        return false;
+    }
+
+    private static bool RegisterGameModeAttribute(Type type, MiraPluginInfo pluginInfo)
+    {
+        try
+        {
+            if (type.IsAssignableTo(typeof(AbstractGameMode)))
+            {
+                // TODO: bool
+                CustomGameModeManager.RegisterGameMode(type, pluginInfo);
+                return true;
+            }
+        }
+        catch (Exception e)
+        {
+            Error($"Failed to register gamemode {type.Name}: {e}");
         }
 
         return false;

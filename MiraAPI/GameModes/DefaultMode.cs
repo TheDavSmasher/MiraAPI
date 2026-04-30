@@ -9,8 +9,8 @@ namespace MiraAPI.GameModes;
 public class DefaultMode : AbstractGameMode
 {
     /// <inheritdoc/>
-    public override string Name => "Default";
+    public override string Name => "Classic";
 
     /// <inheritdoc/>
-    public override string Description => "Default Among Us GameMode";
+    public override string Description => "The classic Among Us experience";
 }

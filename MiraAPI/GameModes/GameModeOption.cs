@@ -39,10 +39,11 @@ public static class GameModeOption
     internal static StringOption OptionBehaviour { get; private set; } = null!;
     private static int _lastValue;
     private static readonly StringNames GamemodeName = CustomStringName.CreateAndRegister("Gamemode");
-    private static readonly StringNames CustomName = CustomStringName.CreateAndRegister("Custom"); 
+    private static readonly StringNames CustomName = CustomStringName.CreateAndRegister("Custom");
     private static readonly Dictionary<string, StringNames> Values = new()
     {
         ["Classic"] = CustomStringName.CreateAndRegister("Classic"),
+        ["Hide n Seek"] = CustomStringName.CreateAndRegister("Hide n Seek"),
     };
 
     // loading takes place before option creation
@@ -80,7 +81,7 @@ public static class GameModeOption
         setting.Type = OptionTypes.MultipleChoice;
         setting.Title = GamemodeName;
         setting.Index = _lastValue;
-        setting.Values = new Il2CppStructArray<StringNames>([Values["Classic"]]);
+        setting.Values = new Il2CppStructArray<StringNames>([Values["Classic"], Values["Hide n Seek"]]);
         OptionBehaviour.SetUpFromData(setting, 20);
         OptionBehaviour.TitleText.fontSize = 3;
         OptionBehaviour.OnValueChanged = (Action<OptionBehaviour>) ((OptionBehaviour opt) =>

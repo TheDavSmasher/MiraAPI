@@ -33,7 +33,7 @@ internal static class HudPatches
         gmText.SetActive(false);
         modelText.SetActive(false);
         _text = gmTextClone.GetComponent<TextMeshPro>();
-        _text.text = "Default";
+        _text.text = CustomGameModeManager.ActiveMode?.Name ?? "Classic";
     }
 
     private static TextMeshPro? _text;

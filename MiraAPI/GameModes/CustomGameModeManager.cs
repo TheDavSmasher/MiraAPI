@@ -66,6 +66,9 @@ public static class CustomGameModeManager
         // no need to add to game mode option as it already contains it
         // because we cannot have the option be created with no values
         defaultMode.ID = 0;
+        var hnsMode = new HideAndSeekMode();
+        IdToModeMap.Add(1, hnsMode);
+        hnsMode.ID = 1;
     }
 
     internal static void SetGameMode(uint id)
