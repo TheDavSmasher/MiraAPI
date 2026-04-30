@@ -93,9 +93,19 @@ public static class CustomMurderRpc
             beforeMurderEvent.Cancel();
         }
 
-        if (beforeMurderEvent.IsCancelled)
+        if (target.ProtectedByGa())
+        {
+            beforeMurderEvent.Cancel();
+            murderResultFlags = MurderResultFlags.FailedProtected;
+        }
+        else if (beforeMurderEvent.IsCancelled)
         {
             murderResultFlags = MurderResultFlags.FailedError;
+        }
+
+        if (beforeMurderEvent.IsCancelled && source.AmOwner)
+        {
+            source.isKilling = true;
         }
 
         if (!PlayerControl.LocalPlayer.IsHost())
@@ -127,7 +137,7 @@ public static class CustomMurderRpc
     /// <param name="teleportMurderer">Should the killer be snapped to the dead player.</param>
     /// <param name="showKillAnim">Should the kill animation be shown.</param>
     /// <param name="playKillSound">Should the kill sound be played.</param>
-    [MethodRpc((uint)MiraRpc.ConfirmCustomMurder, LocalHandling = RpcLocalHandling.Before)]
+    [MethodRpc((uint)MiraRpc.ConfirmCustomMurder, LocalHandling = RpcLocalHandling.After)]
     public static void RpcConfirmCustomMurder(
         this PlayerControl host,
         PlayerControl source,
@@ -141,6 +151,7 @@ public static class CustomMurderRpc
     {
         if (LobbyBehaviour.Instance || !host.IsHost() || target.Data.IsDead || target.Data.Disconnected)
         {
+            source.isKilling = false;
             return;
         }
 
@@ -282,7 +293,7 @@ public static class CustomMurderRpc
             source.CurrentOutfitType == PlayerOutfitType.Shapeshifted,
             source.shapeshiftTargetPlayerId,
             target.PlayerId);
-        source.MyPhysics.StartCoroutine(source.KillAnimations.Random()?.CoPerformCustomKill(source, target, createDeadBody, teleportMurderer));
+        source.MyPhysics.StartCoroutine(source.KillAnimations.RandomSnapshot().CoPerformCustomKill(source, target, createDeadBody, teleportMurderer));
     }
 
     /// <summary>

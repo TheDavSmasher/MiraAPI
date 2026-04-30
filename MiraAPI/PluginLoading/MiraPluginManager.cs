@@ -4,14 +4,12 @@ using System.Collections.ObjectModel;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Reflection;
-using BepInEx;
 using BepInEx.Configuration;
 using BepInEx.Unity.IL2CPP;
-using Il2CppInterop.Runtime.Injection;
+using HarmonyLib;
 using MiraAPI.Colors;
 using MiraAPI.Events;
 using MiraAPI.GameEnd;
-using MiraAPI.GameModes;
 using MiraAPI.GameOptions;
 using MiraAPI.GameOptions.Attributes;
 using MiraAPI.Hud;
@@ -22,10 +20,8 @@ using MiraAPI.Modifiers;
 using MiraAPI.Presets;
 using MiraAPI.Roles;
 using MiraAPI.Utilities;
-using Reactor.Localization.Utilities;
 using Reactor.Networking;
 using Reactor.Utilities;
-using Rewired;
 
 namespace MiraAPI.PluginLoading;
 
@@ -44,137 +40,113 @@ public sealed class MiraPluginManager
     internal void Initialize()
     {
         Instance = this;
-        CustomGameModeManager.RegisterDefaultMode();
-        CustomGameModeManager.GetAndSetGameMode();
-        IL2CPPChainloader.Instance.PluginLoad += RegisterPlugin;
+        IL2CPPChainloader.Instance.PluginLoad += (pluginInfo, assembly, plugin) =>
+        {
+            if (plugin is not IMiraPlugin miraPlugin)
+            {
+                return;
+            }
 
+            var info = new MiraPluginInfo(miraPlugin, pluginInfo);
+            var roles = new List<Type>();
+
+            var oldConfigSetting = info.PluginConfig.SaveOnConfigSet;
+            info.PluginConfig.SaveOnConfigSet = false;
+
+            foreach (var type in assembly.GetTypes())
+            {
+                if (type.GetCustomAttribute<MiraIgnoreAttribute>() != null)
+                {
+                    continue;
+                }
+
+                foreach (var method in AccessTools.GetDeclaredMethods(type))
+                {
+                    var eventAttribute = method.GetCustomAttribute<RegisterEventAttribute>();
+                    if (eventAttribute == null)
+                    {
+                        continue;
+                    }
+
+                    if (!method.IsStatic)
+                    {
+                        Error($"Event method {method.Name} in {type.Name} must be static.");
+                        continue;
+                    }
+
+                    var parameters = method.GetParameters();
+                    if (parameters.Length != 1 || !parameters[0].ParameterType.IsSubclassOf(typeof(MiraEvent)))
+                    {
+                        Error($"Invalid event registration method {method.Name} in {type.Name}");
+                        continue;
+                    }
+
+                    var paramType = parameters[0].ParameterType;
+                    MiraEventManager.RegisterEventHandler(paramType, method, eventAttribute.Priority);
+                }
+
+                if (RegisterModifier(type, info))
+                {
+                    continue;
+                }
+
+                if (RegisterOptions(type, info))
+                {
+                    continue;
+                }
+
+                if (RegisterLocalTabs(type, plugin))
+                {
+                    continue;
+                }
+
+                if (RegisterRole(type, info, out var role))
+                {
+                    roles.Add(role);
+                    continue;
+                }
+
+                if (RegisterButton(type, info))
+                {
+                    continue;
+                }
+
+                if (RegisterGameOver(type))
+                {
+                    continue;
+                }
+
+                RegisterColorClasses(type);
+                RegisterKeybinds(type, plugin);
+            }
+
+            info.PluginConfig.Save();
+            info.PluginConfig.SaveOnConfigSet = oldConfigSetting;
+
+            info.InternalOptionGroups.Sort((x, y) => x.GroupPriority.CompareTo(y.GroupPriority));
+            QueuedRoleRegistrations.Add(info, roles);
+
+            _registeredPlugins.Add(assembly, info);
+
+            info.SavePublicCollections();
+            PresetManager.CreateDefaultPreset(info);
+            PresetManager.LoadPresets(info);
+            Info($"Registering mod {pluginInfo.Metadata.GUID} with Mira API.");
+        };
         IL2CPPChainloader.Instance.Finished += PaletteManager.RegisterAllColors;
         IL2CPPChainloader.Instance.Finished += () =>
         {
             // Save all buttons into a read-only collection for easy access
             CustomButtonManager.Buttons = new ReadOnlyCollection<CustomActionButton>(CustomButtonManager.CustomButtons);
 
+            // Cache all the registered plugins into an array for easy access
             RegisteredPlugins = [.. _registeredPlugins.Values];
 
             ModifierManager.Modifiers = new ReadOnlyCollection<BaseModifier>(ModifierManager.InternalModifiers);
-
-            var dict = new Dictionary<string, object>();
-            foreach (var (key, value) in CustomGameModeManager.IdToModeMap)
-            {
-                if (value is DefaultMode)
-                {
-                    continue;
-                }
-                dict.Add(value.Name, key);
-                if (((AmongUs.GameOptions.GameModes) key) == AmongUs.GameOptions.GameModes.Normal)
-                    return;
-                // 'Default' was still being registered twice and idk why
-                GameModesHelpers.ModeToName.Add((AmongUs.GameOptions.GameModes)key, CustomStringName.CreateAndRegister(value.Name));
-            }
-            EnumInjector.InjectEnumValues<AmongUs.GameOptions.GameModes>(dict);
         };
 
         RegisterKeybinds(typeof(MiraGlobalKeybinds), PluginSingleton<MiraApiPlugin>.Instance);
         RegisterLocalTabs(typeof(MiraApiSettings), PluginSingleton<MiraApiPlugin>.Instance);
-    }
-
-    private void RegisterPlugin(PluginInfo pluginInfo, Assembly assembly, BasePlugin plugin)
-    {
-        if (plugin is not IMiraPlugin miraPlugin || _registeredPlugins.ContainsKey(assembly))
-        {
-            return;
-        }
-
-        var info = new MiraPluginInfo(miraPlugin, pluginInfo);
-        var roles = new List<Type>();
-
-        var oldConfigSetting = info.PluginConfig.SaveOnConfigSet;
-        info.PluginConfig.SaveOnConfigSet = false;
-
-        foreach (var type in assembly.GetTypes())
-        {
-            if (type.GetCustomAttribute<MiraIgnoreAttribute>() != null)
-            {
-                continue;
-            }
-
-            foreach (var method in type.GetMethods())
-            {
-                var eventAttribute = method.GetCustomAttribute<RegisterEventAttribute>();
-                if (eventAttribute == null)
-                {
-                    continue;
-                }
-
-                if (!method.IsStatic)
-                {
-                    Error($"Event method {method.Name} in {type.Name} must be static.");
-                    continue;
-                }
-
-                var parameters = method.GetParameters();
-                if (parameters.Length != 1 || !parameters[0].ParameterType.IsSubclassOf(typeof(MiraEvent)))
-                {
-                    Error($"Invalid event registration method {method.Name} in {type.Name}");
-                    continue;
-                }
-
-                var paramType = parameters[0].ParameterType;
-                MiraEventManager.RegisterEventHandler(paramType, method, eventAttribute.Priority);
-            }
-
-            if (RegisterModifier(type, info))
-            {
-                continue;
-            }
-
-            if (RegisterOptions(type, info))
-            {
-                continue;
-            }
-
-            if (RegisterLocalTabs(type, plugin))
-            {
-                continue;
-            }
-
-            if (RegisterRole(type, info, out var role))
-            {
-                roles.Add(role);
-                continue;
-            }
-
-            if (RegisterButton(type, info))
-            {
-                continue;
-            }
-
-            if (RegisterGameOver(type))
-            {
-                continue;
-            }
-
-            if (RegisterGameModeAttribute(type, info))
-            {
-                continue;
-            }
-
-            RegisterColorClasses(type);
-            RegisterKeybinds(type, plugin);
-        }
-
-        info.PluginConfig.Save();
-        info.PluginConfig.SaveOnConfigSet = oldConfigSetting;
-
-        info.InternalOptionGroups.Sort((x, y) => x.GroupPriority.CompareTo(y.GroupPriority));
-        QueuedRoleRegistrations.Add(info, roles);
-
-        _registeredPlugins.Add(assembly, info);
-
-        info.SavePublicCollections();
-        PresetManager.CreateDefaultPreset(info);
-        PresetManager.LoadPresets(info);
-        Info($"Registering mod {pluginInfo.Metadata.GUID} with Mira API.");
     }
 
     /// <summary>
@@ -248,7 +220,6 @@ public sealed class MiraPluginManager
         {
             Error($"Failed to register options for {type.Name}: {e.ToString()}");
         }
-
         return false;
     }
 
@@ -275,7 +246,6 @@ public sealed class MiraPluginManager
         {
             Error($"Failed to register role for {type.Name}: {e}");
         }
-
         return false;
     }
 
@@ -343,25 +313,6 @@ public sealed class MiraPluginManager
         catch (Exception e)
         {
             Error($"Failed to register button {type.Name}: {e}");
-        }
-
-        return false;
-    }
-
-    private static bool RegisterGameModeAttribute(Type type, MiraPluginInfo pluginInfo)
-    {
-        try
-        {
-            if (type.IsAssignableTo(typeof(AbstractGameMode)))
-            {
-                // TODO: bool
-                CustomGameModeManager.RegisterGameMode(type, pluginInfo);
-                return true;
-            }
-        }
-        catch (Exception e)
-        {
-            Error($"Failed to register gamemode {type.Name}: {e}");
         }
 
         return false;

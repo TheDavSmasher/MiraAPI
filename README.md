@@ -5,6 +5,7 @@
 # Mira API
 
 A thorough, but simple, Among Us modding API and utility library that covers:
+
 - Roles
 - Options
 - Modifiers
@@ -13,6 +14,9 @@ A thorough, but simple, Among Us modding API and utility library that covers:
 - Events
 - Voting
 - Assets
+- Keybinds
+- Local Settings
+- Custom Game Over Conditions
 - Compatibility
 - ~~Game Modes~~ (coming soon)
 
@@ -24,9 +28,10 @@ The result is a less intrusive, better modding API that covers general use cases
 # Usage
 
 To start using Mira API, you need to:
+
 1. Add a reference to Mira API either through a [DLL](https://github.com/All-Of-Us-Mods/MiraAPI/releases), project reference, or [NuGet package](https://www.nuget.org/packages/AllOfUs.MiraAPI).
 2. Add a BepInDependency on your plugin class like this: `[BepInDependency(MiraApiPlugin.Id)]`
-3. Implement the IMiraPlugin interface in your plugin class.
+3. Implement the `IMiraPlugin` interface on your plugin class.
 
 Mira API also depends on [Reactor](https://github.com/NuclearPowered/Reactor) to function properly!
 Remember to include it as a reference and `BepInDependency`!
@@ -34,8 +39,10 @@ Remember to include it as a reference and `BepInDependency`!
 For a full example, see [this file](https://github.com/All-Of-Us-Mods/MiraAPI/blob/master/MiraAPI.Example/ExamplePlugin.cs).
 
 ## Recommended Project Structure
+
 It is highly recommended to follow this project structure when using Mira API to keep your code clean and organized.
 You can also view the Example Mod in this repository for some guidance.
+
 ```
 MyMiraMod/
 ├── Buttons/
@@ -60,235 +67,21 @@ MyMiraMod/
 └── MyModAssets.cs
 ```
 
-## Roles
-Roles are straightforward in Mira API. There are two things you need to do to create a custom role:
-1. Create a class that inherits from a base game role (like `CrewmateRole`, `ImpostorRole`, etc.) 
-2. Implement the `ICustomRole` interface from Mira API.
+# Documentation
 
-**Disclaimer: Make sure your plugin class has the following attribute `[ReactorModFlags(ModFlags.RequireOnAllClients)]` or else your roles will not register correctly.**
+Full documentation for every Mira API feature is available on the **[wiki](https://github.com/All-Of-Us-Mods/MiraAPI/wiki)**:
 
-Note: For step 1, if you are making neutral roles,
-you can choose either `CrewmateRole` or `ImpostorRole`,
-or even `RoleBehaviour` if you are okay with starting from scratch.
-
-Mira API handles everything else, from adding the proper options to the settings menu,
-to managing the role assignment at the start of the game.
-There are no extra steps on the developer's part.
-
-See [this file](https://github.com/All-Of-Us-Mods/MiraAPI/blob/master/MiraAPI.Example/Roles/CustomRole.cs) for a code example.
-
-## Modifiers
-Mira API uses a different definition of 'modifiers' than other Among Us mods.
-For example, in Town Of Us, a modifier is an extra "ability" that is applied on top of the base role.
-However, in Mira API, modifiers are very flexible.
-A modifier is anything that "modifiers" a player's abilities or interactions.
-
-Mira provides three classes for working with modifiers:
-- `BaseModifier`: The base for every modifier. You MUST add and remove this modifier from a player manually!
-- `TimedModifier`: A modifier that has a time limit. This modifier has to be added manually, but will automatically remove itself after the time limit.
-- `GameModifier`: This works like the typical TOU modifier, where it is automatically applied at the beginning of the game, then removed at the end.
-
-Modifiers provide various overridable functions and properties for custom behavior.
-They can also be used for "tagging" a player.
-You can check if a player has a modifier through the extension method `HasModifier` on a `PlayerControl` object.
-
-To start using a modifier, pick one of the base classes above and create a class that inherits from it. Implement the properties and methods you would like, then add the `[RegisterModifier]` attribute to the class.
-
-An example Game modifier can be found [here](https://github.com/All-Of-Us-Mods/MiraAPI/blob/master/MiraAPI.Example/Modifiers/GameModifierExample.cs).
-An example Timer modifier can be found [here](https://github.com/All-Of-Us-Mods/MiraAPI/blob/master/MiraAPI.Example/Modifiers/ModifierTimerExample.cs).
-
-## Options
-Options are also simple in Mira API.
-Mira API handles all the hard work behind the scenes,
-so developers only have to follow a few steps to create their custom options.
-The Options API is split up into Groups and Options.
-Every Option needs to be in a Group.
-
-To create a group, you need to create a class that inherits from the `AbstractOptionGroup` abstract class.
-Groups contain some properties for developers to control,
-including `GroupName`, `GroupColor`, `GroupVisible`, and `OptionableType`.
-The full list of properties can be found in the `AbstractOptionGroup` class.
-Only the `GroupName` is required.
-
-Here is an example of a group class:
-```csharp
-public class MyOptionsGroup : AbstractOptionGroup
-{
-    public override string GroupName => "My Options"; // this is required
-
-    [ModdedNumberOption("My Number Option", min: 0, max: 10)]
-    public float MyNumberOption { get; set; } = 5f;
-}
-```
-
-You can access any group class using the `OptionGroupSingleton` class like this:
-```csharp
-// MyOptionsGroup is a class that inherits from AbstractOptionGroup
-var myGroup = OptionGroupSingleton<MyOptionsGroup>.Instance; // gets the instance of the group
-Logger<MyPlugin>.Info(myGroup.MyNumberOption); // prints the value of the option to the console
-```
-
-Once you have an options group, there are two ways to make the actual options:
-- Use an Option Attribute with a property.
-- Create a ModdedOption property.
-
-### Option Attributes
-
-This is an example of using an Option Attribute on a property:
-```csharp
-// The first parameter is always the name of the option. The rest are dependent on the type of option.
-[ModdedNumberOption("Sussy level", min: 0, max: 10)]
-public float SussyLevel { get; set; } = 4f; // You can set a default value here.
-```
-
-Here are the available Option Attributes and their signatures:
-```csharp
-ModdedEnumOption(string name, Type enumType, string[]? values = null, Type? roleType = null)
-
-ModdedNumberOption(
-    string name,
-    float min,
-    float max,
-    float increment=1
-    NumberSuffixes suffixType = NumberSuffixes.None,
-    bool zeroInfinity = false,
-    Type? roleType = null)
-
-ModdedToggleOption(string name, Type? roleType = null)
-```
-
-### ModdedOption Properties
-
-And this is an example of a ModdedOption property:
-```csharp
-public ModdedToggleOption YeezusAbility { get; } = new ModdedToggleOption("Yeezus Ability", false);
-```
-
-There are currently three types of ModdedOptions you can create:
-- `ModdedEnumOption`
-- `ModdedNumberOption`
-- `ModdedToggleOption`
-
-To see a full example of an option class,
-see [this file](https://github.com/All-Of-Us-Mods/MiraAPI/blob/master/MiraAPI.Example/Options/ExampleOptions.cs).
-
-### Role Options
-
-You can also specify a role or game mode type for an option or option group.
-
-To set the role type for an entire group, set the `OptionableType` property on that group like this: 
-```csharp
-public class MyOptionsGroup : AbstractOptionGroup
-{
-    public override string GroupName => "My Options";
-    public override Type AdvancedRole => typeof(MyRole); // this is the role that will have these options
-    public override Type AdvancedMode => typeof(MyMode); // this is the mode that these options are attached to
-
-    public override Type? OptionableType => typeof(MyRole); // this is the role that will have these options
-
-    [ModdedNumberOption("Ability Uses", min: 0, max: 10)]
-    public float AbilityUses { get; set; } = 5f;
-}
-```
-
-To set the role type for individual options, do this:
-```csharp
-// this group doesnt specify a role, so it will show up in the global settings
-public class MyOptionsGroup : AbstractOptionGroup
-{
-    public override string GroupName => "My Options";
-
-    // this option will only show up in the settings for MyRole when the current mode is set to MyMode
-    [ModdedNumberOption("Ability Uses", min: 0, max: 10, roleType: typeof(MyRole), modeType: typeof(MyMode))]
-    public float AbilityUses { get; set; } = 5f;
-}
-```
-You can also use a modifier type for the `OptionableType` property.
-This will associate that option group with the specified modifier type
-and display it in the modifier options menu.
-
-An example can be found [here](https://github.com/All-Of-Us-Mods/MiraAPI/blob/master/MiraAPI.Example/Options/Roles/CustomRoleSettings.cs).
-
-## Custom Murders
-Mira API provides its own implementation for murders.
-Our implementation allows for more customization on kills, and helps bypass server checks.
-You can use `PlayerControl.RpcCustomMurder` to perform a networked custom murder, or `PlayerControl.CustomMurder` to normally perform a custom murder.
-For example:
-```cs
-PlayerControl.LocalPlayer.RpcCustomMurder(Target, createDeadBody: false, teleportMurderer: false, playKillSound: false, resetKillTimer: false, showKillAnim: false);
-```
-This will kill a player without creating a dead body and without teleporting the murderer.
-
-## Buttons
-
-Mira API provides a simple interface for adding ability buttons to the game.
-
-The only thing you need to do is create a class
-that inherits from the `CustomActionButton` class and implement the properties and methods.
-
-Mira API handles all other tasks and logic required to add the button to the game.
-
-In case you need to access your `CustomActionButton` instance from another class,
-you can use the `CustomButtonSingleton` class like this:
-```csharp
-var myButton = CustomButtonSingleton<MyCoolButton>.Instance;
-```
-
-The button API is straightforward, but provides a lot of flexibility.
-There are various methods you can override to customize the behavior of your button.
-See [this file](https://github.com/All-Of-Us-Mods/MiraAPI/blob/master/MiraAPI/Hud/CustomActionButton.cs) 
-for a full list of methods you can override.
-
-An example button can be found [here](https://github.com/All-Of-Us-Mods/MiraAPI/blob/master/MiraAPI.Example/Buttons/ExampleButton.cs).
-
-## Custom Colors
-
-Mira provides a simple Custom Color API that allows you to add custom player colors to the game.
-
-Creating custom colors isn't difficult, but there are some requirements for Mira to register your colors.
-
-1. Create a ***STATIC*** class to house all your `CustomColor` objects.
-2. Inside this class, create a `CustomColor` property for each color you intend to add.
-3. Add the `[RegisterCustomColors]` attribute to the class.
-
-Here is an example of a custom color class:
-```csharp
-[RegisterCustomColors]
-public static class MyCustomColors
-{
-    public static CustomColor Cerulean { get; } = new CustomColor("Cerulean", new Color(0.0f, 0.48f, 0.65f));
-
-    public static CustomColor Rose { get; } = new CustomColor("Rose", new Color(0.98f, 0.26f, 0.62f));
-
-    public static CustomColor Gold { get; } = new CustomColor("Gold", new Color(1.0f, 0.84f, 0.0f));
-}
-```
-
-## Assets
-
-Mira API provides a simple, but expandable asset system.
-The core of the system is the `LoadableAsset<T>` class.
-This is a generic abstract class that provides a pattern for loading assets. 
-
-Mira API comes with a few asset loaders:
-1. `LoadableBundleAsset<T>`: This is used for loading assets from AssetBundles.
-2. `LoadableAddressableAsset<T>`: This is used for loading assets from Addressables.
-3. `LoadableResourceAsset`: This is used for loading **only sprites** from the Embedded Resources within a mod.
-4. `LoadableAudioResourceAsset`: This is used for loading **only audio clips** from the Embedded Resources within a mod.
-
-The code below shows how to use an asset loaders:
-```csharp
-// Load a sprite from an AssetBundle
-AssetBundle bundle = AssetBundleManager.Load("MyBundle"); // AssetBundleManager is a utility provided by Reactor
-LoadableAsset<Sprite> mySpriteAsset = new LoadableBundleAsset<Sprite>("MySprite", bundle);
-Sprite sprite = mySpriteAsset.LoadAsset();
-
-// Load a sprite from an Embedded Resource
-// Make sure to set the Build Action of your image to Embedded Resource!
-LoadableAsset<Sprite> buttonAsset = new LoadableResourceAsset("ExampleMod.Resources.MyButton.png");
-Sprite button = buttonSpriteAsset.LoadAsset();
-```
-
-You can view an example file [here](https://github.com/All-Of-Us-Mods/MiraAPI/blob/master/MiraAPI.Example/ExampleAssets.cs).
-
-You can create your own asset loaders by inheriting from `LoadableAsset<T>` and implementing the `LoadAsset` method.
+- [Get Started / IMiraPlugin](https://github.com/All-Of-Us-Mods/MiraAPI/wiki/Home)
+- [Custom Roles](https://github.com/All-Of-Us-Mods/MiraAPI/wiki/Custom-Roles)
+- [Options](https://github.com/All-Of-Us-Mods/MiraAPI/wiki/Options)
+- [Modifiers](https://github.com/All-Of-Us-Mods/MiraAPI/wiki/Modifiers)
+- [Custom Buttons](https://github.com/All-Of-Us-Mods/MiraAPI/wiki/Custom-Buttons)
+- [Custom Colors](https://github.com/All-Of-Us-Mods/MiraAPI/wiki/Colors)
+- [Events](https://github.com/All-Of-Us-Mods/MiraAPI/wiki/Events)
+- [Meetings and Voting](https://github.com/All-Of-Us-Mods/MiraAPI/wiki/Meetings-and-Voting)
+- [Assets](https://github.com/All-Of-Us-Mods/MiraAPI/wiki/Assets)
+- [Keybinds](https://github.com/All-Of-Us-Mods/MiraAPI/wiki/Keybinds)
+- [Local Settings](https://github.com/All-Of-Us-Mods/MiraAPI/wiki/Local-Settings)
+- [Game Modes](https://github.com/All-Of-Us-Mods/MiraAPI/wiki/Game-Modes)
+- [Custom Game Over](https://github.com/All-Of-Us-Mods/MiraAPI/wiki/Game-Over)
+- [Utilities](https://github.com/All-Of-Us-Mods/MiraAPI/wiki/Utilities)
