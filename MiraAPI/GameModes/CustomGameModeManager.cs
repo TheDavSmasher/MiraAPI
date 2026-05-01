@@ -13,11 +13,7 @@ public static class CustomGameModeManager
 {
     public static readonly Dictionary<uint, AbstractGameMode> IdToModeMap = [];
 
-    private static uint GetNextId()
-    {
-        LastId++;
-        return LastId;
-    }
+    private static uint GetNextId() => ++LastId;
 
     internal static uint LastId { get; private set; }
 
@@ -44,15 +40,16 @@ public static class CustomGameModeManager
 
         IdToModeMap.Add(GetNextId(), mode);
         pluginInfo.GameModes.Add(LastId, mode);
-        GameModeOption.AddOption($"<color=#{mode.Color.ToHtmlStringRGBA()}>{mode.Name}</color>");
+        GameModeOption.AddOption(mode);
         mode.ID = LastId;
     }
 
     /// <summary>
     /// Checks to see if the default game mode is on.
     /// </summary>
-    /// <returns>True if the default mode is one.</returns>
-    public static bool IsDefault() => (uint) GameModeOption.Value == 0;
+    /// <returns>True if the default mode is the current one.</returns>
+    public static bool IsDefault() => ActiveMode is DefaultMode;
+    public static bool IsHideNSeek() => ActiveMode is HideAndSeekMode;
 
     /// <summary>
     /// Gets the current gamemode.
@@ -69,6 +66,8 @@ public static class CustomGameModeManager
         var hnsMode = new HideAndSeekMode();
         IdToModeMap.Add(1, hnsMode);
         hnsMode.ID = 1;
+        GameModeOption.AddOption(hnsMode);
+        LastId++;
     }
 
     internal static void SetGameMode(uint id)

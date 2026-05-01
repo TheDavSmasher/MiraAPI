@@ -1,4 +1,5 @@
 ﻿using MiraAPI.PluginLoading;
+using UnityEngine;
 
 namespace MiraAPI.GameModes;
 
@@ -13,4 +14,6 @@ public class HideAndSeekMode : AbstractGameMode
 
     /// <inheritdoc/>
     public override string Description => "You can run, but you can't hide!";
+
+    public override Color Color { get; } = new Color32(255, 88, 90, 255);
 }

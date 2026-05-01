@@ -5,6 +5,7 @@ using Il2CppInterop.Runtime.InteropTypes.Arrays;
 using Il2CppSystem;
 using MiraAPI.Patches.GameModes;
 using Reactor.Localization.Utilities;
+using Reactor.Utilities.Extensions;
 using UnityEngine;
 using UnityEngine.ProBuilder;
 using Object = UnityEngine.Object;
@@ -37,18 +38,18 @@ public static class GameModeOption
         }
     }
     internal static StringOption OptionBehaviour { get; private set; } = null!;
+
     private static int _lastValue;
     private static readonly StringNames GamemodeName = CustomStringName.CreateAndRegister("Gamemode");
     private static readonly StringNames CustomName = CustomStringName.CreateAndRegister("Custom");
     private static readonly Dictionary<string, StringNames> Values = new()
     {
         ["Classic"] = CustomStringName.CreateAndRegister("Classic"),
-        ["Hide n Seek"] = CustomStringName.CreateAndRegister("Hide n Seek"),
     };
 
-    // loading takes place before option creation
-    internal static void AddOption(string opt)
+    internal static void AddOption(AbstractGameMode mode)
     {
+        var opt = $"<color=#{mode.Color.ToHtmlStringRGBA()}>{mode.Name}</color>";
         if (!Values.ContainsKey(opt))
             Values.Add(opt, CustomStringName.CreateAndRegister(opt));
     }
@@ -59,12 +60,12 @@ public static class GameModeOption
         if (GameManager.Instance.IsHideAndSeek())
             return;
         float num = 0.713f;
-        foreach (var rulesCategory in GameManager.Instance.GameSettingsList.AllCategories)
+        foreach (var category in __instance.settingsContainer.GetComponentsInChildren<CategoryHeaderMasked>())
         {
-            num -= 0.63f;
-            foreach (var a in rulesCategory.AllGameSettings)
-                num -= 0.45f;
+            if (category)
+                category.gameObject.transform.localPosition -= new Vector3(0, 1.3f, 0);
         }
+
         CategoryHeaderMasked categoryHeaderMasked = Object.Instantiate(__instance.categoryHeaderOrigin, Vector3.zero, Quaternion.identity, __instance.settingsContainer);
         categoryHeaderMasked.SetHeader(CustomName, 20);
         categoryHeaderMasked.transform.localScale = Vector3.one * 0.63f;
@@ -81,7 +82,7 @@ public static class GameModeOption
         setting.Type = OptionTypes.MultipleChoice;
         setting.Title = GamemodeName;
         setting.Index = _lastValue;
-        setting.Values = new Il2CppStructArray<StringNames>([Values["Classic"], Values["Hide n Seek"]]);
+        setting.Values = new Il2CppStructArray<StringNames>([Values["Classic"]]);
         OptionBehaviour.SetUpFromData(setting, 20);
         OptionBehaviour.TitleText.fontSize = 3;
         OptionBehaviour.OnValueChanged = (Action<OptionBehaviour>) ((OptionBehaviour opt) =>
@@ -90,9 +91,12 @@ public static class GameModeOption
             CustomGameModeManager.SetGameMode((uint)_lastValue);
             HudPatches.SetGameModeText(Values.ElementAt(_lastValue).Key);
         });
-        num -= 0.37f; // scrollbar offset
+        foreach (var optionBehaviour in __instance.Children.ToArray().Skip(1))
+        {
+            optionBehaviour.gameObject.transform.localPosition -= new Vector3(0, 1.3f, 0);
+        }
         __instance.Children.Add(OptionBehaviour);
-        __instance.scrollBar.SetYBoundsMax(-num - 1.65f);
+        __instance.scrollBar.SetYBoundsMax(__instance.scrollBar.GetYBounds().max + 1);
         for (var i = 1; i < Values.Count; i++)
             OptionBehaviour.Values = (Il2CppStructArray<StringNames>)OptionBehaviour.Values.Add(Values.ElementAt(i).Value);
     }
