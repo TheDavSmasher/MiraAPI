@@ -28,6 +28,7 @@ public class HideAndSeekMode : AbstractGameMode
     public override bool CanReport(DeadBody body) => false;
     public override bool ShouldShowSabotageMap(MapBehaviour map) => false;
     public override bool ShowGameModeIntroCutscene => true;
+    public override bool GameModeBodyTypeOverride => true;
 
     public override IEnumerator IntroCutscene(IntroCutscene __instance)
     {
@@ -179,5 +180,45 @@ public class HideAndSeekMode : AbstractGameMode
         }
         ShipStatus.Instance.StartSFX();
         UnityEngine.Object.Destroy(__instance.gameObject);
+    }
+
+    public override PlayerBodyTypes GetBodyType(PlayerControl player)
+    {
+        if (player == null || player.Data == null || player.Data.Role == null)
+        {
+            if (AprilFoolsMode.ShouldHorseAround())
+            {
+                return PlayerBodyTypes.Horse;
+            }
+            if (AprilFoolsMode.ShouldLongAround())
+            {
+                return PlayerBodyTypes.Long;
+            }
+            return PlayerBodyTypes.Normal;
+        }
+        else if (AprilFoolsMode.ShouldHorseAround())
+        {
+            if (player.Data.Role.IsImpostor)
+            {
+                return PlayerBodyTypes.Normal;
+            }
+            return PlayerBodyTypes.Horse;
+        }
+        else if (AprilFoolsMode.ShouldLongAround())
+        {
+            if (player.Data.Role.IsImpostor)
+            {
+                return PlayerBodyTypes.LongSeeker;
+            }
+            return PlayerBodyTypes.Long;
+        }
+        else
+        {
+            if (player.Data.Role.IsImpostor)
+            {
+                return PlayerBodyTypes.Seeker;
+            }
+            return PlayerBodyTypes.Normal;
+        }
     }
 }

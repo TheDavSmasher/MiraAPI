@@ -33,6 +33,29 @@ public abstract class AbstractGameMode : IOptionable
     public uint ID { get; set; }
 
     /// <summary>
+    /// Gets a value indicating whether a specific body type is used by the game mode.
+    /// </summary>
+    public virtual bool GameModeBodyTypeOverride => false;
+
+    /// <summary>
+    /// Called on GameManager.GetBodyType().
+    /// </summary>
+    /// <param name="player">Player to get body type from.</param>
+    /// <returns>Resulting body type.</returns>
+    public virtual PlayerBodyTypes GetBodyType(PlayerControl player)
+    {
+        if (AprilFoolsMode.ShouldHorseAround())
+        {
+            return PlayerBodyTypes.Horse;
+        }
+        if (AprilFoolsMode.ShouldLongAround())
+        {
+            return PlayerBodyTypes.Long;
+        }
+        return PlayerBodyTypes.Normal;
+    }
+
+    /// <summary>
     /// Gets a value indicating whether a custom intro sequence is implemented by the game mode.
     /// </summary>
     public virtual bool ShowGameModeIntroCutscene => false;

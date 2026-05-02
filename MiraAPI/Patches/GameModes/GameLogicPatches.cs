@@ -6,19 +6,14 @@ namespace MiraAPI.Patches.GameModes;
 [HarmonyPatch]
 internal static class GameLogicPatches
 {
-    [HarmonyPrefix, HarmonyPatch(typeof(LogicGameFlowNormal), nameof(LogicGameFlowNormal.CheckEndCriteria))]
-    public static bool EndCritPatch(LogicGameFlowNormal __instance)
+    [HarmonyPrefix, HarmonyPatch(typeof(NormalGameManager), nameof(NormalGameManager.GetBodyType))]
+    public static bool BodyTypePatch(NormalGameManager __instance, PlayerControl player, ref PlayerBodyTypes __result)
     {
-        var runOriginal = true;
-        CustomGameModeManager.ActiveMode?.CheckGameEnd(out runOriginal, __instance);
-        return runOriginal;
-    }
-
-    [HarmonyPrefix, HarmonyPatch(typeof(LogicRoleSelectionNormal), nameof(LogicRoleSelectionNormal.AssignRolesFromList))]
-    public static bool AssignRolesPatch(LogicRoleSelectionNormal __instance)
-    {
-        var runOriginal = true;
-        CustomGameModeManager.ActiveMode?.AssignRoles(out runOriginal, __instance);
-        return runOriginal;
+        if (CustomGameModeManager.ActiveMode == null || !CustomGameModeManager.ActiveMode.GameModeBodyTypeOverride)
+        {
+            return true;
+        }
+        __result = CustomGameModeManager.ActiveMode.GetBodyType(player);
+        return false;
     }
 }
