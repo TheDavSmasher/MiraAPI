@@ -52,12 +52,7 @@ public static class HudManagerPatches
                     continue;
                 }
 
-                if (aspect.gameObject.transform.parent.name == "TopRight")
-                {
-                    continue;
-                }
-
-                if (aspect.gameObject.transform.parent.transform.parent.name == "TopRight")
+                if (aspect.gameObject.name.Contains("TopRight"))
                 {
                     continue;
                 }
@@ -85,6 +80,11 @@ public static class HudManagerPatches
             foreach (var arrange in baseButtons.GetComponentsInChildren<GridArrange>(true))
             {
                 if (!arrange.gameObject || !arrange.transform)
+                {
+                    continue;
+                }
+
+                if (arrange.gameObject.name.Contains("TopRight"))
                 {
                     continue;
                 }
