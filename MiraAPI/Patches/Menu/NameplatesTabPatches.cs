@@ -6,6 +6,7 @@ using Reactor.Utilities.Extensions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using MiraAPI.Utilities.Assets;
 using TMPro;
 using UnityEngine;
 using Object = UnityEngine.Object;
@@ -44,6 +45,10 @@ public static class NameplatesTabPatches
     [HarmonyPrefix]
     public static bool OnEnablePrefix(NameplatesTab __instance)
     {
+        if (!AddressablesLoader.AddressableNameplatesExist)
+        {
+            return true;
+        }
         __instance.plateId = HatManager.Instance.GetNamePlateById(DataManager.Player.Customization.namePlate).ProdId;
 
         if (!SortedNameplates.ContainsKey("Vanilla")) AddRange(DestroyableSingleton<HatManager>.Instance.GetUnlockedNamePlates().Select(x => ("Vanilla", x)));
@@ -60,6 +65,10 @@ public static class NameplatesTabPatches
 
     public static void UpdatePrefix(NameplatesTab __instance)
     {
+        if (!AddressablesLoader.AddressableNameplatesExist)
+        {
+            return;
+        }
         if (Input.GetKeyDown(KeyCode.LeftControl) || Input.GetKeyDown(KeyCode.RightControl) || Input.GetKeyDown(KeyCode.LeftArrow))
         {
             PreviousPage(__instance);

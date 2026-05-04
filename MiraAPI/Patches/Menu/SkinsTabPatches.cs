@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
+using MiraAPI.Utilities.Assets;
 using TMPro;
 using UnityEngine;
 using Object = UnityEngine.Object;
@@ -36,6 +37,10 @@ public static class SkinsTabPatches
     [HarmonyPrefix]
     public static bool OnEnablePrefix(SkinsTab __instance)
     {
+        if (!AddressablesLoader.AddressableSkinsExist)
+        {
+            return true;
+        }
         __instance.skinId = HatManager.Instance.GetSkinById(DataManager.Player.Customization.Skin).ProdId;
         var allSkins = HatManager.Instance.GetUnlockedSkins().ToImmutableList();
 
@@ -62,6 +67,10 @@ public static class SkinsTabPatches
 
     public static void UpdatePrefix(SkinsTab __instance)
     {
+        if (!AddressablesLoader.AddressableSkinsExist)
+        {
+            return;
+        }
         if (Input.GetKeyDown(KeyCode.LeftControl) || Input.GetKeyDown(KeyCode.RightControl) || Input.GetKeyDown(KeyCode.LeftArrow))
         {
             PreviousPage(__instance);
