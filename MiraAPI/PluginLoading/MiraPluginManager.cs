@@ -39,8 +39,8 @@ public sealed class MiraPluginManager
 
     internal Dictionary<MiraPluginInfo, List<Type>> QueuedRoleRegistrations { get; } = [];
     internal static MiraPluginManager Instance { get; private set; } = new();
-    public static ConfigFile MiraApiConfig { get; private set; }
-    public static MiraPluginInfo MiraApiPluginInfo { get; private set; }
+    public static ConfigFile MiraApiConfig { get; private set; } = null!;
+    public static MiraPluginInfo MiraApiPluginInfo { get; private set; } = null!;
 
     internal void Initialize(BasePlugin miraApiPlugin, IMiraPlugin apiPlugin)
     {

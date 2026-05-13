@@ -15,7 +15,7 @@ namespace MiraAPI.Patches.LocalSettings;
 public static class OptionsMenuPatches
 {
     internal static OptionsMenuBehaviour? Instance { get; private set; }
-    internal static BoxCollider2D MaskCollider;
+    internal static BoxCollider2D MaskCollider = null!;
     private static SpriteRenderer? background;
 
     private static int currentPage = 1;

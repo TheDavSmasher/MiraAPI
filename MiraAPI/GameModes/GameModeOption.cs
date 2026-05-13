@@ -62,12 +62,12 @@ public static class GameModeOption
             Values.Add(opt, CustomStringName.CreateAndRegister(opt));
     }
 
-    private static List<CategoryHeaderMasked> VanillaCategories = new();
-    private static List<OptionBehaviour> VanillaOptions = new();
-    private static List<CategoryHeaderMasked> BaseCategories = new();
-    private static List<OptionBehaviour> BaseOptions = new();
-    private static List<CategoryHeaderMasked> ModeCategories = new();
-    private static List<OptionBehaviour> ModeOptions = new();
+    private static readonly List<CategoryHeaderMasked> VanillaCategories = new();
+    private static readonly List<OptionBehaviour> VanillaOptions = new();
+    private static readonly List<CategoryHeaderMasked> BaseCategories = new();
+    private static readonly List<OptionBehaviour> BaseOptions = new();
+    private static readonly List<CategoryHeaderMasked> ModeCategories = new();
+    private static readonly List<OptionBehaviour> ModeOptions = new();
     [HarmonyPatch(typeof(GameOptionsMenu), nameof(GameOptionsMenu.CreateSettings))]
     [HarmonyPostfix]
     private static void CreateSettingsPatch(GameOptionsMenu __instance)
@@ -76,13 +76,15 @@ public static class GameModeOption
         {
             return;
         }
+
+        var num = 0.713f;
+
         ModeCategories.Clear();
         ModeOptions.Clear();
         VanillaCategories.Clear();
         VanillaOptions.Clear();
         BaseCategories.Clear();
         BaseOptions.Clear();
-        float num = 0.713f;
         foreach (var category in __instance.settingsContainer.GetComponentsInChildren<CategoryHeaderMasked>())
         {
             if (category)
@@ -161,7 +163,7 @@ public static class GameModeOption
         }
 
         var showOpts = mode.ShowNormalGameSettings;
-        var num = 0.083f;
+        var num = 0.713f - (0.63f * BaseCategories.Count) - (0.45f * BaseOptions.Count);
         foreach (var category in VanillaCategories)
         {
             category.gameObject.SetActive(showOpts);
@@ -181,7 +183,8 @@ public static class GameModeOption
                 obj.gameObject.SetActive(true);
                 instance.Children.Add(obj);
             }
-            instance.scrollBar.SetYBoundsMax(instance.scrollBar.GetYBounds().max + 1);
+            num -= 0.63f * VanillaCategories.Count;
+            num -= 0.45f * VanillaOptions.Count;
         }
         else
         {
@@ -189,21 +192,22 @@ public static class GameModeOption
             {
                 obj.gameObject.SetActive(false);
             }
+        }
+
+        if (filteredGroups.Any())
+        {
+            num += 0.225f;
             foreach (var group in filteredGroups)
             {
                 GameOptionsMenuPatch.UpdateGroup(group, ref num);
             }
-
-            instance.scrollBar.SetYBoundsMax(-num - 1.65f);
         }
-        foreach (var option in ModeOptions)
+        instance.ControllerSelectable.Clear();
+        foreach (var obj in instance.scrollBar.GetComponentsInChildren<UiElement>())
         {
-            option.gameObject.transform.localPosition += new Vector3(0, -0.67f, 0);
+            instance.ControllerSelectable.Add(obj);
         }
-        foreach (var header in ModeCategories)
-        {
-            header.gameObject.transform.localPosition += new Vector3(0, -0.67f, 0);
-        }
+        instance.scrollBar.SetYBoundsMax(-num - 1.65f);
     }
 
     [HarmonyPatch(typeof(GameOptionsMenu), nameof(GameOptionsMenu.ValueChanged))]

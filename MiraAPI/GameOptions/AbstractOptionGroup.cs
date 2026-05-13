@@ -96,5 +96,5 @@ public enum MenuCategory
     Roles,
     Modifiers,
     CustomOne,
-    CustomTwo
+    CustomTwo,
 }
