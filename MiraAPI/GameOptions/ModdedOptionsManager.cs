@@ -27,7 +27,7 @@ public static class ModdedOptionsManager
 
     internal static readonly Dictionary<OptionBehaviour, ModdedPlayerOption> CreatedPlayerOptions = [];
     internal static readonly Dictionary<OptionBehaviour, ModdedStringOption> CreatedStringOptions = [];
-    internal static readonly Dictionary<Type, AbstractOptionGroup> GameModeOptionGroups = [];
+    internal static readonly Dictionary<Type, List<AbstractOptionGroup>> GameModeOptionGroups = [];
     internal static readonly Dictionary<uint, IModdedOption> ModdedOptions = [];
     internal static readonly List<AbstractOptionGroup> Groups = [];
 
@@ -74,7 +74,14 @@ public static class ModdedOptionsManager
         TypeToGroup.Add(type, group);
         if (group.OptionableType?.IsAssignableTo(typeof(AbstractGameMode)) == true)
         {
-            GameModeOptionGroups.Add(group.OptionableType, group);
+            if (GameModeOptionGroups.TryGetValue(group.OptionableType, out var oldList))
+            {
+                oldList.Add(group);
+            }
+            else
+            {
+                GameModeOptionGroups.Add(group.OptionableType, new List<AbstractOptionGroup>() { group });
+            }
         }
         pluginInfo.InternalOptionGroups.Add(group);
 
