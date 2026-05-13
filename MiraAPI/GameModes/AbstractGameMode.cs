@@ -38,6 +38,11 @@ public abstract class AbstractGameMode : IOptionable
     public virtual bool GameModeBodyTypeOverride => false;
 
     /// <summary>
+    /// Gets a value indicating whether the gamemode is based on Hide n Seek.
+    /// </summary>
+    public virtual bool IsHideAndSeek => false;
+
+    /// <summary>
     /// Called on GameManager.GetBodyType().
     /// </summary>
     /// <param name="player">Player to get body type from.</param>

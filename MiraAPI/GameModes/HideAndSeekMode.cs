@@ -29,6 +29,7 @@ public class HideAndSeekMode : AbstractGameMode
     public override bool ShouldShowSabotageMap(MapBehaviour map) => false;
     public override bool ShowGameModeIntroCutscene => true;
     public override bool GameModeBodyTypeOverride => true;
+    public override bool IsHideAndSeek => true;
 
     public override IEnumerator IntroCutscene(IntroCutscene __instance)
     {
@@ -226,6 +227,7 @@ public class HideAndSeekMode : AbstractGameMode
     public override void OnPlayerDeath(PlayerControl player, bool assignGhostRole)
     {
         base.OnPlayerDeath(player, assignGhostRole);
+        HudManager.Instance.NotifyOfDeath();
         var popup = GameManagerCreator.Instance.HideAndSeekManagerPrefab.DeathPopupPrefab;
         deadPlayerCount++;
         var item = UnityEngine.Object.Instantiate(popup, HudManager.Instance.transform.parent);
