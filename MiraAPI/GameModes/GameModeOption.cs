@@ -392,9 +392,8 @@ public static class GameModeOption
             (UnityAction)(() =>
             {
                 group.AllOptionsHidden = !group.AllOptionsHidden;
-                newText.text = group.AllOptionsHidden
-                    ? "<size=70%>(Click to open)</size>"
-                    : "<size=70%>(Click to close)</size>";
+                newText.text = "<size=70%>(Click to open/close)</size>";
+                menu.RefreshOptions(CustomGameModeManager.ActiveMode!);
             }));
         headerBtn.SetButtonEnableState(true);
     }
