@@ -25,6 +25,26 @@ public static class AddressablesLoader
     private static readonly List<string> RegisteredSkinKeys = [];
 
     /// <summary>
+    /// Gets a value indicating whether hats have been loaded by the addressables system.
+    /// </summary>
+    public static bool AddressableHatsExist { get; private set; }
+
+    /// <summary>
+    /// Gets a value indicating whether visors have been loaded by the addressables system.
+    /// </summary>
+    public static bool AddressableVisorsExist { get; private set; }
+
+    /// <summary>
+    /// Gets a value indicating whether nameplates have been loaded by the addressables system.
+    /// </summary>
+    public static bool AddressableNameplatesExist { get; private set; }
+
+    /// <summary>
+    /// Gets a value indicating whether skins have been loaded by the addressables system.
+    /// </summary>
+    public static bool AddressableSkinsExist { get; private set; }
+
+    /// <summary>
     /// Registers a specific addressables package to load asynchronously at the start of the game, when possible.
     /// </summary>
     /// <param name="location">The location, remote or otherwise, of the addressables.</param>
@@ -52,6 +72,7 @@ public static class AddressablesLoader
             return;
         }
 
+        AddressableHatsExist = true;
         RegisteredHatKeys.Add(addressablesKey);
     }
 
@@ -67,6 +88,7 @@ public static class AddressablesLoader
             return;
         }
 
+        AddressableSkinsExist = true;
         RegisteredSkinKeys.Add(addressablesKey);
     }
 
@@ -83,6 +105,7 @@ public static class AddressablesLoader
             return;
         }
 
+        AddressableNameplatesExist = true;
         RegisteredNameplateKeys.Add((addressablesKey, groupTitle));
     }
 
@@ -99,6 +122,7 @@ public static class AddressablesLoader
             return;
         }
 
+        AddressableVisorsExist = true;
         RegisteredVisorKeys.Add((addressablesKey, groupTitle));
     }
 

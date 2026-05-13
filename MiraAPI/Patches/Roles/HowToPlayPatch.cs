@@ -22,22 +22,18 @@ internal static class HowToPlayPatch
         __instance.startPage.SetActive(false);
         if (__instance.roleButtonsParent.childCount == 0)
         {
-            using (IEnumerator<RoleBehaviour> enumerator = RoleManager.Instance.AllRoles.ToArray().Where(x => !x.IsCustomRole()).GetEnumerator())
+            foreach (var role in RoleManager.Instance.AllRoles.ToArray().Where(x => !x.IsCustomRole()))
             {
-                while (enumerator.MoveNext())
+                if (!role.IsSimpleRole && role.Role != RoleTypes.CrewmateGhost && role.Role != RoleTypes.ImpostorGhost)
                 {
-                    RoleBehaviour role = enumerator.Current;
-                    if (!role.IsSimpleRole && role.Role != RoleTypes.CrewmateGhost && role.Role != RoleTypes.ImpostorGhost)
+                    HowToPlayRoleButton component = Object.Instantiate(__instance.roleButtonPrefab, __instance.roleButtonsParent).GetComponent<HowToPlayRoleButton>();
+                    Sprite roleIcon = __instance.rolesScenes.ToArray().First(r => r.role == role.Role).roleIcon;
+                    component.SetRoleInfo(role, roleIcon);
+                    component.SetButtonAction((Il2CppSystem.Action)(() =>
                     {
-                        HowToPlayRoleButton component = Object.Instantiate(__instance.roleButtonPrefab, __instance.roleButtonsParent).GetComponent<HowToPlayRoleButton>();
-                        Sprite roleIcon = __instance.rolesScenes.ToArray().First(r => r.role == role.Role).roleIcon;
-                        component.SetRoleInfo(role, roleIcon);
-                        component.SetButtonAction((Il2CppSystem.Action)(() =>
-                        {
-                            __instance.OpenRolePage(role.Role);
-                        }));
-                        __instance.controllerSelectables.Add(component.GetComponent<PassiveButton>());
-                    }
+                        OpenRolePage(__instance, role.Role);
+                    }));
+                    __instance.controllerSelectables.Add(component.GetComponent<PassiveButton>());
                 }
             }
             foreach (UiElement uiElement in __instance.controllerSelectables)
@@ -49,5 +45,24 @@ internal static class HowToPlayPatch
         __instance.DisableAllScenes();
         __instance.roleSelectionScene.SetActive(true);
         ControllerManager.Instance.SetDefaultSelection(__instance.defaultButtonSelected, null);
+    }
+    public static void OpenRolePage(HowToPlayScene instance, RoleTypes roleType)
+    {
+        instance.category = HowToPlayScene.HowToPlayCategory.Roles;
+        var newList = instance.rolesScenes.ToArray().ToList();
+        var buttonList = instance.roleButtons;
+        instance.sceneIndex = newList.FindIndex(r => r.role == roleType);
+        if (roleType != RoleTypes.Crewmate)
+        {
+            foreach (var button in buttonList)
+            {
+                if (button.GetRole().Role == roleType)
+                {
+                    instance.previouslySelectedRoleButton = button.GetComponent<PassiveButton>();
+                }
+            }
+        }
+        instance.SetupDots(instance.rolesScenes[instance.sceneIndex].rolePages.Count);
+        instance.ChangeScene(0);
     }
 }

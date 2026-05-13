@@ -5,6 +5,7 @@ using Reactor.Utilities.Extensions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using MiraAPI.Utilities.Assets;
 using TMPro;
 using UnityEngine;
 using Object = UnityEngine.Object;
@@ -44,6 +45,10 @@ public static class VisorsTabPatches
     [HarmonyPrefix]
     public static bool OnEnablePrefix(VisorsTab __instance)
     {
+        if (!AddressablesLoader.AddressableVisorsExist)
+        {
+            return true;
+        }
         __instance.visorId = HatManager.Instance.GetVisorById(DataManager.Player.Customization.Visor).ProdId;
 
         if (!SortedVisors.ContainsKey("Vanilla")) AddRange(DestroyableSingleton<HatManager>.Instance.GetUnlockedVisors().Select(x => ("Vanilla", x)));
@@ -60,6 +65,10 @@ public static class VisorsTabPatches
 
     public static void UpdatePrefix(VisorsTab __instance)
     {
+        if (!AddressablesLoader.AddressableVisorsExist)
+        {
+            return;
+        }
         if (Input.GetKeyDown(KeyCode.LeftControl) || Input.GetKeyDown(KeyCode.RightControl) || Input.GetKeyDown(KeyCode.LeftArrow))
         {
             PreviousPage(__instance);

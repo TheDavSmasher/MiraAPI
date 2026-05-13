@@ -41,6 +41,10 @@ public static class HatsTabPatches
     [HarmonyPrefix]
     public static bool OnEnablePrefix(HatsTab __instance)
     {
+        if (!AddressablesLoader.AddressableHatsExist)
+        {
+            return true;
+        }
         __instance.currentHat = HatManager.Instance.GetHatById(DataManager.Player.Customization.Hat);
         var allHats = HatManager.Instance.GetUnlockedHats().ToImmutableList();
 
@@ -66,6 +70,10 @@ public static class HatsTabPatches
     [HarmonyPrefix]
     public static void UpdatePrefix(HatsTab __instance)
     {
+        if (!AddressablesLoader.AddressableHatsExist)
+        {
+            return;
+        }
         if (sortedHats.Count == 0) return;
 
         if (Input.GetKeyDown(KeyCode.LeftControl) || Input.GetKeyDown(KeyCode.RightControl) || Input.GetKeyDown(KeyCode.LeftArrow))
