@@ -3,12 +3,18 @@ using MiraAPI.GameModes;
 
 namespace MiraAPI.Patches.GameModes;
 
-[HarmonyPatch(typeof(KillAnimation))]
+[HarmonyPatch(typeof(GameManager))]
 internal static class OnDeathPatch
 {
-    [HarmonyPostfix, HarmonyPatch(nameof(KillAnimation.CoPerformKill))]
-    public static void OnDeathPostfix([HarmonyArgument(0)] PlayerControl source, [HarmonyArgument(1)] PlayerControl target)
+    [HarmonyPrefix, HarmonyPatch(nameof(GameManager.OnPlayerDeath))]
+    public static bool OnDeathPostfix([HarmonyArgument(0)] PlayerControl player, [HarmonyArgument(1)] bool assignGhostRole)
     {
-        CustomGameModeManager.ActiveMode?.OnDeath(target);
+        if (CustomGameModeManager.ActiveMode != null)
+        {
+            CustomGameModeManager.ActiveMode.OnPlayerDeath(player, assignGhostRole);
+            return false;
+        }
+
+        return true;
     }
 }

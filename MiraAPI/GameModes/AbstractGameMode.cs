@@ -87,8 +87,10 @@ public abstract class AbstractGameMode : IOptionable
     /// Called when a player is killed.
     /// </summary>
     /// <param name="player">PlayerControl that was killed.</param>
-    public virtual void OnDeath(PlayerControl player)
+    /// <param name="assignGhostRole">Determines whether to assign a ghost role on the player.</param>
+    public virtual void OnPlayerDeath(PlayerControl player, bool assignGhostRole)
     {
+        GameManager.Instance.LogicRoleSelection.OnPlayerDeath(player, assignGhostRole);
     }
 
     /// <summary>

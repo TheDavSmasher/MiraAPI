@@ -32,6 +32,7 @@ public class HideAndSeekMode : AbstractGameMode
 
     public override IEnumerator IntroCutscene(IntroCutscene __instance)
     {
+        deadPlayerCount = 0;
         SoundManager.Instance.PlaySound(__instance.IntroStinger, false, 1f, null);
         ShipStatus.Instance.BreakEmergencyButton();
         Logger.GlobalInstance.Info("IntroCutscene :: CoBegin() :: Game Mode: Hide and Seek (MiraAPI)", null);
@@ -220,5 +221,14 @@ public class HideAndSeekMode : AbstractGameMode
             }
             return PlayerBodyTypes.Normal;
         }
+    }
+    private int deadPlayerCount;
+    public override void OnPlayerDeath(PlayerControl player, bool assignGhostRole)
+    {
+        base.OnPlayerDeath(player, assignGhostRole);
+        var popup = GameManagerCreator.Instance.HideAndSeekManagerPrefab.DeathPopupPrefab;
+        deadPlayerCount++;
+        var item = UnityEngine.Object.Instantiate(popup, HudManager.Instance.transform.parent);
+        item.Show(player, deadPlayerCount);
     }
 }
