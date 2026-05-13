@@ -1,5 +1,6 @@
 using HarmonyLib;
 using MiraAPI.GameModes;
+using Reactor.Utilities.Extensions;
 using TMPro;
 using UnityEngine;
 
@@ -33,7 +34,7 @@ internal static class HudPatches
         gmText.SetActive(false);
         modelText.SetActive(false);
         _text = gmTextClone.GetComponent<TextMeshPro>();
-        _text.text = CustomGameModeManager.ActiveMode?.Name ?? "Classic";
+        _text.text = CustomGameModeManager.ActiveMode != null ? $"<color=#{CustomGameModeManager.ActiveMode.Color.ToHtmlStringRGBA()}>{CustomGameModeManager.ActiveMode.Name}</color>" : "Classic";
     }
 
     private static TextMeshPro? _text;
