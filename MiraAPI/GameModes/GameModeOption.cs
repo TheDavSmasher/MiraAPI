@@ -4,6 +4,7 @@ using HarmonyLib;
 using Il2CppInterop.Runtime.InteropTypes.Arrays;
 using Il2CppSystem;
 using MiraAPI.Patches.GameModes;
+using MiraAPI.Patches.Options;
 using Reactor.Localization.Utilities;
 using Reactor.Utilities.Extensions;
 using UnityEngine;
@@ -57,6 +58,10 @@ public static class GameModeOption
     [HarmonyPostfix]
     private static void CreateSettingsPatch(GameOptionsMenu __instance)
     {
+        if (GameSettingMenuPatches.SelectedModIdx != 0)
+        {
+            return;
+        }
         if (GameManager.Instance.IsHideAndSeek())
             return;
         float num = 0.713f;
