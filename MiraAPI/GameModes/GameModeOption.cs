@@ -246,7 +246,9 @@ public static class GameModeOption
         categoryHeaderMasked.transform.localPosition += Vector3.down;
 
         var newText = Object.Instantiate(categoryHeaderMasked.Title, categoryHeaderMasked.transform);
-        newText.text = "<size=70%>(Click to close)</size>";
+        newText.text = group.AllOptionsHidden
+            ? "<size=70%>(Click to open)</size>"
+            : "<size=70%>(Click to close)</size>";
         newText.transform.localPosition = new Vector3(2.6249f, -0.165f, 0f);
         newText.gameObject.GetComponent<TextTranslatorTMP>().Destroy();
 
@@ -392,7 +394,9 @@ public static class GameModeOption
             (UnityAction)(() =>
             {
                 group.AllOptionsHidden = !group.AllOptionsHidden;
-                newText.text = "<size=70%>(Click to open/close)</size>";
+                newText.text = group.AllOptionsHidden
+                    ? "<size=70%>(Click to open)</size>"
+                    : "<size=70%>(Click to close)</size>";
                 menu.RefreshOptions(CustomGameModeManager.ActiveMode!);
             }));
         headerBtn.SetButtonEnableState(true);
