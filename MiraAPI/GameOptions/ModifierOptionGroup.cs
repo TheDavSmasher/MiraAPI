@@ -1,8 +1,10 @@
 ﻿using System.Linq;
+using MiraAPI.PluginLoading;
 
 namespace MiraAPI.GameOptions;
 
 #pragma warning disable CA1852
+[MiraIgnore]
 internal class ModifierOptionGroup : AbstractOptionGroup
 #pragma warning restore CA1852
 {

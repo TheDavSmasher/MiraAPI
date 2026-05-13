@@ -39,12 +39,111 @@ public sealed class MiraPluginManager
 
     internal Dictionary<MiraPluginInfo, List<Type>> QueuedRoleRegistrations { get; } = [];
     internal static MiraPluginManager Instance { get; private set; } = new();
+    public static ConfigFile MiraApiConfig { get; private set; }
+    public static MiraPluginInfo MiraApiPluginInfo { get; private set; }
 
-    internal void Initialize()
+    internal void Initialize(BasePlugin miraApiPlugin, IMiraPlugin apiPlugin)
     {
         Instance = this;
         CustomGameModeManager.RegisterDefaultMode();
         CustomGameModeManager.GetAndSetGameMode();
+        if (IL2CPPChainloader.Instance.Plugins.TryGetValue(MiraApiPlugin.Id, out var newPlugin))
+        {
+            var assembly = Assembly.GetCallingAssembly();
+            var info = new MiraPluginInfo(apiPlugin, newPlugin);
+            var roles = new List<Type>();
+
+            var oldConfigSetting = info.PluginConfig.SaveOnConfigSet;
+            info.PluginConfig.SaveOnConfigSet = false;
+
+            foreach (var type in assembly.GetTypes())
+            {
+                if (type.IsAbstract || type.GetCustomAttribute<MiraIgnoreAttribute>() != null)
+                {
+                    continue;
+                }
+
+                foreach (var method in AccessTools.GetDeclaredMethods(type))
+                {
+                    var eventAttribute = method.GetCustomAttribute<RegisterEventAttribute>();
+                    if (eventAttribute == null)
+                    {
+                        continue;
+                    }
+
+                    if (!method.IsStatic)
+                    {
+                        Error($"Event method {method.Name} in {type.Name} must be static.");
+                        continue;
+                    }
+
+                    var parameters = method.GetParameters();
+                    if (parameters.Length != 1 || !parameters[0].ParameterType.IsSubclassOf(typeof(MiraEvent)))
+                    {
+                        Error($"Invalid event registration method {method.Name} in {type.Name}");
+                        continue;
+                    }
+
+                    var paramType = parameters[0].ParameterType;
+                    MiraEventManager.RegisterEventHandler(paramType, method, eventAttribute.Priority);
+                }
+
+                if (RegisterModifier(type, info))
+                {
+                    continue;
+                }
+
+                if (RegisterOptions(type, info))
+                {
+                    continue;
+                }
+
+                if (RegisterLocalTabs(type, miraApiPlugin))
+                {
+                    continue;
+                }
+
+                if (RegisterRole(type, info, out var role))
+                {
+                    roles.Add(role);
+                    continue;
+                }
+
+                if (RegisterButton(type, info))
+                {
+                    continue;
+                }
+
+                if (RegisterGameOver(type))
+                {
+                    continue;
+                }
+
+                if (RegisterGameModeAttribute(type, info))
+                {
+                    continue;
+                }
+
+                RegisterColorClasses(type);
+                RegisterKeybinds(type, miraApiPlugin);
+            }
+
+            info.PluginConfig.Save();
+            info.PluginConfig.SaveOnConfigSet = oldConfigSetting;
+            MiraApiConfig = info.PluginConfig;
+
+            info.InternalOptionGroups.Sort((x, y) => x.GroupPriority.CompareTo(y.GroupPriority));
+            QueuedRoleRegistrations.Add(info, roles);
+
+            _registeredPlugins.Add(assembly, info);
+            MiraApiPluginInfo = info;
+
+            info.SavePublicCollections();
+            PresetManager.CreateDefaultPreset(info);
+            PresetManager.LoadPresets(info);
+            Info($"Registering Mira API as mod.");
+        }
+
         IL2CPPChainloader.Instance.PluginLoad += (pluginInfo, assembly, plugin) =>
         {
             if (plugin is not IMiraPlugin miraPlugin)
