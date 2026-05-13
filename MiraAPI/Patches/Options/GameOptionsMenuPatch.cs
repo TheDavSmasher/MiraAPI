@@ -72,7 +72,7 @@ internal static class GameOptionsMenuPatch
         __instance.scrollBar.SetYBoundsMax(-num - 1.65f);
     }
 
-    private static void UpdateGroup(AbstractOptionGroup group, ref float num)
+    internal static void UpdateGroup(AbstractOptionGroup group, ref float num)
     {
         if (group.Options.Count == 0 || group.Header is null)
         {

@@ -6,6 +6,7 @@ using System.Reflection;
 using BepInEx.Configuration;
 using HarmonyLib;
 using Il2CppInterop.Runtime.Injection;
+using MiraAPI.GameModes;
 using MiraAPI.GameOptions.Attributes;
 using MiraAPI.GameOptions.OptionTypes;
 using MiraAPI.Networking;
@@ -26,6 +27,7 @@ public static class ModdedOptionsManager
 
     internal static readonly Dictionary<OptionBehaviour, ModdedPlayerOption> CreatedPlayerOptions = [];
     internal static readonly Dictionary<OptionBehaviour, ModdedStringOption> CreatedStringOptions = [];
+    internal static readonly Dictionary<Type, AbstractOptionGroup> GameModeOptionGroups = [];
     internal static readonly Dictionary<uint, IModdedOption> ModdedOptions = [];
     internal static readonly List<AbstractOptionGroup> Groups = [];
 
@@ -70,6 +72,10 @@ public static class ModdedOptionsManager
 
         Groups.Add(group);
         TypeToGroup.Add(type, group);
+        if (group.OptionableType?.IsAssignableTo(typeof(AbstractGameMode)) == true)
+        {
+            GameModeOptionGroups.Add(group.OptionableType, group);
+        }
         pluginInfo.InternalOptionGroups.Add(group);
 
         typeof(OptionGroupSingleton<>).MakeGenericType(type)

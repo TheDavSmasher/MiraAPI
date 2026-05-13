@@ -43,6 +43,11 @@ public abstract class AbstractGameMode : IOptionable
     public virtual bool IsHideAndSeek => false;
 
     /// <summary>
+    /// Gets a value indicating whether the gamemode removes the normal game settings.
+    /// </summary>
+    public virtual bool ShowNormalGameSettings => true;
+
+    /// <summary>
     /// Called on GameManager.GetBodyType().
     /// </summary>
     /// <param name="player">Player to get body type from.</param>

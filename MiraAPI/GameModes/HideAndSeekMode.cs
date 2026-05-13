@@ -30,6 +30,7 @@ public class HideAndSeekMode : AbstractGameMode
     public override bool ShowGameModeIntroCutscene => true;
     public override bool GameModeBodyTypeOverride => true;
     public override bool IsHideAndSeek => true;
+    public override bool ShowNormalGameSettings => false;
 
     public override IEnumerator IntroCutscene(IntroCutscene __instance)
     {

@@ -3,6 +3,7 @@ using System.Linq;
 using HarmonyLib;
 using Il2CppInterop.Runtime.InteropTypes.Arrays;
 using Il2CppSystem;
+using MiraAPI.GameOptions;
 using MiraAPI.Patches.GameModes;
 using MiraAPI.Patches.Options;
 using Reactor.Localization.Utilities;
@@ -54,21 +55,43 @@ public static class GameModeOption
         if (!Values.ContainsKey(opt))
             Values.Add(opt, CustomStringName.CreateAndRegister(opt));
     }
+
+    private static List<CategoryHeaderMasked> VanillaCategories = new();
+    private static List<OptionBehaviour> VanillaOptions = new();
+    private static List<CategoryHeaderMasked> BaseCategories = new();
+    private static List<OptionBehaviour> BaseOptions = new();
     [HarmonyPatch(typeof(GameOptionsMenu), nameof(GameOptionsMenu.CreateSettings))]
     [HarmonyPostfix]
     private static void CreateSettingsPatch(GameOptionsMenu __instance)
     {
-        if (GameSettingMenuPatches.SelectedModIdx != 0)
+        if (GameSettingMenuPatches.SelectedModIdx != 0 || GameManager.Instance.IsHideAndSeek() || CustomGameModeManager.ActiveMode == null)
         {
             return;
         }
-        if (GameManager.Instance.IsHideAndSeek())
-            return;
+        VanillaCategories.Clear();
+        VanillaOptions.Clear();
+        BaseCategories.Clear();
+        BaseOptions.Clear();
         float num = 0.713f;
         foreach (var category in __instance.settingsContainer.GetComponentsInChildren<CategoryHeaderMasked>())
         {
             if (category)
                 category.gameObject.transform.localPosition -= new Vector3(0, 1.3f, 0);
+        }
+
+        var showOpts = CustomGameModeManager.ActiveMode.ShowNormalGameSettings;
+
+        var newList = __instance.Children.ToArray();
+        BaseOptions.Add(newList[0]);
+        foreach (var obj in newList.Skip(1))
+        {
+            VanillaOptions.Add(obj);
+            obj.gameObject.SetActive(showOpts);
+        }
+        foreach (var category in __instance.settingsContainer.GetComponentsInChildren<CategoryHeaderMasked>())
+        {
+            VanillaCategories.Add(category);
+            category.gameObject.SetActive(showOpts);
         }
 
         CategoryHeaderMasked categoryHeaderMasked = Object.Instantiate(__instance.categoryHeaderOrigin, Vector3.zero, Quaternion.identity, __instance.settingsContainer);
@@ -95,15 +118,60 @@ public static class GameModeOption
             _lastValue = opt.GetInt();
             CustomGameModeManager.SetGameMode((uint)_lastValue);
             HudPatches.SetGameModeText(Values.ElementAt(_lastValue).Key);
+            __instance.RefreshOptions(CustomGameModeManager.ActiveMode);
         });
         foreach (var optionBehaviour in __instance.Children.ToArray().Skip(1))
         {
             optionBehaviour.gameObject.transform.localPosition -= new Vector3(0, 1.3f, 0);
         }
         __instance.Children.Add(OptionBehaviour);
-        __instance.scrollBar.SetYBoundsMax(__instance.scrollBar.GetYBounds().max + 1);
+        BaseCategories.Add(categoryHeaderMasked);
+        BaseOptions.Add(OptionBehaviour);
         for (var i = 1; i < Values.Count; i++)
             OptionBehaviour.Values = (Il2CppStructArray<StringNames>)OptionBehaviour.Values.Add(Values.ElementAt(i).Value);
+        __instance.RefreshOptions(CustomGameModeManager.ActiveMode);
+    }
+
+    private static void RefreshOptions(this GameOptionsMenu instance, AbstractGameMode mode)
+    {
+        instance.Children.Clear();
+        foreach (var group in BaseOptions)
+        {
+            instance.Children.Add(group);
+        }
+
+        var showOpts = mode.ShowNormalGameSettings;
+        var num = 0.083f;
+        foreach (var category in VanillaCategories)
+        {
+            category.gameObject.SetActive(showOpts);
+        }
+        if (showOpts)
+        {
+            foreach (var obj in VanillaOptions)
+            {
+                obj.gameObject.SetActive(true);
+                instance.Children.Add(obj);
+            }
+            instance.scrollBar.SetYBoundsMax(instance.scrollBar.GetYBounds().max + 1);
+        }
+        else
+        {
+            foreach (var obj in VanillaOptions)
+            {
+                obj.gameObject.SetActive(false);
+            }
+            /*var filteredGroups =
+                ModdedOptionsManager.GameModeOptionGroups
+                    .Where(x => x.Key == mode.GetType()) ?? [];
+
+            foreach (var group in filteredGroups)
+            {
+                GameOptionsMenuPatch.UpdateGroup(group.Value, ref num);
+            }*/
+
+            instance.scrollBar.SetYBoundsMax(-num - 1.65f);
+        }
     }
 
     [HarmonyPatch(typeof(GameOptionsMenu), nameof(GameOptionsMenu.ValueChanged))]
