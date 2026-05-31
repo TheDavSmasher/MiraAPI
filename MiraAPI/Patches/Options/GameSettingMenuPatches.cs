@@ -199,7 +199,7 @@ internal static class GameSettingMenuPatches
             {
                 SaveScrollPositions(__instance);
                 SelectedModIdx += 1;
-                if (SelectedModIdx > MiraPluginManager.Instance.RegisteredPlugins.Length)
+                if (SelectedModIdx > MiraPluginManager.Instance.ConfigurablePlugins.Length)
                 {
                     SelectedModIdx = 0;
                 }
@@ -220,7 +220,7 @@ internal static class GameSettingMenuPatches
                 SelectedModIdx -= 1;
                 if (SelectedModIdx < 0)
                 {
-                    SelectedModIdx = MiraPluginManager.Instance.RegisteredPlugins.Length;
+                    SelectedModIdx = MiraPluginManager.Instance.ConfigurablePlugins.Length;
                 }
 
                 UpdateText(__instance, __instance.GameSettingsTab, __instance.RoleSettingsTab);
@@ -352,7 +352,7 @@ internal static class GameSettingMenuPatches
 
         _modifierBtnOgPos = _modifiersButton.transform.localPosition;
 
-        foreach (var plugin in MiraPluginManager.Instance.RegisteredPlugins)
+        foreach (var plugin in MiraPluginManager.Instance.ConfigurablePlugins)
         {
             PresetManager.LoadPresets(plugin);
         }
@@ -399,17 +399,17 @@ internal static class GameSettingMenuPatches
     {
         if (_text is not null && SelectedModIdx == 0)
         {
-            _text.text = $"<size=40%>(Page 0/{MiraPluginManager.Instance.RegisteredPlugins.Length})</size>\nDefault";
+            _text.text = $"<size=40%>(Page 0/{MiraPluginManager.Instance.ConfigurablePlugins.Length})</size>\nDefault";
             _text.fontSizeMax = 3.2f;
             SelectedMod = null;
         }
         else if (_text is not null)
         {
             _text.fontSizeMax = 2.3f;
-            SelectedMod = MiraPluginManager.Instance.RegisteredPlugins[SelectedModIdx - 1];
+            SelectedMod = MiraPluginManager.Instance.ConfigurablePlugins[SelectedModIdx - 1];
 
             var name = SelectedMod.MiraPlugin.OptionsTitleText;
-            _text.text = $"<size=50%>(Page {SelectedModIdx}/{MiraPluginManager.Instance.RegisteredPlugins.Length})</size>\n" + name[..Math.Min(name.Length, 25)];
+            _text.text = $"<size=50%>(Page {SelectedModIdx}/{MiraPluginManager.Instance.ConfigurablePlugins.Length})</size>\n" + name[..Math.Min(name.Length, 25)];
         }
 
         bool replaceWithModifiers = true;

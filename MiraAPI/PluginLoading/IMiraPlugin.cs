@@ -13,6 +13,11 @@ public interface IMiraPlugin
     string OptionsTitleText { get; }
 
     /// <summary>
+    /// Gets the value indicating if the mod appears in the settings menu.
+    /// </summary>
+    public virtual bool ShowInSettings => true;
+
+    /// <summary>
     /// Gets the name for the first custom category in the game options menu, if any.
     /// </summary>
     public virtual string CustomOptionMenuNameOne => "Custom Category 1";

@@ -32,6 +32,9 @@ public partial class MiraApiPlugin : BasePlugin, IMiraPlugin
     /// <inheritdoc />
     public string OptionsTitleText => "MiraAPI";
 
+    /// <inheritdoc />
+    public bool ShowInSettings => false;
+
     /// <summary>
     /// Gets a value indicating whether the current device is running Starlight (on mobile).
     /// </summary>

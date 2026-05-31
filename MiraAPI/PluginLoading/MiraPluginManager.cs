@@ -34,8 +34,10 @@ namespace MiraAPI.PluginLoading;
 public sealed class MiraPluginManager
 {
     private readonly Dictionary<Assembly, MiraPluginInfo> _registeredPlugins = [];
+    private readonly Dictionary<Assembly, MiraPluginInfo> _configurablePlugins = [];
 
     internal MiraPluginInfo[] RegisteredPlugins { get; private set; } = null!;
+    internal MiraPluginInfo[] ConfigurablePlugins { get; private set; } = null!;
 
     internal Dictionary<MiraPluginInfo, List<Type>> QueuedRoleRegistrations { get; } = [];
     internal static MiraPluginManager Instance { get; private set; } = new();
@@ -236,6 +238,10 @@ public sealed class MiraPluginManager
             QueuedRoleRegistrations.Add(info, roles);
 
             _registeredPlugins.Add(assembly, info);
+            if (miraPlugin.ShowInSettings)
+            {
+                _configurablePlugins.Add(assembly, info);
+            }
 
             info.SavePublicCollections();
             PresetManager.CreateDefaultPreset(info);
@@ -250,6 +256,7 @@ public sealed class MiraPluginManager
 
             // Cache all the registered plugins into an array for easy access
             RegisteredPlugins = [.. _registeredPlugins.Values];
+            ConfigurablePlugins = [.. _configurablePlugins.Values];
 
             ModifierManager.Modifiers = new ReadOnlyCollection<BaseModifier>(ModifierManager.InternalModifiers);
 
