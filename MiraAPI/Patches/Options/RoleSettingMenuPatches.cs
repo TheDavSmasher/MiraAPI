@@ -41,12 +41,6 @@ public static class RoleSettingMenuPatches
     {
         HudManager.Instance.PlayerCam.OverrideScreenShakeEnabled = false;
     }
-    [HarmonyPostfix]
-    [HarmonyPatch(nameof(RolesSettingsMenu.OnDisable))]
-    public static void ClosePatch(RolesSettingsMenu __instance)
-    {
-        HudManager.Instance.PlayerCam.OverrideScreenShakeEnabled = true;
-    }
 
     [HarmonyPostfix]
     [HarmonyPatch(nameof(RolesSettingsMenu.SetQuotaTab))]
