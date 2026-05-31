@@ -58,7 +58,7 @@ public static class GameModeOption
     internal static void AddOption(AbstractGameMode mode)
     {
         if (!Values.ContainsKey(mode.ID))
-            Values.Add(mode.ID, CustomStringName.CreateAndRegister(mode.GetColoredName()));
+            Values.Add(mode.ID, CustomStringName.CreateAndRegister(mode.ColoredName));
     }
 
     private static readonly List<CategoryHeaderMasked> VanillaCategories = new();

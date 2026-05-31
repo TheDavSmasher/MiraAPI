@@ -29,6 +29,11 @@ public abstract class AbstractGameMode : IOptionable
     public virtual Color Color { get; } = Color.white;
 
     /// <summary>
+    /// Gets the colored game mode name, using the color and name properties.
+    /// </summary>
+    public string ColoredName => $"<color=#{Color.ToHtmlStringRGBA()}>{Name}</color>";
+
+    /// <summary>
     /// Gets the game mode id.
     /// </summary>
     public uint ID { get; internal set; }
@@ -65,12 +70,6 @@ public abstract class AbstractGameMode : IOptionable
         }
         return PlayerBodyTypes.Normal;
     }
-
-    /// <summary>
-    /// Used to construct the Gamemode option.
-    /// </summary>
-    /// <returns>The colored version of the Gamemode name using its color.</returns>
-    public string GetColoredName() => $"<color=#{Color.ToHtmlStringRGBA()}>{Name}</color>";
 
     /// <summary>
     /// Gets a value indicating whether a custom intro sequence is implemented by the game mode.
