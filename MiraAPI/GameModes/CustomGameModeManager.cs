@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using MiraAPI.PluginLoading;
 using Reactor.Utilities;
-using Reactor.Utilities.Extensions;
 
 namespace MiraAPI.GameModes;
 
@@ -11,11 +10,11 @@ namespace MiraAPI.GameModes;
 /// </summary>
 public static class CustomGameModeManager
 {
-    public static readonly Dictionary<uint, AbstractGameMode> IdToModeMap = [];
+    internal static readonly Dictionary<uint, AbstractGameMode> IdToModeMap = [];
 
     private static uint GetNextId() => ++LastId;
 
-    internal static uint LastId { get; private set; }
+    private static uint LastId { get; set; }
 
     /// <summary>
     /// Register gamemode from type.
@@ -45,20 +44,39 @@ public static class CustomGameModeManager
     }
 
     /// <summary>
-    /// Checks to see if the default game mode is on.
+    /// Checks to see if the classic game mode is on.
     /// </summary>
-    /// <returns>True if the default mode is the current one.</returns>
-    public static bool IsDefault() => ActiveMode is DefaultMode;
-    public static bool IsHideNSeek() => ActiveMode is HideAndSeekMode;
+    /// <returns>True if the classic mode is the current one.</returns>
+    public static bool IsClassic() => IsActiveGameMode<ClassicMode>();
+
+    /// <summary>
+    /// Checks to see if the HNS game mode is on.
+    /// </summary>
+    /// <returns>True if the Hide & Seek mode is the current one.</returns>
+    public static bool IsHideNSeek() => IsActiveGameMode<HideAndSeekMode>();
+
+    /// <summary>
+    /// Checks if a provided GameMode is the current active one.
+    /// </summary>
+    /// <typeparam name="T">The AbstractGameMode subclass being checked.</typeparam>
+    /// <returns>Whether the provided mode is the current active one.</returns>
+    public static bool IsActiveGameMode<T>() where T : AbstractGameMode => ActiveMode is T;
 
     /// <summary>
     /// Gets the current gamemode.
     /// </summary>
     public static AbstractGameMode? ActiveMode { get; internal set; }
 
+    /// <summary>
+    /// Gets a gamemode from an ID.
+    /// </summary>
+    /// <param name="id">The ID of the gamemode to fetch.</param>
+    /// <returns>The gamemode matching that ID.</returns>
+    public static AbstractGameMode GetMode(uint id) => IdToModeMap[id];
+
     internal static void RegisterDefaultMode()
     {
-        var defaultMode = new DefaultMode();
+        var defaultMode = new ClassicMode();
         IdToModeMap.Add(0, defaultMode);
         // no need to add to game mode option as it already contains it
         // because we cannot have the option be created with no values

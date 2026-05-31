@@ -3,10 +3,10 @@
 namespace MiraAPI.GameModes;
 
 /// <summary>
-/// The default game mode.
+/// The classic game mode.
 /// </summary>
 [MiraIgnore]
-public class DefaultMode : AbstractGameMode
+public class ClassicMode : AbstractGameMode
 {
     /// <inheritdoc/>
     public override string Name => "Classic";

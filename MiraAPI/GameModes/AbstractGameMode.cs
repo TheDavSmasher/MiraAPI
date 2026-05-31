@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using MiraAPI.GameOptions;
 using MiraAPI.PluginLoading;
+using Reactor.Utilities.Extensions;
 using UnityEngine;
 
 namespace MiraAPI.GameModes;
@@ -28,9 +29,9 @@ public abstract class AbstractGameMode : IOptionable
     public virtual Color Color { get; } = Color.white;
 
     /// <summary>
-    /// Gets or sets the game mode id.
+    /// Gets the game mode id.
     /// </summary>
-    public uint ID { get; set; }
+    public uint ID { get; internal set; }
 
     /// <summary>
     /// Gets a value indicating whether a specific body type is used by the game mode.
@@ -64,6 +65,12 @@ public abstract class AbstractGameMode : IOptionable
         }
         return PlayerBodyTypes.Normal;
     }
+
+    /// <summary>
+    /// Used to construct the Gamemode option.
+    /// </summary>
+    /// <returns>The colored version of the Gamemode name using its color.</returns>
+    public string GetColoredName() => $"<color=#{Color.ToHtmlStringRGBA()}>{Name}</color>";
 
     /// <summary>
     /// Gets a value indicating whether a custom intro sequence is implemented by the game mode.

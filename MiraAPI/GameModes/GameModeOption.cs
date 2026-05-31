@@ -50,16 +50,15 @@ public static class GameModeOption
     private static int _lastValue;
     private static readonly StringNames GamemodeName = CustomStringName.CreateAndRegister("Gamemode");
     private static readonly StringNames CustomName = CustomStringName.CreateAndRegister("Custom");
-    private static readonly Dictionary<string, StringNames> Values = new()
+    private static readonly Dictionary<uint, StringNames> Values = new()
     {
-        ["Classic"] = CustomStringName.CreateAndRegister("Classic"),
+        [0] = CustomStringName.CreateAndRegister("Classic"),
     };
 
     internal static void AddOption(AbstractGameMode mode)
     {
-        var opt = $"<color=#{mode.Color.ToHtmlStringRGBA()}>{mode.Name}</color>";
-        if (!Values.ContainsKey(opt))
-            Values.Add(opt, CustomStringName.CreateAndRegister(opt));
+        if (!Values.ContainsKey(mode.ID))
+            Values.Add(mode.ID, CustomStringName.CreateAndRegister(mode.GetColoredName()));
     }
 
     private static readonly List<CategoryHeaderMasked> VanillaCategories = new();
@@ -122,14 +121,15 @@ public static class GameModeOption
         setting.Type = OptionTypes.MultipleChoice;
         setting.Title = GamemodeName;
         setting.Index = _lastValue;
-        setting.Values = new Il2CppStructArray<StringNames>([Values["Classic"]]);
+        setting.Values = new Il2CppStructArray<StringNames>([Values[0]]);
         OptionBehaviour.SetUpFromData(setting, 20);
         OptionBehaviour.TitleText.fontSize = 3;
         OptionBehaviour.OnValueChanged = (Action<OptionBehaviour>) ((OptionBehaviour opt) =>
         {
             _lastValue = opt.GetInt();
             CustomGameModeManager.SetGameMode((uint)_lastValue);
-            HudPatches.SetGameModeText(Values.ElementAt(_lastValue).Key);
+            HudPatches.SetGameModeText(CustomGameModeManager.GetMode(Values.ElementAt(_lastValue).Key).Name);
+            // could make Values a dict of AbstractGameMode to 
             __instance.RefreshOptions(CustomGameModeManager.ActiveMode);
         });
         foreach (var optionBehaviour in __instance.Children.ToArray().Skip(1))

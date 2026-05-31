@@ -9,7 +9,7 @@ internal static class WinnersPatch
     [HarmonyPostfix]
     public static void ShowWinningScreen()
     {
-        if (CustomGameModeManager.ActiveMode is null or DefaultMode)
+        if (CustomGameModeManager.ActiveMode is null or ClassicMode)
             return;
 
         var winners = CustomGameModeManager.ActiveMode.CalculateWinners();

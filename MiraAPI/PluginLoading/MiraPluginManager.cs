@@ -263,7 +263,7 @@ public sealed class MiraPluginManager
             var dict = new Dictionary<string, object>();
             foreach (var (key, value) in CustomGameModeManager.IdToModeMap)
             {
-                if (value is DefaultMode)
+                if (value is ClassicMode)
                 {
                     continue;
                 }
