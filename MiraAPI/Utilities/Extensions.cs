@@ -53,7 +53,7 @@ public static class Extensions
         bool isComplete;
         if (self.amClosing == Minigame.CloseState.Closing)
         {
-            UnityEngine.Object.Destroy(self.gameObject);
+            self.gameObject.FakeDestroy();
             return;
         }
         if (self.CloseSound && Constants.ShouldPlaySfx())
@@ -218,6 +218,24 @@ public static class Extensions
     {
         return Mathf.Approximately(number, Mathf.Round(number));
     }
+
+    /// <summary>
+    /// Hides the object away rather than destroy it to prevent memory leaks.
+    /// </summary>
+    /// <param name="obj">The object to hide.</param>
+    public static void FakeDestroy(this GameObject obj)
+    {
+        obj.hideFlags = HideFlags.HideAndDontSave;
+        if (!toDestroyHolder)
+        {
+            toDestroyHolder = new GameObject("ToDestroyHolder");
+            toDestroyHolder.gameObject.SetActive(false);
+        }
+        obj.transform.SetParent(toDestroyHolder.transform);
+        obj.SetActive(false);
+    }
+
+    private static GameObject toDestroyHolder;
 
     /// <summary>
     /// Gets a cache of player's vote data components to improve performance.

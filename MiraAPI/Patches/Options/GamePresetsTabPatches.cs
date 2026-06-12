@@ -262,7 +262,7 @@ internal static class GamePresetsTabPatches
             iconSpriteRend.sprite = MiraAssets.RefreshIcon.LoadAsset();
 
             Helpers.DivideSize(refreshButton.gameObject, 2f);
-            refreshButton.buttonText.gameObject.Destroy();
+            refreshButton.buttonText.gameObject.FakeDestroy();
 
             refreshButton.OnClick = new Button.ButtonClickedEvent();
             refreshButton.OnClick.AddListener((UnityAction)Refresh);

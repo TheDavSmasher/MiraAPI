@@ -81,9 +81,9 @@ public static class NameplatesTabPatches
 
     private static void GenerateHats(NameplatesTab __instance, int page)
     {
-        foreach (ColorChip instanceColorChip in __instance.ColorChips) instanceColorChip.gameObject.Destroy();
+        foreach (ColorChip instanceColorChip in __instance.ColorChips) instanceColorChip.gameObject.FakeDestroy();
         __instance.ColorChips.Clear();
-        __instance.scroller.Inner.GetComponentsInChildren<TextMeshPro>().Do(x => x.gameObject.Destroy());
+        __instance.scroller.Inner.GetComponentsInChildren<TextMeshPro>().Do(x => x.gameObject.FakeDestroy());
 
         var groupNameText = __instance.GetComponentInChildren<TextMeshPro>(false);
 

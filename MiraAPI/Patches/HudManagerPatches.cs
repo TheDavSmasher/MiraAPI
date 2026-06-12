@@ -143,7 +143,7 @@ public static class HudManagerPatches
 
         foreach (var t in BottomLeft.GetComponentsInChildren<ActionButton>(true))
         {
-            t.gameObject.Destroy();
+            t.gameObject.FakeDestroy();
         }
 
         var gridArrange = BottomLeft.GetComponent<GridArrange>();

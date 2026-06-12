@@ -53,9 +53,23 @@ public static class RoleSettingMenuPatches
     [HarmonyPatch(nameof(RolesSettingsMenu.SetQuotaTab))]
     public static bool SetQuotaTabPatch(RolesSettingsMenu __instance)
     {
-        Headers.ForEach(Object.Destroy);
-        RoleOptionSettings.ForEach(Object.Destroy);
+        foreach (var obj in Headers)
+        {
+            if (!obj)
+            {
+                continue;
+            }
+            obj.FakeDestroy();
+        }
         Headers.Clear();
+        foreach (var obj in RoleOptionSettings)
+        {
+            if (!obj)
+            {
+                continue;
+            }
+            obj.gameObject.FakeDestroy();
+        }
         RoleOptionSettings.Clear();
         CurrentRole = null;
         CurrentRoleOptions = null;
@@ -204,9 +218,9 @@ public static class RoleSettingMenuPatches
             var blankLabel = quotaInst.transform.FindChild("BlankLabel").gameObject;
             var chanceLabel = quotaInst.transform.FindChild("Chance Label").gameObject;
             var countLabel = quotaInst.transform.FindChild("# Label").gameObject;
-            blankLabel.Destroy();
-            chanceLabel.Destroy();
-            countLabel.Destroy();
+            blankLabel.FakeDestroy();
+            chanceLabel.FakeDestroy();
+            countLabel.FakeDestroy();
 
             categoryHeaderMasked.Background.sprite = MiraAssets.CategoryHeader.LoadAsset();
             categoryHeaderMasked.Background.sprite.texture.filterMode = FilterMode.Bilinear;
@@ -289,14 +303,22 @@ public static class RoleSettingMenuPatches
                     {
                         RoleGroupHidden[group] = !groupHidden;
                     }
-                    foreach (var header in Headers)
+                    foreach (var obj in Headers)
                     {
-                        header.Destroy();
+                        if (!obj)
+                        {
+                            continue;
+                        }
+                        obj.FakeDestroy();
                     }
                     Headers.Clear();
-                    foreach (var option in RoleOptionSettings)
+                    foreach (var obj in RoleOptionSettings)
                     {
-                        option.gameObject.Destroy();
+                        if (!obj)
+                        {
+                            continue;
+                        }
+                        obj.gameObject.FakeDestroy();
                     }
                     RoleOptionSettings.Clear();
                     __instance.SetQuotaTab();
@@ -422,7 +444,7 @@ public static class RoleSettingMenuPatches
     {
         foreach (var optBehaviour in __instance.AdvancedRolesSettings.GetComponentsInChildren<OptionBehaviour>())
         {
-            optBehaviour.gameObject.DestroyImmediate();
+            optBehaviour.gameObject.FakeDestroy();
         }
 
         CurrentRole = role;
@@ -618,7 +640,7 @@ public static class RoleSettingMenuPatches
             var newButton = Object.Instantiate(roleOptionSetting.buttons[0], roleOptionSetting.transform);
             newButton.name = "ConfigButton";
             newButton.transform.localPosition = new Vector3(0.4473f, -0.3f, -2f);
-            newButton.transform.FindChild("Text_TMP").gameObject.DestroyImmediate();
+            newButton.transform.FindChild("Text_TMP").gameObject.FakeDestroy();
             newButton.activeSprites.Destroy();
 
             var btnRend = newButton.transform.FindChild("ButtonSprite").GetComponent<SpriteRenderer>();

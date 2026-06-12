@@ -4,6 +4,7 @@ using System.Linq;
 using HarmonyLib;
 using Il2CppInterop.Runtime.Attributes;
 using MiraAPI.LocalSettings;
+using MiraAPI.Utilities;
 using MiraAPI.Utilities.Assets;
 using Reactor.Utilities.Attributes;
 using Reactor.Utilities.Extensions;
@@ -137,7 +138,7 @@ public class ModifierDisplayComponent(nint cppPtr) : MonoBehaviour(cppPtr)
     internal void DestroyComponent(ModifierUiComponent component)
     {
         _modifiers.Remove(component.Modifier!);
-        component.gameObject.DestroyImmediate();
+        component.gameObject.FakeDestroy();
         RefreshModifiers();
     }
 
@@ -207,7 +208,7 @@ public class ModifierDisplayComponent(nint cppPtr) : MonoBehaviour(cppPtr)
                 continue;
             }
 
-            mod.Value.gameObject.Destroy();
+            mod.Value.gameObject.FakeDestroy();
             _modifiers.Remove(mod.Key);
         }
 
