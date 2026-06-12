@@ -139,7 +139,7 @@ public static class CustomRoleManager
         roleBehaviour.CanBeKilled = customRole.Configuration.CanGetKilled;
         roleBehaviour.CanUseKillButton = customRole.Configuration.UseVanillaKillButton;
         roleBehaviour.TasksCountTowardProgress = customRole.Configuration.TasksCountForProgress;
-        roleBehaviour.CanVent = customRole.Configuration.CanUseVent || customRole.Configuration.GetsVentData || customRole.Configuration.UseVanillaVentButton;
+        roleBehaviour.CanVent = customRole.Configuration.CanUseVent || customRole.Configuration.GetsVentData;
         roleBehaviour.DefaultGhostRole = customRole.Configuration.GhostRole;
         roleBehaviour.MaxCount = customRole.Configuration.MaxRoleCount;
         roleBehaviour.RoleScreenshot = customRole.Configuration.OptionsScreenshot?.LoadAsset();
