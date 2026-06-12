@@ -39,7 +39,8 @@ public record struct CustomRoleConfiguration
         GhostRole = role.Team is ModdedRoleTeams.Impostor ? RoleTypes.ImpostorGhost : RoleTypes.CrewmateGhost;
         CanGetKilled = roleBehaviour?.IsDead == false && role.Team is not ModdedRoleTeams.Impostor;
         UseVanillaKillButton = role.Team is ModdedRoleTeams.Impostor;
-        CanUseVent = role.Team is ModdedRoleTeams.Impostor;
+        GetsVentData = role.Team is ModdedRoleTeams.Impostor;
+        UseVanillaVentButton = role.Team is ModdedRoleTeams.Impostor;
         CanUseSabotage = role.Team is ModdedRoleTeams.Impostor;
         TasksCountForProgress = role.Team is ModdedRoleTeams.Crewmate;
         HideSettings = roleBehaviour?.IsDead == true;
@@ -111,7 +112,18 @@ public record struct CustomRoleConfiguration
     /// <summary>
     /// Gets or sets a value indicating whether the role can use vents.
     /// </summary>
+    [Obsolete("The equivalent of having both GetsVentData and UseVanillaVentButton as true. Only remains for compatability.")]
     public bool CanUseVent { get; set; }
+
+    /// <summary>
+    /// Gets or sets a value indicating whether the role can receive vanilla vent data.
+    /// </summary>
+    public bool GetsVentData { get; set; }
+
+    /// <summary>
+    /// Gets or sets a value indicating whether the role can use the vanilla vent button.
+    /// </summary>
+    public bool UseVanillaVentButton { get; set; }
 
     /// <summary>
     /// Gets or sets a value indicating whether the role can use the sabotage button.

@@ -28,7 +28,7 @@ internal static class VentCanUsePatch
         var @object = pc.Object;
         var role = @object.Data.Role;
 
-        var canVent = role is ICustomRole customRole ? customRole.Configuration.CanUseVent : role.CanVent;
+        var canVent = role is ICustomRole customRole ? customRole.Configuration.CanUseVent || customRole.Configuration.GetsVentData || customRole.Configuration.UseVanillaVentButton : role.CanVent;
         couldUse = canVent;
 
         var modifiers = @object.GetModifierComponent().ActiveModifiers;

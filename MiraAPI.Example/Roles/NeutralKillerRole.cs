@@ -18,7 +18,8 @@ public class NeutralKillerRole : ImpostorRole, ICustomRole
     {
         UseVanillaKillButton = true,
         CanGetKilled = true,
-        CanUseVent = true,
+        GetsVentData = true,
+        UseVanillaVentButton = true,
     };
 
     public RoleOptionsGroup RoleOptionsGroup { get; } = new("Outcast", Color.gray);
