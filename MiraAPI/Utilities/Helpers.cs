@@ -539,7 +539,7 @@ public static class Helpers
     }
 
     /// <summary>
-    /// Returns whether the role is blacklisted from appearing and spawning. (Only applicable to vanilla roles)
+    /// Returns whether the role is blacklisted from appearing and spawning. Only applicable to vanilla roles.
     /// </summary>
     /// <param name="role">The role to check.</param>
     /// <returns>The role's blacklist status.</returns>

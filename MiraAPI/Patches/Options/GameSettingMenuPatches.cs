@@ -6,6 +6,7 @@ using MiraAPI.GameOptions;
 using MiraAPI.Modifiers;
 using MiraAPI.PluginLoading;
 using MiraAPI.Presets;
+using MiraAPI.Utilities;
 using MiraAPI.Utilities.Assets;
 using Reactor.Utilities.Extensions;
 using TMPro;
@@ -40,6 +41,140 @@ internal static class GameSettingMenuPatches
     private static PassiveButton? _customTwoButton;
     private static GameObject? _nextModButton;
     private static GameObject? _previousModButton;
+    public static List<GameSettingsCache> CachedGameSettings { get; } = [];
+    public static List<RoleSettingsCache> CachedRoleSettings { get; } = [];
+
+    public sealed class GameSettingsCache
+    {
+        public int ModId { get; set; }
+        public MenuCategory Category { get; set; } = MenuCategory.Game;
+        public Il2CppSystem.Collections.Generic.List<OptionBehaviour> Options { get; set; }
+        public List<CategoryHeaderMasked> CategoryHeaders { get; set; }
+        public GameObject CacheHolder { get; set; }
+    }
+    public static GameSettingsCache GetCurrentSettings(MenuCategory category)
+    {
+        var existing = CachedGameSettings.FirstOrDefault(x => x.ModId == SelectedModIdx && x.Category == category);
+        if (existing != null)
+        {
+            return existing;
+        }
+
+        var menu = category switch
+        {
+            MenuCategory.Modifiers => _modifiersTab!,
+            MenuCategory.CustomOne => _customOneTab!,
+            MenuCategory.CustomTwo => _customTwoTab!,
+            _ => GameSettingMenu.Instance.GameSettingsTab,
+        };
+        return AddGameSettings(
+            category,
+            menu.Children,
+            menu.settingsContainer
+                .GetComponentsInChildren<CategoryHeaderMasked>()
+                .ToList());
+    }
+    public static GameSettingsCache AddGameSettings(MenuCategory category, Il2CppSystem.Collections.Generic.List<OptionBehaviour> options, List<CategoryHeaderMasked> categoryHeaders)
+    {
+        var modName = SelectedMod?.MiraPlugin.OptionsTitleText ?? "Vanilla";
+        var newHolder = new GameObject($"{modName} {category}");
+        newHolder.DontUnload().DontDestroy();
+        newHolder.SetActive(false);
+        var newCache = new GameSettingsCache
+        {
+            ModId = SelectedModIdx,
+            Category = category,
+            Options = options,
+            CategoryHeaders = categoryHeaders,
+            CacheHolder = newHolder,
+        };
+        CachedGameSettings.Add(newCache);
+        return newCache;
+    }
+    public static void HideGameOptions(GameSettingsCache cached, GameOptionsMenu gameOptMenu)
+    {
+        foreach (var obj in gameOptMenu.scrollBar.Inner.GetComponentsInChildren<Transform>())
+        {
+            if (obj.gameObject.name == "MapPicker" || !obj.gameObject)
+            {
+                continue;
+            }
+            obj.SetParent(cached.CacheHolder.transform);
+        }
+    }
+    public static void ShowGameOptions(GameSettingsCache cached, GameOptionsMenu gameOptMenu)
+    {
+        foreach (var obj in cached.CacheHolder.GetComponentsInChildren<Transform>())
+        {
+            if (!obj.gameObject)
+            {
+                continue;
+            }
+            obj.SetParent(gameOptMenu.scrollBar.Inner);
+        }
+    }
+    public sealed class RoleSettingsCache
+    {
+        public int ModId { get; set; }
+        public Il2CppSystem.Collections.Generic.List<OptionBehaviour> Options { get; set; }
+        public List<CategoryHeaderEditRole> RoleHeaders { get; set; }
+        public List<RoleOptionSetting> RoleOptions { get; set; }
+        public List<CategoryHeaderEditRole> CategoryHeaders { get; set; }
+        public GameObject CacheHolder { get; set; }
+    }
+    public static RoleSettingsCache GetCurrentRoleSettings()
+    {
+        var existing = CachedRoleSettings.FirstOrDefault(x => x.ModId == SelectedModIdx);
+        if (existing != null)
+        {
+            return existing;
+        }
+
+        var menu = GameSettingMenu.Instance.RoleSettingsTab;
+        return AddRoleSettings(
+            menu.advancedSettingChildren,
+            menu.RoleChancesSettings
+                .GetComponentsInChildren<CategoryHeaderEditRole>()
+                .ToList());
+    }
+    public static RoleSettingsCache AddRoleSettings(Il2CppSystem.Collections.Generic.List<OptionBehaviour> options, List<CategoryHeaderEditRole> categoryHeaders)
+    {
+        var modName = SelectedMod?.MiraPlugin.OptionsTitleText ?? "Vanilla";
+        var newHolder = new GameObject($"{modName} Roles");
+        newHolder.DontUnload().DontDestroy();
+        newHolder.SetActive(false);
+        var newCache = new RoleSettingsCache
+        {
+            ModId = SelectedModIdx,
+            Options = options,
+            CategoryHeaders = categoryHeaders,
+            CacheHolder = newHolder,
+        };
+        CachedRoleSettings.Add(newCache);
+        return newCache;
+    }
+    public static void HideRoleOptions(RoleSettingsCache cached, RolesSettingsMenu gameOptMenu)
+    {
+        foreach (var obj in gameOptMenu.scrollBar.Inner.GetComponentsInChildren<Transform>())
+        {
+            if (obj.gameObject.name == "MapPicker" || !obj.gameObject)
+            {
+                continue;
+            }
+            obj.SetParent(cached.CacheHolder.transform);
+        }
+    }
+    public static void ShowRoleOptions(RoleSettingsCache cached, RolesSettingsMenu gameOptMenu)
+    {
+        foreach (var obj in cached.CacheHolder.GetComponentsInChildren<Transform>())
+        {
+            if (!obj.gameObject)
+            {
+                continue;
+            }
+            obj.SetParent(gameOptMenu.scrollBar.Inner);
+        }
+    }
 
     private static Dictionary<int, Vector3> OptionsPositions { get; } = [];
     private static Dictionary<int, Vector3> ModifiersPositions { get; } = [];
@@ -564,21 +699,6 @@ internal static class GameSettingMenuPatches
         CleanupTab(settings, roles);
     }
 
-    private static void ClearOptions(Il2CppSystem.Collections.Generic.List<OptionBehaviour> options)
-    {
-        foreach (var child in options)
-        {
-            if (child.TryCast<GameOptionsMapPicker>() || !child.gameObject)
-            {
-                continue;
-            }
-
-            child.gameObject.DestroyImmediate();
-        }
-
-        options.Clear();
-    }
-
     private static void CleanupTab(GameOptionsMenu settings, RolesSettingsMenu roles)
     {
         if (roles.roleChances != null)
@@ -608,24 +728,10 @@ internal static class GameSettingMenuPatches
 
         void CleanupRoleSettings(RolesSettingsMenu rolesMenu)
         {
-            if (rolesMenu.advancedSettingChildren != null)
-            {
-                ClearOptions(rolesMenu.advancedSettingChildren);
-                rolesMenu.advancedSettingChildren = null;
-            }
+            HideRoleOptions(GetCurrentRoleSettings(), rolesMenu);
+            rolesMenu.advancedSettingChildren = null;
 
-            rolesMenu.RoleChancesSettings
-                .transform
-                .GetComponentsInChildren<CategoryHeaderEditRole>()
-                .ToList()
-                .ForEach(header => header.gameObject.DestroyImmediate());
-
-            foreach (var role in rolesMenu.roleChances)
-            {
-                role.gameObject.DestroyImmediate();
-            }
-
-            rolesMenu.roleChances?.Clear();
+            rolesMenu.roleChances.Clear();
 
             rolesMenu.AdvancedRolesSettings.gameObject.SetActive(false);
             rolesMenu.RoleChancesSettings.gameObject.SetActive(true);
@@ -643,13 +749,15 @@ internal static class GameSettingMenuPatches
 
         void CleanupSettings(GameOptionsMenu gameOptMenu, MenuCategory menuCategory = MenuCategory.Roles)
         {
-            ClearOptions(gameOptMenu.Children);
+            if (menuCategory is MenuCategory.Roles)
+            {
+                HideRoleOptions(GetCurrentRoleSettings(), gameOptMenu.RolesMenu);
+            }
+            else
+            {
+                HideGameOptions(GetCurrentSettings(menuCategory), gameOptMenu);
+            }
             gameOptMenu.Children = null;
-
-            gameOptMenu.settingsContainer
-                .GetComponentsInChildren<CategoryHeaderMasked>()
-                .ToList()
-                .ForEach(header => header.gameObject.DestroyImmediate());
 
             gameOptMenu.Initialize();
             var positions = OptionsPositions;

@@ -139,11 +139,25 @@ internal static class GameOptionsMenuPatch
 
     private static void CustomMenuOneCreate(GameOptionsMenu menu)
     {
-        var groups = GameSettingMenuPatches.SelectedMod?.InternalOptionGroups
-            .Where(x => x.ParentMenu == MenuCategory.CustomOne) ?? [];
-        foreach (var group in groups)
+        var existing = GameSettingMenuPatches.CachedGameSettings.FirstOrDefault(x => x.ModId == GameSettingMenuPatches.SelectedModIdx && x.Category == MenuCategory.CustomOne);
+        if (existing != null)
         {
-            CreateGroup(menu, group);
+            GameSettingMenuPatches.ShowGameOptions(existing, menu);
+        }
+        else
+        {
+            var groups = GameSettingMenuPatches.SelectedMod?.InternalOptionGroups
+                .Where(x => x.ParentMenu == MenuCategory.CustomOne) ?? [];
+            foreach (var group in groups)
+            {
+                CreateGroup(menu, group);
+            }
+            GameSettingMenuPatches.AddGameSettings(
+                MenuCategory.CustomOne,
+                menu.Children,
+                menu.settingsContainer
+                    .GetComponentsInChildren<CategoryHeaderMasked>()
+                    .ToList());
         }
     }
 
@@ -160,11 +174,25 @@ internal static class GameOptionsMenuPatch
 
     private static void CustomMenuTwoCreate(GameOptionsMenu menu)
     {
-        var groups = GameSettingMenuPatches.SelectedMod?.InternalOptionGroups
-            .Where(x => x.ParentMenu == MenuCategory.CustomTwo) ?? [];
-        foreach (var group in groups)
+        var existing = GameSettingMenuPatches.CachedGameSettings.FirstOrDefault(x => x.ModId == GameSettingMenuPatches.SelectedModIdx && x.Category == MenuCategory.CustomTwo);
+        if (existing != null)
         {
-            CreateGroup(menu, group);
+            GameSettingMenuPatches.ShowGameOptions(existing, menu);
+        }
+        else
+        {
+            var groups = GameSettingMenuPatches.SelectedMod?.InternalOptionGroups
+                .Where(x => x.ParentMenu == MenuCategory.CustomTwo) ?? [];
+            foreach (var group in groups)
+            {
+                CreateGroup(menu, group);
+            }
+            GameSettingMenuPatches.AddGameSettings(
+                MenuCategory.CustomTwo,
+                menu.Children,
+                menu.settingsContainer
+                    .GetComponentsInChildren<CategoryHeaderMasked>()
+                    .ToList());
         }
     }
 
@@ -181,11 +209,25 @@ internal static class GameOptionsMenuPatch
 
     private static void ModifiersCreate(GameOptionsMenu menu)
     {
-        var groups = GameSettingMenuPatches.SelectedMod?.InternalOptionGroups
-            .Where(x => x.ShowInModifiersMenu || x.OptionableType?.IsAssignableTo(typeof(BaseModifier)) == true) ?? [];
-        foreach (var group in groups)
+        var existing = GameSettingMenuPatches.CachedGameSettings.FirstOrDefault(x => x.ModId == GameSettingMenuPatches.SelectedModIdx && x.Category == MenuCategory.Modifiers);
+        if (existing != null)
         {
-            CreateGroup(menu, group);
+            GameSettingMenuPatches.ShowGameOptions(existing, menu);
+        }
+        else
+        {
+            var groups = GameSettingMenuPatches.SelectedMod?.InternalOptionGroups
+                .Where(x => x.ShowInModifiersMenu || x.OptionableType?.IsAssignableTo(typeof(BaseModifier)) == true) ?? [];
+            foreach (var group in groups)
+            {
+                CreateGroup(menu, group);
+            }
+            GameSettingMenuPatches.AddGameSettings(
+                MenuCategory.Modifiers,
+                menu.Children,
+                menu.settingsContainer
+                    .GetComponentsInChildren<CategoryHeaderMasked>()
+                    .ToList());
         }
     }
 
@@ -217,12 +259,20 @@ internal static class GameOptionsMenuPatch
             return false;
         }
 
-        var filteredGroups = GameSettingMenuPatches.SelectedMod?.InternalOptionGroups
-            .Where(x => x.OptionableType == null && !x.ShowInModifiersMenu && x.ParentMenu == MenuCategory.Roles) ?? [];
-
-        foreach (var group in filteredGroups)
+        var existing = GameSettingMenuPatches.CachedGameSettings.FirstOrDefault(x => x.ModId == GameSettingMenuPatches.SelectedModIdx && x.Category == MenuCategory.Game);
+        if (existing != null)
         {
-            CreateGroup(__instance, group);
+            GameSettingMenuPatches.ShowGameOptions(existing, __instance);
+        }
+        else
+        {
+            var filteredGroups = GameSettingMenuPatches.SelectedMod?.InternalOptionGroups
+                .Where(x => x.OptionableType == null && !x.ShowInModifiersMenu && x.ParentMenu == MenuCategory.Roles) ?? [];
+
+            foreach (var group in filteredGroups)
+            {
+                CreateGroup(__instance, group);
+            }
         }
 
         return false;

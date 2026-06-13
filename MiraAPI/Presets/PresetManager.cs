@@ -62,9 +62,10 @@ public static class PresetManager
         {
             if (btn != null)
             {
-                btn.FakeDestroy();
+                btn.DeepDestroy(false);
             }
         }
+        Utilities.Extensions.ClearGarbageCollector();
 
         plugin.InternalPresets.Clear();
         if (!Directory.Exists(PresetDirectory))

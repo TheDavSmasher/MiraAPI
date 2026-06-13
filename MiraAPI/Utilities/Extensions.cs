@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
@@ -53,7 +54,7 @@ public static class Extensions
         bool isComplete;
         if (self.amClosing == Minigame.CloseState.Closing)
         {
-            self.gameObject.FakeDestroy();
+            self.gameObject.DeepDestroy();
             return;
         }
         if (self.CloseSound && Constants.ShouldPlaySfx())
@@ -220,22 +221,119 @@ public static class Extensions
     }
 
     /// <summary>
-    /// Hides the object away rather than destroy it to prevent memory leaks.
+    /// Destroys the object properly.
     /// </summary>
-    /// <param name="obj">The object to hide.</param>
-    public static void FakeDestroy(this GameObject obj)
+    /// <param name="obj">The object to destroy.</param>
+    /// <param name="clearGc">Whether to run the garbage collector immediately.</param>
+    public static void DeepDestroy(this GameObject? obj, bool clearGc = true)
     {
-        obj.hideFlags = HideFlags.HideAndDontSave;
-        if (!toDestroyHolder)
-        {
-            toDestroyHolder = new GameObject("ToDestroyHolder");
-            toDestroyHolder.gameObject.SetActive(false);
-        }
-        obj.transform.SetParent(toDestroyHolder.transform);
-        obj.SetActive(false);
+        Coroutines.Start(Nuke(obj, clearGc));
     }
 
-    private static GameObject toDestroyHolder;
+    private static IEnumerator Nuke(GameObject? go, bool clearGc)
+    {
+        if (go == null)
+            yield break;
+
+        try
+        {
+            go.transform.SetParent(null, false);
+        }
+        catch
+        {
+            // ignored
+        }
+
+        try
+        {
+            go.SetActive(false);
+        }
+        catch
+        {
+            // ignored
+        }
+
+        foreach (var mb in go.GetComponentsInChildren<MonoBehaviour>(true))
+        {
+            if (mb == null)
+                continue;
+
+            try
+            {
+                mb.StopAllCoroutines();
+            }
+            catch
+            {
+                // ignored
+            }
+
+            try
+            {
+                mb.enabled = false;
+            }
+            catch
+            {
+                // ignored
+            }
+        }
+
+        foreach (var renderer in go.GetComponentsInChildren<Renderer>(true))
+        {
+            if (renderer == null)
+                continue;
+
+            try
+            {
+                foreach (var mat in renderer.materials)
+                {
+                    if (mat != null)
+                        UnityEngine.Object.Destroy(mat);
+                }
+            }
+            catch
+            {
+                // ignored
+            }
+        }
+
+        foreach (var filter in go.GetComponentsInChildren<MeshFilter>(true))
+        {
+            if (filter == null)
+                continue;
+
+            try
+            {
+                var mesh = filter.mesh;
+                if (mesh != null)
+                    UnityEngine.Object.Destroy(mesh);
+            }
+            catch
+            {
+                // ignored
+            }
+        }
+
+        UnityEngine.Object.Destroy(go);
+        yield return null;
+        if (clearGc)
+        {
+            yield return CoFreeResources();
+        }
+    }
+
+    public static void ClearGarbageCollector()
+    {
+        Coroutines.Start(CoFreeResources());
+    }
+
+    private static IEnumerator CoFreeResources()
+    {
+        yield return Resources.UnloadUnusedAssets();
+
+        GC.Collect(0, GCCollectionMode.Forced, blocking: true);
+        GC.WaitForPendingFinalizers();
+        GC.Collect(0, GCCollectionMode.Forced, blocking: true);
+    }
 
     /// <summary>
     /// Gets a cache of player's vote data components to improve performance.

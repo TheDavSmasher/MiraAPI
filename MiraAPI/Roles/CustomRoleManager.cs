@@ -123,7 +123,7 @@ public static class CustomRoleManager
 
         if (roleBehaviour is not ICustomRole customRole)
         {
-            roleBehaviour.gameObject.Destroy();
+            roleBehaviour.gameObject.DeepDestroy();
             return null;
         }
 

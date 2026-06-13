@@ -53,23 +53,11 @@ public static class RoleSettingMenuPatches
     [HarmonyPatch(nameof(RolesSettingsMenu.SetQuotaTab))]
     public static bool SetQuotaTabPatch(RolesSettingsMenu __instance)
     {
-        foreach (var obj in Headers)
-        {
-            if (!obj)
-            {
-                continue;
-            }
-            obj.FakeDestroy();
-        }
+        GameSettingMenuPatches.HideRoleOptions(GameSettingMenuPatches.GetCurrentRoleSettings(), __instance);
+        __instance.advancedSettingChildren = null;
+
         Headers.Clear();
-        foreach (var obj in RoleOptionSettings)
-        {
-            if (!obj)
-            {
-                continue;
-            }
-            obj.gameObject.FakeDestroy();
-        }
+        __instance.roleChances.Clear();
         RoleOptionSettings.Clear();
         CurrentRole = null;
         CurrentRoleOptions = null;
@@ -147,6 +135,7 @@ public static class RoleSettingMenuPatches
                 num3++;
             }
 
+            Utilities.Extensions.ClearGarbageCollector();
             return false;
         }
 
@@ -168,6 +157,7 @@ public static class RoleSettingMenuPatches
 
         if (roleGroups is null)
         {
+            Utilities.Extensions.ClearGarbageCollector();
             return false;
         }
 
@@ -218,9 +208,9 @@ public static class RoleSettingMenuPatches
             var blankLabel = quotaInst.transform.FindChild("BlankLabel").gameObject;
             var chanceLabel = quotaInst.transform.FindChild("Chance Label").gameObject;
             var countLabel = quotaInst.transform.FindChild("# Label").gameObject;
-            blankLabel.FakeDestroy();
-            chanceLabel.FakeDestroy();
-            countLabel.FakeDestroy();
+            blankLabel.DeepDestroy(false);
+            chanceLabel.DeepDestroy(false);
+            countLabel.DeepDestroy(false);
 
             categoryHeaderMasked.Background.sprite = MiraAssets.CategoryHeader.LoadAsset();
             categoryHeaderMasked.Background.sprite.texture.filterMode = FilterMode.Bilinear;
@@ -303,23 +293,10 @@ public static class RoleSettingMenuPatches
                     {
                         RoleGroupHidden[group] = !groupHidden;
                     }
-                    foreach (var obj in Headers)
-                    {
-                        if (!obj)
-                        {
-                            continue;
-                        }
-                        obj.FakeDestroy();
-                    }
+                    GameSettingMenuPatches.HideRoleOptions(GameSettingMenuPatches.GetCurrentRoleSettings(), __instance);
+                    __instance.advancedSettingChildren = null;
                     Headers.Clear();
-                    foreach (var obj in RoleOptionSettings)
-                    {
-                        if (!obj)
-                        {
-                            continue;
-                        }
-                        obj.gameObject.FakeDestroy();
-                    }
+                    __instance.roleChances.Clear();
                     RoleOptionSettings.Clear();
                     __instance.SetQuotaTab();
                 }));
@@ -330,6 +307,7 @@ public static class RoleSettingMenuPatches
                 ScrollerNum -= 0.4f;
             }
         }
+        Utilities.Extensions.ClearGarbageCollector();
 
         __instance.scrollBar.SetScrollBounds(__instance);
         return false;
@@ -444,8 +422,9 @@ public static class RoleSettingMenuPatches
     {
         foreach (var optBehaviour in __instance.AdvancedRolesSettings.GetComponentsInChildren<OptionBehaviour>())
         {
-            optBehaviour.gameObject.FakeDestroy();
+            optBehaviour.gameObject.DeepDestroy(false);
         }
+        Utilities.Extensions.ClearGarbageCollector();
 
         CurrentRole = role;
         __instance.advancedSettingChildren.Clear();
@@ -640,7 +619,7 @@ public static class RoleSettingMenuPatches
             var newButton = Object.Instantiate(roleOptionSetting.buttons[0], roleOptionSetting.transform);
             newButton.name = "ConfigButton";
             newButton.transform.localPosition = new Vector3(0.4473f, -0.3f, -2f);
-            newButton.transform.FindChild("Text_TMP").gameObject.FakeDestroy();
+            newButton.transform.FindChild("Text_TMP").gameObject.DeepDestroy();
             newButton.activeSprites.Destroy();
 
             var btnRend = newButton.transform.FindChild("ButtonSprite").GetComponent<SpriteRenderer>();
