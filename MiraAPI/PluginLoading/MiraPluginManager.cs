@@ -20,6 +20,7 @@ using MiraAPI.Modifiers;
 using MiraAPI.Patches.Options;
 using MiraAPI.Presets;
 using MiraAPI.Roles;
+using MiraAPI.Translation;
 using MiraAPI.Utilities;
 using Reactor.Networking;
 using Reactor.Utilities;
@@ -423,7 +424,7 @@ public sealed class MiraPluginManager
                 KeybindManager.Keybinds.Add(keybind);
                 if (source is IMiraPlugin miraPlugin)
                 {
-                    keybind.SourcePluginName = miraPlugin.OptionsTitleText;
+                    keybind.SourcePluginName = miraPlugin.OptionsTitleText.Translate();
                 }
                 else if (source is MiraApiPlugin)
                 {

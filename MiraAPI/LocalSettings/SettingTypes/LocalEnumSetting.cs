@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using BepInEx.Configuration;
+using MiraAPI.Translation;
 using MiraAPI.Utilities;
 using Reactor.Utilities.Extensions;
 using TMPro;
@@ -127,6 +128,6 @@ public class LocalEnumSetting : LocalSettingBase<int>
     /// <inheritdoc/>
     protected override string GetValueText()
     {
-        return $"<font=\"LiberationSans SDF\" material=\"LiberationSans SDF - Chat Message Masked\">{Name}: <b>{Values[GetValue()]}</font></b>";
+        return $"<font=\"LiberationSans SDF\" material=\"LiberationSans SDF - Chat Message Masked\">{Name.Translate()}: <b>{Values[GetValue()]}</font></b>";
     }
 }

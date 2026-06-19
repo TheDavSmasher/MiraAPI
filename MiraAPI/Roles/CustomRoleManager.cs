@@ -7,6 +7,7 @@ using Il2CppInterop.Runtime.Injection;
 using Il2CppInterop.Runtime.InteropTypes.Arrays;
 using MiraAPI.Networking;
 using MiraAPI.PluginLoading;
+using MiraAPI.Translation;
 using MiraAPI.Utilities;
 using MiraAPI.Utilities.Assets;
 using Reactor.Localization.Utilities;
@@ -131,9 +132,9 @@ public static class CustomRoleManager
         roleBehaviour.Role = (RoleTypes)roleId;
         roleBehaviour.TeamType = customRole.Team == ModdedRoleTeams.Custom ? RoleTeamTypes.Crewmate : (RoleTeamTypes)customRole.Team;
         roleBehaviour.NameColor = customRole.RoleColor;
-        roleBehaviour.StringName = CustomStringName.CreateAndRegister(customRole.RoleName);
-        roleBehaviour.BlurbName = CustomStringName.CreateAndRegister(customRole.RoleDescription);
-        roleBehaviour.BlurbNameLong = CustomStringName.CreateAndRegister(customRole.RoleLongDescription);
+        roleBehaviour.StringName = CustomStringName.CreateAndRegister(customRole.RoleName.Translate());
+        roleBehaviour.BlurbName = CustomStringName.CreateAndRegister(customRole.RoleDescription.Translate());
+        roleBehaviour.BlurbNameLong = CustomStringName.CreateAndRegister(customRole.RoleLongDescription.Translate());
         roleBehaviour.AffectedByLightAffectors = customRole.Configuration.AffectedByLightOnAirship;
         roleBehaviour.CanBeKilled = customRole.Configuration.CanGetKilled;
         roleBehaviour.CanUseKillButton = customRole.Configuration.UseVanillaKillButton;
@@ -178,7 +179,7 @@ public static class CustomRoleManager
 
         if (useTaskHint && !overridesTaskText)
         {
-            Error($"Role {customRole.RoleName} is using RoleHintType.TaskHint but does not override SpawnTaskHeader!");
+            Error($"Role {customRole.RoleName.Translate()} is using RoleHintType.TaskHint but does not override SpawnTaskHeader!");
         }
 
         CustomRoles.Add(roleId, roleBehaviour);
@@ -246,9 +247,9 @@ public static class CustomRoleManager
     {
         var tabText = panel.tab.gameObject.GetComponentInChildren<TextMeshPro>();
         var ogPanel = HudManager.Instance.TaskStuff.transform.FindChild("TaskPanel").gameObject.GetComponent<TaskPanelBehaviour>();
-        if (tabText.text != role.RoleName)
+        if (tabText.text != role.RoleName.Translate())
         {
-            tabText.text = role.RoleName;
+            tabText.text = role.RoleName.Translate();
         }
 
         var y = ogPanel.taskText.textBounds.size.y + 1;

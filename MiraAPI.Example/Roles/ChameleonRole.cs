@@ -10,8 +10,8 @@ namespace MiraAPI.Example.Roles;
 
 public class ChameloenRole : CrewmateRole, ICustomRole
 {
-    public string RoleName => "Chamelon";
-    public string RoleLongDescription => "Stay invisible while not moving.";
+    public string RoleName => "chamelon.name";
+    public string RoleLongDescription => "chamelon.description";
     public string RoleDescription => RoleLongDescription;
     public Color RoleColor => Palette.AcceptedGreen;
     public ModdedRoleTeams Team => ModdedRoleTeams.Crewmate;

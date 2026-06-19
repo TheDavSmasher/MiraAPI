@@ -6,6 +6,7 @@ using HarmonyLib;
 using MiraAPI.GameOptions;
 using MiraAPI.Modifiers;
 using MiraAPI.Presets;
+using MiraAPI.Translation;
 using MiraAPI.Utilities;
 using MiraAPI.Utilities.Assets;
 using Reactor.Localization.Utilities;
@@ -257,7 +258,7 @@ internal static class GameOptionsMenuPatch
                 Quaternion.identity,
                 container);
 
-            categoryHeaderMasked.SetHeader(CustomStringName.CreateAndRegister(group.GroupName), 20);
+            categoryHeaderMasked.SetHeader(CustomStringName.CreateAndRegister(group.GroupName.Translate()), 20);
             categoryHeaderMasked.Background.color = group.GroupColor;
             categoryHeaderMasked.Divider.color = group.GroupColor;
             categoryHeaderMasked.Title.color = group.GroupColor.Equals(MiraApiPlugin.DefaultHeaderColor)
@@ -276,7 +277,7 @@ internal static class GameOptionsMenuPatch
             categoryHeaderMasked.gameObject.SetActive(false);
 
             var newText = Object.Instantiate(categoryHeaderMasked.Title, categoryHeaderMasked.transform);
-            newText.text = "<size=70%>(Click to close)</size>";
+            newText.text = $"<size=70%>({"gamesetting.global.clicktoclose".Translate()})</size>";
             newText.transform.localPosition = new Vector3(2.6249f, -0.165f, 0f);
             newText.gameObject.GetComponent<TextTranslatorTMP>().Destroy();
 
@@ -293,8 +294,8 @@ internal static class GameOptionsMenuPatch
                 {
                     group.AllOptionsHidden = !group.AllOptionsHidden;
                     newText.text = group.AllOptionsHidden
-                        ? "<size=70%>(Click to open)</size>"
-                        : "<size=70%>(Click to close)</size>";
+                        ? $"<size=70%>({"gamesetting.global.clicktoopen".Translate()})</size>"
+                        : $"<size=70%>({"gamesetting.global.clicktoclose".Translate()})</size>";
                 }));
             headerBtn.SetButtonEnableState(true);
 

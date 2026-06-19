@@ -1,4 +1,5 @@
 ﻿using Il2CppInterop.Runtime.Attributes;
+using MiraAPI.Translation;
 using Reactor.Utilities.Attributes;
 using TMPro;
 using UnityEngine;
@@ -50,8 +51,8 @@ public class ModifierUiComponent(nint cppPtr) : MonoBehaviour(cppPtr)
             return;
         }
 
-        nameText.text = Modifier.ModifierName;
-        desc.text = Modifier.GetDescription();
+        nameText.text = Modifier.ModifierName.Translate();
+        desc.text = Modifier.GetDescription().Translate();
         modBg.gameObject.SetActive(true);
 
         icon.gameObject.SetActive(Modifier.ModifierIcon != null);

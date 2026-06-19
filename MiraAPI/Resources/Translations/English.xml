@@ -1,0 +1,28 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<resources>
+  <string name="miraApi.name">Mira API</string>
+  <string name="miraApi.visualsUi">Visuals/UI</string>
+  <string name="miraApi.freeplay">Freeplay</string>
+  <string name="miraApi.accessibility">Accessibility</string>
+  <string name="miraApi.miraApiBrand">MiraAPI</string>
+  <string name="miraApi.showModifiersHudOnLeftSide">Show Modifiers HUD on Left Side</string>
+  <string name="miraApi.showKeybindsOnButtons">Show Keybinds on Buttons</string>
+  <string name="miraApi.buttonScaleFactor">Button Scale Factor</string>
+  <string name="miraApi.maxFps">Max FPS</string>
+  <string name="miraApi.prettyTaskLaptop">Pretty Task Laptop</string>
+  <string name="miraApi.enableSabotageFlashes">Enable Sabotage Flashes</string>
+  <string name="miraApi.enableSabotageBlare">Enable Sabotage Blare</string>
+  <string name="miraApi.returnToRoleSettings">RETURN TO ROLE SETTINGS</string>
+  <string name="miraApi.customCategory1">Custom Category 1</string>
+  <string name="miraApi.customCategory2">Custom Category 2</string>
+  <string name="miraApi.modifierMenuDescription">Configure modifiers and their settings here!</string>
+  <string name="miraApi.customOptionMenuDescription">Apply game settings for this mod!</string>
+  <string name="gamemode.default.name">Default</string>
+  <string name="gamemode.default.description">Default Among Us GameMode</string>
+  <string name="gamesetting.global.clicktoclose">Click to close</string>
+  <string name="gamesetting.global.clicktoopen">Click to open</string>
+  <string name="gamesetting.preset.hint">Select or create a options preset for this game</string>
+  <string name="gamesetting.preset.save">Save</string>
+  <string name="gamesetting.roles">Roles</string>
+  <string name="gamesetting.modifiers">Modifiers</string>
+</resources>

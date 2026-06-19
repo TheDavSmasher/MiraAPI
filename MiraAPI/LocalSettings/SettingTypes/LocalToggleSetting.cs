@@ -1,5 +1,6 @@
 ﻿using System;
 using BepInEx.Configuration;
+using MiraAPI.Translation;
 using MiraAPI.Utilities;
 using Reactor.Localization.Utilities;
 using TMPro;
@@ -46,9 +47,9 @@ public class LocalToggleSetting : LocalSettingBase<bool>
             toggleObject.transform.localPosition = new Vector3(order == 1 ? -1.185f : 1.185f, 1.85f - offset, -7);
         }
 
-        toggleObject.BaseText = CustomStringName.CreateAndRegister(Name);
+        toggleObject.BaseText = CustomStringName.CreateAndRegister(Name.Translate());
         toggleObject.UpdateText(GetValue());
-        toggleObject.name = Name;
+        toggleObject.name = Name.Translate();
         toggleObject.Background.color = GetValue() ? Tab!.TabAppearance.ToggleActiveColor : Tab!.TabAppearance.ToggleInactiveColor;
         passiveButton.OnClick = new UnityEngine.UI.Button.ButtonClickedEvent();
         rollover.OverColor = Tab!.TabAppearance.ToggleHoverColor;

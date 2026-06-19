@@ -4,6 +4,7 @@ using BepInEx.Configuration;
 using MiraAPI.GameOptions;
 using MiraAPI.Modifiers;
 using MiraAPI.PluginLoading;
+using MiraAPI.Translation;
 using UnityEngine;
 
 namespace MiraAPI.Roles;
@@ -56,7 +57,7 @@ public interface ICustomRole : IOptionable
         ModdedRoleTeams.Crewmate => RoleOptionsGroup.Crewmate,
         ModdedRoleTeams.Impostor => RoleOptionsGroup.Impostor,
         ModdedRoleTeams.Custom => RoleOptionsGroup.Neutral,
-        _ => new RoleOptionsGroup(RoleName, RoleColor),
+        _ => new RoleOptionsGroup(RoleName.Translate(), RoleColor),
     };
 
     /// <summary>
@@ -156,7 +157,7 @@ public interface ICustomRole : IOptionable
     {
         if (!Configuration.CanModifyChance)
         {
-            Error($"Cannot modify chance for role: {RoleName}");
+            Error($"Cannot modify chance for role: {RoleName.Translate()}");
             return;
         }
 
@@ -166,7 +167,7 @@ public interface ICustomRole : IOptionable
             return;
         }
 
-        Error($"Error getting chance configuration for role: {RoleName}");
+        Error($"Error getting chance configuration for role: {RoleName.Translate()}");
     }
 
     /// <summary>
@@ -181,7 +182,7 @@ public interface ICustomRole : IOptionable
             return;
         }
 
-        Error($"Error getting count configuration for role: {RoleName}");
+        Error($"Error getting count configuration for role: {RoleName.Translate()}");
     }
 
     /// <summary>
@@ -221,7 +222,7 @@ public interface ICustomRole : IOptionable
     /// <returns>A string with a custom ejection message or <see langword="null"/>.</returns>
     string? GetCustomEjectionMessage(NetworkedPlayerInfo player)
     {
-        return Team == ModdedRoleTeams.Impostor ? $"{player.PlayerName} was The {RoleName}" : null;
+        return Team == ModdedRoleTeams.Impostor ? $"{player.PlayerName} was The {RoleName.Translate()}" : null;
     }
 
     /// <summary>

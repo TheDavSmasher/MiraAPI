@@ -2,6 +2,7 @@
 using MiraAPI.LocalSettings;
 using MiraAPI.LocalSettings.Attributes;
 using MiraAPI.Patches;
+using MiraAPI.Translation;
 using MiraAPI.Utilities;
 using MiraAPI.Utilities.Assets;
 using UnityEngine;
@@ -14,7 +15,7 @@ namespace MiraAPI;
 public class MiraApiSettings(ConfigFile config) : LocalSettingsTab(config)
 {
     /// <inheritdoc />
-    public override string TabName => "Mira API";
+    public override string TabName => "miraApi.name".Translate();
 
     /// <inheritdoc />
     public override LocalSettingTabAppearance TabAppearance => new()

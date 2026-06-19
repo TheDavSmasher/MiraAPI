@@ -4,6 +4,7 @@ using Il2CppInterop.Runtime.InteropTypes;
 using MiraAPI.Events;
 using MiraAPI.Events.Vanilla.Gameplay;
 using MiraAPI.Roles;
+using MiraAPI.Translation;
 using MiraAPI.Utilities;
 
 namespace MiraAPI.Patches;
@@ -78,8 +79,8 @@ public static class IntroCutscenePatches
         {
             __instance.BackgroundBar.material.SetColor(ShaderID.Color, introConfig.IntroTeamColor);
             __instance.TeamTitle.color = introConfig.IntroTeamColor;
-            __instance.TeamTitle.text = introConfig.IntroTeamTitle;
-            __instance.ImpostorText.text = introConfig.IntroTeamDescription;
+            __instance.TeamTitle.text = introConfig.IntroTeamTitle.Translate();
+            __instance.ImpostorText.text = introConfig.IntroTeamDescription.Translate();
         }
     }
 

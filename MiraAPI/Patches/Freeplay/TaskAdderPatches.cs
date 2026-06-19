@@ -10,6 +10,7 @@ using MiraAPI.Modifiers;
 using MiraAPI.Modifiers.Types;
 using MiraAPI.PluginLoading;
 using MiraAPI.Roles;
+using MiraAPI.Translation;
 using MiraAPI.Utilities;
 using MiraAPI.Utilities.Assets;
 using Reactor.Utilities.Extensions;
@@ -458,7 +459,7 @@ public static class TaskAdderPatches
                     taskAddButton.role = null;
                     taskAddButton.MyTask = null;
                     taskAddButton.SafePositionWorld = __instance.SafePositionWorld;
-                    taskAddButton.Text.text = modifier.ModifierName;
+                    taskAddButton.Text.text = modifier.ModifierName.Translate();
                     taskAddButton.Text.fontSizeMin = 1;
                     taskAddButton.Text.EnableMasking();
                     taskAddButton.FileImage.color = modifier.FreeplayFileColor;

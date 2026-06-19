@@ -4,11 +4,11 @@ namespace MiraAPI.Example.Modifiers;
 
 public class HighPriorityModifier : GameModifier
 {
-    public override string ModifierName => "High Priority";
+    public override string ModifierName => "modifier.highPriority.name";
 
     public override string GetDescription()
     {
-        return "You are high priority! Idrk what this means either tbh...";
+        return "modifier.highPriority.description";
     }
 
     public override int GetAssignmentChance()

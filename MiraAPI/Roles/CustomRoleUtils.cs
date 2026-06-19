@@ -4,6 +4,7 @@ using System.Globalization;
 using System.Linq;
 using System.Text;
 using AmongUs.GameOptions;
+using MiraAPI.Translation;
 using MiraAPI.Utilities.Assets;
 using UnityEngine;
 
@@ -101,9 +102,9 @@ public static class CustomRoleUtils
     public static StringBuilder CreateForRole(ICustomRole role)
     {
         var taskStringBuilder = new StringBuilder();
-        taskStringBuilder.AppendLine(CultureInfo.InvariantCulture, $"{role.RoleColor.ToTextColor()}Your role is <b>{role.RoleName}.</b></color>");
+        taskStringBuilder.AppendLine(CultureInfo.InvariantCulture, $"{role.RoleColor.ToTextColor()}Your role is <b>{role.RoleName.Translate()}.</b></color>");
         taskStringBuilder.Append("<size=70%>");
-        taskStringBuilder.AppendLine(CultureInfo.InvariantCulture, $"{role.RoleLongDescription}");
+        taskStringBuilder.AppendLine(CultureInfo.InvariantCulture, $"{role.RoleLongDescription.Translate()}");
         return taskStringBuilder;
     }
 

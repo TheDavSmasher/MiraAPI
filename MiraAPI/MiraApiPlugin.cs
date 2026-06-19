@@ -4,6 +4,7 @@ using BepInEx;
 using BepInEx.Unity.IL2CPP;
 using HarmonyLib;
 using MiraAPI.PluginLoading;
+using MiraAPI.Translation;
 using Reactor;
 using Reactor.Networking;
 using Reactor.Networking.Attributes;
@@ -54,5 +55,7 @@ public partial class MiraApiPlugin : BasePlugin
 
         PluginManager = new MiraPluginManager();
         PluginManager.Initialize();
+
+        TranslationManager.Register("mira.api");
     }
 }

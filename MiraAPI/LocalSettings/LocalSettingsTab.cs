@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using BepInEx.Configuration;
 using HarmonyLib;
 using MiraAPI.Patches.LocalSettings;
+using MiraAPI.Translation;
 using MiraAPI.Utilities;
 using Reactor.Utilities.Extensions;
 using TMPro;
@@ -216,7 +217,7 @@ public abstract class LocalSettingsTab(ConfigFile config)
         tabButtonText.transform.localPosition = new Vector3(0.078f, 0, 0);
         tabButtonText.transform.localScale = new Vector3(0.9f, 0.9f);
         tabButtonText.alignment = TextAlignmentOptions.Right;
-        tabButtonText.text = $"<b>{GetShortName(TabName)}</b>";
+        tabButtonText.text = $"<b>{GetShortName(TabName.Translate())}</b>";
 
         var tabButton = tabButtonObject.GetComponent<PassiveButton>();
         var rollover = tabButtonObject.Rollover;
@@ -244,7 +245,7 @@ public abstract class LocalSettingsTab(ConfigFile config)
             tabButtonText.gameObject.SetActive(true);
             tabButtonText.transform.localPosition = new Vector3(-0.024f, 0, 0);
             tabButtonText.maxVisibleCharacters = int.MaxValue;
-            tabButtonText.text = TabName;
+            tabButtonText.text = TabName.Translate();
             tabButtonText.alignment = TextAlignmentOptions.Left;
             tabButtonRend?.gameObject.SetActive(!TabAppearance.HideIconOnHover);
         }));
@@ -266,7 +267,7 @@ public abstract class LocalSettingsTab(ConfigFile config)
 
             tabButtonText.transform.localPosition = new Vector3(0.1f, 0, 0);
             tabButtonText.maxVisibleCharacters = 4;
-            tabButtonText.text = $"<b>{GetShortName(TabName)}</b>";
+            tabButtonText.text = $"<b>{GetShortName(TabName.Translate())}</b>";
         }));
 
         return tabButtonObject.gameObject;
@@ -280,7 +281,7 @@ public abstract class LocalSettingsTab(ConfigFile config)
         label.name = text;
 
         var tmp = label.GetComponent<TextMeshPro>();
-        tmp.text = $"<font=\"LiberationSans SDF\" material=\"LiberationSans SDF - Chat Message Masked\"><b>{text}</b></font>";
+        tmp.text = $"<font=\"LiberationSans SDF\" material=\"LiberationSans SDF - Chat Message Masked\"><b>{text.Translate()}</b></font>";
         tmp.alignment = TextAlignmentOptions.Center;
 
         var meshRend = label.GetComponent<MeshRenderer>();

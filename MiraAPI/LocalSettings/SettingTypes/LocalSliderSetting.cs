@@ -1,5 +1,6 @@
 ﻿using System;
 using BepInEx.Configuration;
+using MiraAPI.Translation;
 using MiraAPI.Utilities;
 using Reactor.Utilities.Extensions;
 using TMPro;
@@ -112,9 +113,9 @@ public class LocalSliderSetting : LocalSettingBase<float>
             var value = GetValue();
             var formated = Helpers.FormatValue(value, SuffixType, FormatString);
             var maxFormated = Helpers.FormatValue(SliderRange.max, SuffixType, FormatString);
-            return $"<font=\"LiberationSans SDF\" material=\"LiberationSans SDF - Chat Message Masked\">{Name}: <b>{formated} / {maxFormated}</font></b>";
+            return $"<font=\"LiberationSans SDF\" material=\"LiberationSans SDF - Chat Message Masked\">{Name.Translate()}: <b>{formated} / {maxFormated}</font></b>";
         }
 
-        return $"<font=\"LiberationSans SDF\" material=\"LiberationSans SDF - Chat Message Masked\">{Name}</font></b>";
+        return $"<font=\"LiberationSans SDF\" material=\"LiberationSans SDF - Chat Message Masked\">{Name.Translate()}</font></b>";
     }
 }

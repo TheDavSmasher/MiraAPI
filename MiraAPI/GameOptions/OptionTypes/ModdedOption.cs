@@ -2,6 +2,7 @@
 using BepInEx.Configuration;
 using MiraAPI.Networking;
 using MiraAPI.PluginLoading;
+using MiraAPI.Translation;
 using Reactor.Localization.Utilities;
 using Reactor.Networking.Rpc;
 using UnityEngine;
@@ -78,10 +79,10 @@ public abstract class ModdedOption<T> : IModdedOption
     protected ModdedOption(string title, T defaultValue, bool includeInPreset = true)
     {
         Id = ModdedOptionsManager.NextId;
-        Title = title;
+        Title = title.Translate();
         DefaultValue = defaultValue;
         Value = defaultValue;
-        StringName = CustomStringName.CreateAndRegister(Title);
+        StringName = CustomStringName.CreateAndRegister(Title.Translate());
         Visible = () => true;
         IncludeInPreset = includeInPreset;
     }
