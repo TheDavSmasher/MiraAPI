@@ -29,9 +29,12 @@ public abstract class AbstractOptionGroup
     public virtual Type? OptionableType => null;
 
     /// <summary>
-    /// Gets a value indicating whether the group should be shown in the modifiers menu. This is deprecated, please use ParentMenu!
+    /// Gets a value indicating whether the group should be shown in the modifiers menu.
     /// </summary>
     // TODO: make this not a boolean
+#pragma warning disable S1133
+    [Obsolete("Use ParentMenu instead.")]
+#pragma warning restore S1133
     public virtual bool ShowInModifiersMenu => false;
 
     /// <summary>
