@@ -390,6 +390,77 @@ public class ModifierComponent(IntPtr cppPtr) : MonoBehaviour(cppPtr)
     }
 
     /// <summary>
+    /// Tries to remove a modifier from the player.
+    /// </summary>
+    /// <typeparam name="T">The modifier type.</typeparam>
+    /// <param name="predicate">The predicate to check the modifier by.</param>
+    /// <returns><see langword="false"/> if the modifier is not active on this player, or there are multiple instances;
+    ///     else <see langword="true"/>.</returns>
+    [HideFromIl2Cpp]
+    public bool TryRemoveModifier<T>(Func<T, bool>? predicate = null) where T : BaseModifier
+    {
+        return TryGetModifier(out var modifier, predicate) &&
+               TryRemoveModifier(modifier);
+    }
+
+    /// <summary>
+    /// Tries to remove a modifier from the player.
+    /// </summary>
+    /// <param name="type">The modifier type.</param>
+    /// <param name="predicate">The predicate to check the modifier by.</param>
+    /// <returns><see langword="false"/> if the modifier is not active on this player, or there are multiple instances;
+    ///     else <see langword="true"/>.</returns>
+    [HideFromIl2Cpp]
+    public bool TryRemoveModifier(Type type, Func<BaseModifier, bool>? predicate = null)
+    {
+        return TryGetModifier(type, out var modifier, predicate) &&
+               TryRemoveModifier(modifier);
+    }
+
+    /// <summary>
+    /// Tries to remove a modifier from the player.
+    /// </summary>
+    /// <param name="modifier">The modifier object.</param>
+    /// <returns><see langword="false"/> if the modifier is not active on this player, else <see langword="true"/>.</returns>
+    [HideFromIl2Cpp]
+    public bool TryRemoveModifier(BaseModifier modifier)
+    {
+        if (!ActiveModifiers.Contains(modifier))
+        {
+            return false;
+        }
+
+        _toRemove.Add(modifier);
+        return true;
+    }
+
+    /// <summary>
+    /// Tries to remove a modifier from the player.
+    /// </summary>
+    /// <param name="typeId">The modifier's type ID.</param>
+    /// <param name="predicate">The predicate to check the modifier by.</param>
+    /// <returns><see langword="false"/> if the modifier is not active on this player, or there are multiple instances;
+    ///     else <see langword="true"/>.</returns>
+    [HideFromIl2Cpp]
+    public bool TryRemoveModifier(uint typeId, Func<BaseModifier, bool>? predicate = null)
+    {
+        return TryGetModifier(typeId, out var modifier, predicate) &&
+               TryRemoveModifier(modifier);
+    }
+
+    /// <summary>
+    /// Tries to remove a modifier from the player.
+    /// </summary>
+    /// <param name="uniqueId">The modifier's unique ID.</param>
+    /// <returns><see langword="false"/> if the modifier is not active on this player, else <see langword="true"/>.</returns>
+    [HideFromIl2Cpp]
+    public bool TryRemoveModifier(Guid uniqueId)
+    {
+        return TryGetModifier(uniqueId, out var modifier) &&
+               TryRemoveModifier(modifier);
+    }
+
+    /// <summary>
     /// Adds a modifier to the player.
     /// </summary>
     /// <param name="args">The arguments to initialize the modifier constructor with.</param>
