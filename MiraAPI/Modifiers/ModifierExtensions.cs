@@ -192,6 +192,18 @@ public static class ModifierExtensions
     }
 
     /// <summary>
+    /// Checks if the player has a specific modifier, if the type is an interface.
+    /// </summary>
+    /// <typeparam name="T">The type of the interface of the modifier.</typeparam>
+    /// <param name="player">The PlayerControl instance.</param>
+    /// <param name="predicate">Optional predicate to filter the modifiers.</param>
+    /// <returns>True if the player has the modifier, false otherwise.</returns>
+    public static bool HasModifierOfType<T>(this PlayerControl player, Func<T, bool>? predicate = null) where T : class
+    {
+        return player.GetModifierComponent().HasModifierOfType(predicate);
+    }
+
+    /// <summary>
     /// Clears all modifiers from a player.
     /// </summary>
     /// <param name="plr">The player you want to clear modifiers for.</param>
@@ -267,6 +279,19 @@ public static class ModifierExtensions
     }
 
     /// <summary>
+    /// Tries to get a modifier by its type, if the type is an interface.
+    /// </summary>
+    /// <param name="player">The PlayerControl instance.</param>
+    /// <param name="modifier">The modifier or null.</param>
+    /// <param name="predicate">The predicate to check the modifier by.</param>
+    /// <typeparam name="T">The Type of the interface of the Modifier.</typeparam>
+    /// <returns>True if the modifier was found, false otherwise.</returns>
+    public static bool TryGetModifierOfType<T>(this PlayerControl player, [NotNullWhen(true)] out T? modifier, Func<T, bool>? predicate = null) where T : class
+    {
+        return player.GetModifierComponent().TryGetModifierOfType(out modifier, predicate);
+    }
+
+    /// <summary>
     /// Gets a specific modifier from the player.
     /// </summary>
     /// <typeparam name="T">The type of the modifier.</typeparam>
@@ -322,6 +347,18 @@ public static class ModifierExtensions
     }
 
     /// <summary>
+    /// Gets a specific modifier from the player, if the type is an interface.
+    /// </summary>
+    /// <typeparam name="T">The type of the interface of the modifier.</typeparam>
+    /// <param name="player">The PlayerControl instance.</param>
+    /// <param name="predicate">Optional predicate to filter the modifiers.</param>
+    /// <returns>The modifier if found, null otherwise.</returns>
+    public static T? GetModifierOfType<T>(this PlayerControl player, Func<T, bool>? predicate = null) where T : class
+    {
+        return player.GetModifierComponent().GetModifierOfType(predicate);
+    }
+
+    /// <summary>
     /// Gets all modifiers of a specific type from the player.
     /// </summary>
     /// <typeparam name="T">The type of the modifiers.</typeparam>
@@ -362,6 +399,19 @@ public static class ModifierExtensions
         Func<BaseModifier, bool>? predicate = null)
     {
         return player.GetModifierComponent().GetModifiers(typeId, predicate);
+    }
+
+    /// <summary>
+    /// Gets all modifiers of a specific type from the player, if the type is an interface.
+    /// </summary>
+    /// <typeparam name="T">The type of the interface of the modifiers.</typeparam>
+    /// <param name="player">The PlayerControl instance.</param>
+    /// <param name="predicate">Optional predicate to filter the modifiers.</param>
+    /// <returns>A collection of modifiers.</returns>
+    public static IEnumerable<T> GetModifiersOfType<T>(this PlayerControl player, Func<T, bool>? predicate = null)
+        where T : class
+    {
+        return player.GetModifierComponent().GetModifiersOfType(predicate);
     }
 
     /// <summary>
