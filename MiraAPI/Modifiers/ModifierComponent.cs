@@ -204,6 +204,18 @@ public class ModifierComponent(IntPtr cppPtr) : MonoBehaviour(cppPtr)
     }
 
     /// <summary>
+    /// Gets a collection of modifiers by type, if the type is an interface.
+    /// </summary>
+    /// <param name="predicate">The predicate to check the modifier by.</param>
+    /// <typeparam name="T">The Type of the interface of the Modifier.</typeparam>
+    /// <returns>A collection of modifiers.</returns>
+    [HideFromIl2Cpp]
+    public IEnumerable<T> GetModifiersOfType<T>(Func<T, bool>? predicate = null) where T : class
+    {
+        return ActiveModifiers.OfType<T>().Where(x => predicate == null || predicate(x));
+    }
+
+    /// <summary>
     /// Tries to get a modifier by its type.
     /// </summary>
     /// <param name="modifier">The modifier or null.</param>
@@ -259,6 +271,20 @@ public class ModifierComponent(IntPtr cppPtr) : MonoBehaviour(cppPtr)
     }
 
     /// <summary>
+    /// Tries to get a modifier by its type, if the type is an interface.
+    /// </summary>
+    /// <param name="modifier">The modifier or null.</param>
+    /// <param name="predicate">The predicate to check the modifier by.</param>
+    /// <typeparam name="T">The Type of the interface of the Modifier.</typeparam>
+    /// <returns>True if the modifier was found, false otherwise.</returns>
+    [HideFromIl2Cpp]
+    public bool TryGetModifierOfType<T>([NotNullWhen(true)] out T? modifier, Func<T, bool>? predicate = null) where T : class
+    {
+        modifier = GetModifierOfType(predicate);
+        return modifier != null;
+    }
+
+    /// <summary>
     /// Gets a modifier by its type.
     /// </summary>
     /// <param name="predicate">The predicate to check the modifier by.</param>
@@ -306,6 +332,18 @@ public class ModifierComponent(IntPtr cppPtr) : MonoBehaviour(cppPtr)
     public BaseModifier? GetModifier(Guid modifierGuid)
     {
         return ActiveModifiers.Find(x => x.UniqueId == modifierGuid);
+    }
+
+    /// <summary>
+    /// Gets a modifier by its type, if the type is an interface.
+    /// </summary>
+    /// <param name="predicate">The predicate to check the modifier by.</param>
+    /// <typeparam name="T">The Type of the interface of the Modifier.</typeparam>
+    /// <returns>The Modifier if it is found, null otherwise.</returns>
+    [HideFromIl2Cpp]
+    public T? GetModifierOfType<T>(Func<T, bool>? predicate = null) where T : class
+    {
+        return GetModifiersOfType(predicate).FirstOrDefault();
     }
 
     /// <summary>
@@ -655,5 +693,31 @@ public class ModifierComponent(IntPtr cppPtr) : MonoBehaviour(cppPtr)
     {
         return ActiveModifiers.Exists(MatchExpr) || (checkInactive && _toAdd.Exists(MatchExpr));
         bool MatchExpr(BaseModifier bm) => bm.UniqueId == id;
+    }
+
+    /// <summary>
+    /// Checks if a player has an active modifier by its type, if the type is an interface.
+    /// </summary>
+    /// <param name="predicate">The predicate to check the modifier.</param>
+    /// <typeparam name="T">The Type of the interface of the Modifier.</typeparam>
+    /// <returns>True if the Modifier is present, false otherwise.</returns>
+    [HideFromIl2Cpp]
+    public bool HasModifierOfType<T>(Func<T, bool>? predicate=null) where T : class
+    {
+        return ActiveModifiers.Exists(x => x is T modifier && (predicate == null || predicate(modifier)));
+    }
+
+    /// <summary>
+    /// Checks if a player has an active modifier by its type, if the type is an interface.
+    /// </summary>
+    /// <param name="checkInactive">Whether to check inactive modifiers (those pending to be added).</param>
+    /// <param name="predicate">The predicate to check the modifier.</param>
+    /// <typeparam name="T">The Type of the interface of the Modifier.</typeparam>
+    /// <returns>True if the Modifier is present, false otherwise.</returns>
+    [HideFromIl2Cpp]
+    public bool HasModifierOfType<T>(bool checkInactive, Func<T, bool>? predicate=null) where T : class
+    {
+        return ActiveModifiers.Exists(MatchExpr) || (checkInactive && _toAdd.Exists(MatchExpr));
+        bool MatchExpr(BaseModifier bm) => bm is T modifier && (predicate == null || predicate(modifier));
     }
 }
