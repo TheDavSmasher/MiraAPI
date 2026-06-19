@@ -424,6 +424,73 @@ public static class ModifierExtensions
     }
 
     /// <summary>
+    /// Tries to remove a specific modifier from the player.
+    /// </summary>
+    /// <param name="player">The PlayerControl instance.</param>
+    /// <param name="modifier">The modifier to remove.</param>
+    /// <returns><see langword="false"/> if the modifier is not active on this player, else <see langword="true"/>.</returns>
+    public static bool TryRemoveModifier(this PlayerControl player, BaseModifier modifier)
+    {
+        return player.GetModifierComponent().TryRemoveModifier(modifier);
+    }
+
+    /// <summary>
+    /// Tries to remove a specific modifier from the player.
+    /// </summary>
+    /// <typeparam name="T">The type of the modifier.</typeparam>
+    /// <param name="player">The PlayerControl instance.</param>
+    /// <param name="predicate">Optional predicate to filter the modifiers.</param>
+    /// <returns><see langword="false"/> if the modifier is not active on this player, or there are multiple instances;
+    ///     else <see langword="true"/>.</returns>
+    public static bool TryRemoveModifier<T>(this PlayerControl player, Func<T, bool>? predicate = null)
+        where T : BaseModifier
+    {
+        return player.GetModifierComponent().TryRemoveModifier(predicate);
+    }
+
+    /// <summary>
+    /// Tries to remove a specific modifier from the player by type.
+    /// </summary>
+    /// <param name="player">The PlayerControl instance.</param>
+    /// <param name="type">The type of the modifier.</param>
+    /// <param name="predicate">Optional predicate to filter the modifiers.</param>
+    /// <returns><see langword="false"/> if the modifier is not active on this player, or there are multiple instances;
+    ///     else <see langword="true"/>.</returns>
+    public static bool TryRemoveModifier(this PlayerControl player, Type type, Func<BaseModifier, bool>? predicate = null)
+    {
+        return player.GetModifierComponent().TryRemoveModifier(type, predicate);
+    }
+
+    /// <summary>
+    /// Tries to remove a specific modifier from the player by its type ID.
+    /// </summary>
+    /// <param name="player">The PlayerControl instance.</param>
+    /// <param name="typeId">The type ID of the modifier.</param>
+    /// <param name="predicate">Optional predicate to filter the modifiers.</param>
+    /// <returns><see langword="false"/> if the modifier is not active on this player, or there are multiple instances;
+    ///     else <see langword="true"/>.</returns>
+    public static bool TryRemoveModifier(
+        this PlayerControl player,
+        uint typeId,
+        Func<BaseModifier, bool>? predicate = null)
+    {
+        return player.GetModifierComponent().TryRemoveModifier(typeId, predicate);
+    }
+
+    /// <summary>
+    /// Tries to remove a specific modifier from the player by its GUID.
+    /// </summary>
+    /// <param name="player">The PlayerControl instance.</param>
+    /// <param name="uniqueId">The GUID of the modifier.</param>
+    /// <returns><see langword="false"/> if the modifier is not active on this player, else <see langword="true"/>.</returns>
+    public static bool TryRemoveModifier(
+        this PlayerControl player,
+        Guid uniqueId)
+    {
+        return player.GetModifierComponent().TryRemoveModifier(uniqueId);
+    }
+
+    /// <summary>
     /// Adds a specific modifier to the player.
     /// </summary>
     /// <typeparam name="T">The type of the modifier.</typeparam>
