@@ -1,9 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using BepInEx.Configuration;
-using MiraAPI.Networking;
 using MiraAPI.PluginLoading;
-using UnityEngine;
 
 namespace MiraAPI.GameOptions;
 
@@ -23,15 +21,9 @@ public interface IModdedOptionList
     IReadOnlyList<uint> Ids { get; }
 
     /// <summary>
-    /// Gets or sets the titles of the options.
-    /// The end title will equal this value with its index appended (e.g., Title1).
+    /// Gets the titles of the options.
     /// </summary>
-    string Title { get; set; }
-
-    /// <summary>
-    /// Gets or sets a value indicating whether the first option's title has a 0, else starts with 1.
-    /// </summary>
-    bool ZeroIndexTitle { get; set; }
+    IReadOnlyList<string> Titles { get; }
 
     /// <summary>
     /// Gets the StringName for the options, used for localization.
@@ -64,42 +56,9 @@ public interface IModdedOptionList
     bool IncludeInPreset { get; set; }
 
     /// <summary>
-    /// Gets the array of ConfigDefinition for the options, used for BepInEx configuration.
+    /// Gets the set of ConfigDefinition for the options, used for BepInEx configuration.
     /// </summary>
-    ConfigDefinition?[] ConfigDefinitions { get; }
-
-    /// <summary>
-    /// Creates the option behaviour for the modded option at index <paramref name="idx"/>.
-    /// </summary>
-    /// <param name="idx">The option's index.</param>
-    /// <param name="toggleOpt">The ToggleOption template.</param>
-    /// <param name="numberOpt">The NumberOption template.</param>
-    /// <param name="stringOpt">The StringOption template.</param>
-    /// <param name="playerOpt">The PlayerOption template.</param>
-    /// <param name="container">>The Transform container for the option.</param>
-    /// <returns>The created OptionBehaviour object.</returns>
-    OptionBehaviour CreateOption(int idx, ToggleOption toggleOpt, NumberOption numberOpt, StringOption stringOpt, PlayerOption playerOpt, Transform container);
-
-    /// <summary>
-    /// Gets the value at index <paramref name="idx"/> as a float.
-    /// </summary>
-    /// <param name="idx">The option's index.</param>
-    /// <returns>The value of the option as a float.</returns>
-    float GetFloatData(int idx);
-
-    /// <summary>
-    /// Gets the NetData for the option at index <paramref name="idx"/>, used for network synchronization.
-    /// </summary>
-    /// <param name="idx">The option's index.</param>
-    /// <returns>Returns the NetData object for the option.</returns>
-    NetData GetNetData(int idx);
-
-    /// <summary>
-    /// Handles incoming network data for the option at index <paramref name="idx"/>.
-    /// </summary>
-    /// <param name="idx">The option's index.</param>
-    /// <param name="data">The byte array representing the network data.</param>
-    void HandleNetData(int idx, byte[] data);
+    IReadOnlyList<ConfigDefinition?> ConfigDefinitions { get; }
 
     /// <summary>
     /// Saves the options to a preset configuration file.
