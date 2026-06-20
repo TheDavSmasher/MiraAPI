@@ -201,12 +201,16 @@ public sealed class MiraPluginManager
                 }
 
                 var attribute = property.GetCustomAttribute<ModdedOptionAttribute>();
-                if (attribute == null)
+                if (attribute != null)
                 {
+                    ModdedOptionsManager.RegisterAttributeOption(type, attribute, property, pluginInfo);
                     continue;
                 }
 
-                ModdedOptionsManager.RegisterAttributeOption(type, attribute, property, pluginInfo);
+                if (property.PropertyType.IsAssignableTo(typeof(IModdedOptionList)))
+                {
+                    ModdedOptionsManager.RegisterPropertyOptionList(type, property, pluginInfo);
+                }
             }
 
             foreach (var field in type.GetFields().Where(f => f.FieldType.IsAssignableTo(typeof(IModdedOption))))

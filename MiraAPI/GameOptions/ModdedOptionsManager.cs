@@ -113,6 +113,26 @@ public static class ModdedOptionsManager
         RegisterOption(option, group, property.Name, pluginInfo);
     }
 
+    internal static void RegisterPropertyOptionList(Type type, PropertyInfo property, MiraPluginInfo pluginInfo)
+    {
+        if (!TypeToGroup.TryGetValue(type, out var group))
+        {
+            Error($"Failed to get group for {type.Name}");
+            return;
+        }
+
+        if (property.GetValue(group) is not IModdedOptionList optionList)
+        {
+            Error($"Failed to get option list for {property.Name}");
+            return;
+        }
+
+        for (int i = 0; i < optionList.Count; i++)
+        {
+            RegisterOption(optionList[i], group, property.Name + i, pluginInfo);
+        }
+    }
+
     internal static void RegisterOption(
         IModdedOption option,
         AbstractOptionGroup group,
