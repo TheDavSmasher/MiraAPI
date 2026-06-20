@@ -13,23 +13,21 @@ namespace MiraAPI.GameOptions.OptionTypes;
 /// <typeparam name="T">The type of options.</typeparam>
 public class ModdedOptionList<T> : IModdedOptionList, IReadOnlyList<T> where T : IModdedOption
 {
-    private IMiraPlugin? _parentMod;
-
     /// <inheritdoc/>
     public int Count { get; }
 
     /// <inheritdoc />
     public IMiraPlugin? ParentMod
     {
-        get => _parentMod;
+        get;
         set
         {
-            if (_parentMod != null || value == null) return;
-            _parentMod = value;
+            if (field != null || value == null) return;
+            field = value;
 
             foreach (var option in Options)
             {
-                option.ParentMod = _parentMod!;
+                option.ParentMod = value;
             }
         }
     }
@@ -40,10 +38,32 @@ public class ModdedOptionList<T> : IModdedOptionList, IReadOnlyList<T> where T :
     public IReadOnlyList<T> Options { get; }
 
     /// <inheritdoc />
-    public Func<int, bool> Visible { get; set; }
+    public Func<int, bool> Visible
+    {
+        get;
+        set
+        {
+            field = value;
+            foreach (var (option, idx) in Options.Select((o, i) => (o, i)))
+            {
+                option.Visible = () => value(idx);
+            }
+        }
+    }
 
     /// <inheritdoc />
-    public bool IncludeInPreset { get; set; }
+    public bool IncludeInPreset
+    {
+        get;
+        set
+        {
+            field = value;
+            foreach (var option in Options)
+            {
+                option.IncludeInPreset = value;
+            }
+        }
+    }
 
     /// <summary>
     /// Initializes a new instance of the <see cref="ModdedOptionList{T}"/> class.
