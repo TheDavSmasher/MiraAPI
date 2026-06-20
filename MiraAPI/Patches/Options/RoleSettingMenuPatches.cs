@@ -59,7 +59,7 @@ public static class RoleSettingMenuPatches
             {
                 continue;
             }
-            obj.DeepDestroy();
+            obj.DeepDestroy(false);
         }
         Headers.Clear();
         foreach (var obj in RoleOptionSettings)
@@ -68,7 +68,7 @@ public static class RoleSettingMenuPatches
             {
                 continue;
             }
-            obj.gameObject.DeepDestroy();
+            obj.gameObject.DeepDestroy(false);
         }
         RoleOptionSettings.Clear();
         CurrentRole = null;
@@ -76,6 +76,7 @@ public static class RoleSettingMenuPatches
 
         __instance.roleChances = new Il2CppSystem.Collections.Generic.List<RoleOptionSetting>();
         __instance.advancedSettingChildren = new Il2CppSystem.Collections.Generic.List<OptionBehaviour>();
+        Utilities.Extensions.ClearGarbageCollector();
 
         var maskBg = __instance.scrollBar.transform.FindChild("MaskBg");
         var hitbox = __instance.scrollBar.transform.FindChild("Hitbox");
@@ -218,9 +219,9 @@ public static class RoleSettingMenuPatches
             var blankLabel = quotaInst.transform.FindChild("BlankLabel").gameObject;
             var chanceLabel = quotaInst.transform.FindChild("Chance Label").gameObject;
             var countLabel = quotaInst.transform.FindChild("# Label").gameObject;
-            blankLabel.DeepDestroy();
-            chanceLabel.DeepDestroy();
-            countLabel.DeepDestroy();
+            blankLabel.DeepDestroy(false);
+            chanceLabel.DeepDestroy(false);
+            countLabel.DeepDestroy(false);
 
             categoryHeaderMasked.Background.sprite = MiraAssets.CategoryHeader.LoadAsset();
             categoryHeaderMasked.Background.sprite.texture.filterMode = FilterMode.Bilinear;
@@ -309,7 +310,7 @@ public static class RoleSettingMenuPatches
                         {
                             continue;
                         }
-                        obj.DeepDestroy();
+                        obj.DeepDestroy(false);
                     }
                     Headers.Clear();
                     foreach (var obj in RoleOptionSettings)
@@ -318,9 +319,10 @@ public static class RoleSettingMenuPatches
                         {
                             continue;
                         }
-                        obj.gameObject.DeepDestroy();
+                        obj.gameObject.DeepDestroy(false);
                     }
                     RoleOptionSettings.Clear();
+                    Utilities.Extensions.ClearGarbageCollector();
                     __instance.SetQuotaTab();
                 }));
             headerBtn.SetButtonEnableState(true);
@@ -444,11 +446,12 @@ public static class RoleSettingMenuPatches
     {
         foreach (var optBehaviour in __instance.AdvancedRolesSettings.GetComponentsInChildren<OptionBehaviour>())
         {
-            optBehaviour.gameObject.DeepDestroy();
+            optBehaviour.gameObject.DeepDestroy(false);
         }
 
         CurrentRole = role;
         __instance.advancedSettingChildren.Clear();
+        Utilities.Extensions.ClearGarbageCollector();
 
         // TODO: create sub groups under the role settings.
         var filteredOptions = GameSettingMenuPatches.SelectedMod?.InternalOptionGroups

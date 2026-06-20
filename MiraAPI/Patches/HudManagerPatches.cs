@@ -143,8 +143,9 @@ public static class HudManagerPatches
 
         foreach (var t in BottomLeft.GetComponentsInChildren<ActionButton>(true))
         {
-            t.gameObject.DeepDestroy();
+            t.gameObject.DeepDestroy(false);
         }
+        Utilities.Extensions.ClearGarbageCollector();
 
         var gridArrange = BottomLeft.GetComponent<GridArrange>();
         var aspectPosition = BottomLeft.GetComponent<AspectPosition>();

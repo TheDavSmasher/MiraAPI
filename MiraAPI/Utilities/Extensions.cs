@@ -223,9 +223,10 @@ public static class Extensions
     }
 
     /// <summary>
-    /// Hides the object away rather than destroy it to prevent memory leaks.
+    /// Destroys the object properly.
     /// </summary>
-    /// <param name="obj">The object to hide.</param>
+    /// <param name="obj">The object to destroy.</param>
+    /// <param name="clearGc">Whether to run the garbage collector immediately.</param>
     public static void DeepDestroy(this GameObject obj, bool clearGc = true)
     {
         if (MainMenuManagerPatches.NeedsDeepDestroy)
