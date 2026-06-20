@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using BepInEx.Configuration;
 using MiraAPI.Networking;
 using MiraAPI.PluginLoading;
@@ -108,15 +109,6 @@ public interface IModdedOption
 /// <summary>
 /// Interface for list of modded options.
 /// </summary>
-public interface IModdedOptionList
+public interface IModdedOptionList : IReadOnlyList<IModdedOption>
 {
-    /// <summary>
-    /// Gets or sets the MiraPlugin that created this list of options.
-    /// </summary>
-    IMiraPlugin? ParentMod { get; set; }
-
-    /// <summary>
-    /// Gets the number of options in the list.
-    /// </summary>
-    int Count { get; }
 }

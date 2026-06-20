@@ -2,7 +2,6 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using MiraAPI.PluginLoading;
 
 namespace MiraAPI.GameOptions.OptionTypes;
 
@@ -10,26 +9,10 @@ namespace MiraAPI.GameOptions.OptionTypes;
 /// Represents a modded option list.
 /// </summary>
 /// <typeparam name="T">The type of options.</typeparam>
-public class ModdedOptionList<T> : IModdedOptionList, IReadOnlyList<T> where T : IModdedOption
+public class ModdedOptionList<T> : IModdedOptionList where T : IModdedOption
 {
     /// <inheritdoc/>
     public int Count { get; }
-
-    /// <inheritdoc />
-    public IMiraPlugin? ParentMod
-    {
-        get;
-        set
-        {
-            if (field != null || value == null) return;
-            field = value;
-
-            foreach (var option in Options)
-            {
-                option.ParentMod = value;
-            }
-        }
-    }
 
     /// <summary>
     /// Gets the list of options.
@@ -48,9 +31,9 @@ public class ModdedOptionList<T> : IModdedOptionList, IReadOnlyList<T> where T :
     }
 
     /// <inheritdoc/>
-    public IEnumerator<T> GetEnumerator()
+    public IEnumerator<IModdedOption> GetEnumerator()
     {
-        return ((IEnumerable<T>)Options).GetEnumerator();
+        return ((IEnumerable<IModdedOption>)Options).GetEnumerator();
     }
 
     IEnumerator IEnumerable.GetEnumerator()
@@ -64,4 +47,6 @@ public class ModdedOptionList<T> : IModdedOptionList, IReadOnlyList<T> where T :
     /// <param name="idx">The option's index.</param>
     /// <returns>option of type <typeparamref name="T"/>.</returns>
     public T this[int idx] => Options[idx];
+
+    IModdedOption IReadOnlyList<IModdedOption>.this[int index] => this[index];
 }
