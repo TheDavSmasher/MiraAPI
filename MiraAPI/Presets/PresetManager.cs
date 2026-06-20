@@ -62,7 +62,7 @@ public static class PresetManager
         {
             if (btn != null)
             {
-                btn.FakeDestroy();
+                btn.DeepDestroy();
             }
         }
 

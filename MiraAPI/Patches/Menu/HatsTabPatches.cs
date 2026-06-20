@@ -92,9 +92,9 @@ public static class HatsTabPatches
         if (loadRoutine != null) Coroutines.Stop(loadRoutine);
 
         hatIndex = 0;
-        foreach (var instanceColorChip in __instance.ColorChips) instanceColorChip.gameObject.FakeDestroy();
+        foreach (var instanceColorChip in __instance.ColorChips) instanceColorChip.gameObject.DeepDestroy();
         __instance.ColorChips.Clear();
-        __instance.scroller.Inner.GetComponentsInChildren<TextMeshPro>().Do(x => x.gameObject.FakeDestroy());
+        __instance.scroller.Inner.GetComponentsInChildren<TextMeshPro>().Do(x => x.gameObject.DeepDestroy());
 
         var groupNameText = __instance.GetComponentInChildren<TextMeshPro>(false);
 

@@ -59,7 +59,7 @@ public static class RoleSettingMenuPatches
             {
                 continue;
             }
-            obj.FakeDestroy();
+            obj.DeepDestroy();
         }
         Headers.Clear();
         foreach (var obj in RoleOptionSettings)
@@ -68,7 +68,7 @@ public static class RoleSettingMenuPatches
             {
                 continue;
             }
-            obj.gameObject.FakeDestroy();
+            obj.gameObject.DeepDestroy();
         }
         RoleOptionSettings.Clear();
         CurrentRole = null;
@@ -218,9 +218,9 @@ public static class RoleSettingMenuPatches
             var blankLabel = quotaInst.transform.FindChild("BlankLabel").gameObject;
             var chanceLabel = quotaInst.transform.FindChild("Chance Label").gameObject;
             var countLabel = quotaInst.transform.FindChild("# Label").gameObject;
-            blankLabel.FakeDestroy();
-            chanceLabel.FakeDestroy();
-            countLabel.FakeDestroy();
+            blankLabel.DeepDestroy();
+            chanceLabel.DeepDestroy();
+            countLabel.DeepDestroy();
 
             categoryHeaderMasked.Background.sprite = MiraAssets.CategoryHeader.LoadAsset();
             categoryHeaderMasked.Background.sprite.texture.filterMode = FilterMode.Bilinear;
@@ -309,7 +309,7 @@ public static class RoleSettingMenuPatches
                         {
                             continue;
                         }
-                        obj.FakeDestroy();
+                        obj.DeepDestroy();
                     }
                     Headers.Clear();
                     foreach (var obj in RoleOptionSettings)
@@ -318,7 +318,7 @@ public static class RoleSettingMenuPatches
                         {
                             continue;
                         }
-                        obj.gameObject.FakeDestroy();
+                        obj.gameObject.DeepDestroy();
                     }
                     RoleOptionSettings.Clear();
                     __instance.SetQuotaTab();
@@ -444,7 +444,7 @@ public static class RoleSettingMenuPatches
     {
         foreach (var optBehaviour in __instance.AdvancedRolesSettings.GetComponentsInChildren<OptionBehaviour>())
         {
-            optBehaviour.gameObject.FakeDestroy();
+            optBehaviour.gameObject.DeepDestroy();
         }
 
         CurrentRole = role;
@@ -640,7 +640,7 @@ public static class RoleSettingMenuPatches
             var newButton = Object.Instantiate(roleOptionSetting.buttons[0], roleOptionSetting.transform);
             newButton.name = "ConfigButton";
             newButton.transform.localPosition = new Vector3(0.4473f, -0.3f, -2f);
-            newButton.transform.FindChild("Text_TMP").gameObject.FakeDestroy();
+            newButton.transform.FindChild("Text_TMP").gameObject.DeepDestroy();
             newButton.activeSprites.Destroy();
 
             var btnRend = newButton.transform.FindChild("ButtonSprite").GetComponent<SpriteRenderer>();

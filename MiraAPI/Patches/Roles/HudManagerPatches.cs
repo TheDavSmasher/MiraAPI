@@ -73,7 +73,7 @@ public static class HudManagerPatches
         }
         else if (RoleTab != null)
         {
-            RoleTab.gameObject.FakeDestroy();
+            RoleTab.gameObject.DeepDestroy();
             RoleTab = null;
         }
     }

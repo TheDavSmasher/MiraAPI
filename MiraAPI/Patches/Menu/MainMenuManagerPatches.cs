@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using HarmonyLib;
 using MiraAPI.LocalSettings;
 using MiraAPI.Utilities.Assets;
@@ -13,6 +14,8 @@ namespace MiraAPI.Patches.Menu;
 [HarmonyPatch(typeof(MainMenuManager))]
 public static class MainMenuManagerPatches
 {
+    internal static bool NeedsDeepDestroy { get; private set; }
+
     /// <summary>
     /// A postifix on Awake to load all the addressables registered.
     /// </summary>
@@ -20,6 +23,9 @@ public static class MainMenuManagerPatches
     [HarmonyPostfix]
     public static void AwakePostfix()
     {
+        var requiredVersion = new Version(2026, 6, 5);
+        var version = Version.Parse(Application.version);
+        NeedsDeepDestroy = version >= requiredVersion;
         AddressablesLoader.LoadAll();
         Coroutines.Start(SetFps());
     }

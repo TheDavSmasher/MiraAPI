@@ -138,7 +138,7 @@ public class ModifierDisplayComponent(nint cppPtr) : MonoBehaviour(cppPtr)
     internal void DestroyComponent(ModifierUiComponent component)
     {
         _modifiers.Remove(component.Modifier!);
-        component.gameObject.FakeDestroy();
+        component.gameObject.DeepDestroy();
         RefreshModifiers();
     }
 
@@ -208,7 +208,7 @@ public class ModifierDisplayComponent(nint cppPtr) : MonoBehaviour(cppPtr)
                 continue;
             }
 
-            mod.Value.gameObject.FakeDestroy();
+            mod.Value.gameObject.DeepDestroy();
             _modifiers.Remove(mod.Key);
         }
 
