@@ -36,47 +36,15 @@ public class ModdedOptionList<T> : IModdedOptionList, IReadOnlyList<T> where T :
     /// </summary>
     public IReadOnlyList<T> Options { get; }
 
-    /// <inheritdoc />
-    public Func<int, bool>? Visible
-    {
-        get;
-        init
-        {
-            field = value;
-            if (value == null) return;
-            foreach (var (option, idx) in Options.Select((o, i) => (o, i)))
-            {
-                option.Visible = () => value(idx);
-            }
-        }
-    }
-
-    /// <inheritdoc />
-    public bool? IncludeInPreset
-    {
-        get;
-        init
-        {
-            field = value;
-            if (value == null) return;
-            foreach (var option in Options)
-            {
-                option.IncludeInPreset = value.Value;
-            }
-        }
-    }
-
     /// <summary>
     /// Initializes a new instance of the <see cref="ModdedOptionList{T}"/> class.
     /// </summary>
     /// <param name="count">The option list's length.</param>
     /// <param name="optionFactory">The option factory to instantiate the options from.</param>
-    /// <param name="includeInPreset">Whether to include the options in the preset.</param>
-    public ModdedOptionList(int count, Func<int, T> optionFactory, bool? includeInPreset = true)
+    public ModdedOptionList(int count, Func<int, T> optionFactory)
     {
         Count = count;
         Options = Enumerable.Range(0, Count).Select(optionFactory).ToArray();
-        IncludeInPreset = includeInPreset;
     }
 
     /// <inheritdoc/>

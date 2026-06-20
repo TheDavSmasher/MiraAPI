@@ -119,16 +119,4 @@ public interface IModdedOptionList
     /// Gets the number of options in the list.
     /// </summary>
     int Count { get; }
-
-    /// <summary>
-    /// Gets the visibility function for the options.
-    /// Leaving it null will leave the options unchanged.
-    /// </summary>
-    Func<int, bool>? Visible { get; init; }
-
-    /// <summary>
-    /// Gets a value indicating whether the options should be included with presets.
-    /// Leaving it null will leave the options unchanged.
-    /// </summary>
-    bool? IncludeInPreset { get; init; }
 }
