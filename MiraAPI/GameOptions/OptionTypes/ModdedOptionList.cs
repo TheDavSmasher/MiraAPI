@@ -18,18 +18,6 @@ public class ModdedOptionList<T> : IModdedOptionList where T : IModdedOption
     public int Count { get; }
 
     /// <inheritdoc />
-    public IReadOnlyList<uint> Ids => FromOptions(o => o.Id);
-
-    /// <inheritdoc />
-    public IReadOnlyList<string> Titles => FromOptions(o => o.Title);
-
-    /// <inheritdoc />
-    public IReadOnlyList<StringNames> StringNames => FromOptions(o => o.StringName);
-
-    /// <inheritdoc />
-    public IReadOnlyList<BaseGameSetting> Data => FromOptions(o => o.Data);
-
-    /// <inheritdoc />
     public IMiraPlugin? ParentMod
     {
         get => _parentMod;
@@ -56,12 +44,6 @@ public class ModdedOptionList<T> : IModdedOptionList where T : IModdedOption
     /// <inheritdoc />
     public bool IncludeInPreset { get; set; }
 
-    /// <inheritdoc />
-    public IReadOnlyList<OptionBehaviour?> OptionBehaviours => FromOptions(o => o.OptionBehaviour);
-
-    /// <inheritdoc />
-    public IReadOnlyList<ConfigDefinition?> ConfigDefinitions => FromOptions(o => o.ConfigDefinition);
-
     /// <summary>
     /// Initializes a new instance of the <see cref="ModdedOptionList{T}"/> class.
     /// </summary>
@@ -74,11 +56,6 @@ public class ModdedOptionList<T> : IModdedOptionList where T : IModdedOption
         Visible = _ => true;
         IncludeInPreset = includeInPreset;
         Options = Enumerable.Range(0, Count).Select(optionFactory).ToArray();
-    }
-
-    internal IReadOnlyList<TVal> FromOptions<TVal>(Func<T, TVal> getter)
-    {
-        return Options.Select(getter).ToArray();
     }
 
     /// <inheritdoc/>

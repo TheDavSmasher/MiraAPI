@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using BepInEx.Configuration;
 using MiraAPI.PluginLoading;
 
@@ -16,34 +15,9 @@ public interface IModdedOptionList
     int Count { get; }
 
     /// <summary>
-    /// Gets the unique identifiers for the options.
-    /// </summary>
-    IReadOnlyList<uint> Ids { get; }
-
-    /// <summary>
-    /// Gets the titles of the options.
-    /// </summary>
-    IReadOnlyList<string> Titles { get; }
-
-    /// <summary>
-    /// Gets the StringName for the options, used for localization.
-    /// </summary>
-    IReadOnlyList<StringNames> StringNames { get; }
-
-    /// <summary>
     /// Gets or sets the MiraPlugin that created these options.
     /// </summary>
     IMiraPlugin? ParentMod { get; set; }
-
-    /// <summary>
-    /// Gets the game setting data for the options.
-    /// </summary>
-    IReadOnlyList<BaseGameSetting> Data { get; }
-
-    /// <summary>
-    /// Gets the OptionBehaviour object of the options.
-    /// </summary>
-    IReadOnlyList<OptionBehaviour?> OptionBehaviours { get; }
 
     /// <summary>
     /// Gets or sets the visibility function for the options.
@@ -54,11 +28,6 @@ public interface IModdedOptionList
     /// Gets or sets a value indicating whether the options should be included with presets.
     /// </summary>
     bool IncludeInPreset { get; set; }
-
-    /// <summary>
-    /// Gets the set of ConfigDefinition for the options, used for BepInEx configuration.
-    /// </summary>
-    IReadOnlyList<ConfigDefinition?> ConfigDefinitions { get; }
 
     /// <summary>
     /// Saves the options to a preset configuration file.
