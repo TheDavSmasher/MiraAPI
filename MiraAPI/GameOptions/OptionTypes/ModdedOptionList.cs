@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using BepInEx.Configuration;
@@ -10,7 +11,7 @@ namespace MiraAPI.GameOptions.OptionTypes;
 /// Represents a modded option list.
 /// </summary>
 /// <typeparam name="T">The type of options.</typeparam>
-public class ModdedOptionList<T> : IModdedOptionList where T : IModdedOption
+public class ModdedOptionList<T> : IModdedOptionList, IReadOnlyList<T> where T : IModdedOption
 {
     private IMiraPlugin? _parentMod;
 
@@ -36,7 +37,7 @@ public class ModdedOptionList<T> : IModdedOptionList where T : IModdedOption
     /// <summary>
     /// Gets the list of options.
     /// </summary>
-    public T[] Options { get; }
+    public IReadOnlyList<T> Options { get; }
 
     /// <inheritdoc />
     public Func<int, bool> Visible { get; set; }
@@ -83,6 +84,17 @@ public class ModdedOptionList<T> : IModdedOptionList where T : IModdedOption
         {
             option.LoadFromPreset(presetConfig);
         }
+    }
+
+    /// <inheritdoc/>
+    public IEnumerator<T> GetEnumerator()
+    {
+        return ((IEnumerable<T>)Options).GetEnumerator();
+    }
+
+    IEnumerator IEnumerable.GetEnumerator()
+    {
+        return Options.GetEnumerator();
     }
 
     /// <summary>
