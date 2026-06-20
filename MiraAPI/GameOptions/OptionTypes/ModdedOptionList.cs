@@ -2,7 +2,6 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using BepInEx.Configuration;
 using MiraAPI.PluginLoading;
 
 namespace MiraAPI.GameOptions.OptionTypes;
@@ -78,33 +77,6 @@ public class ModdedOptionList<T> : IModdedOptionList, IReadOnlyList<T> where T :
         Count = count;
         Options = Enumerable.Range(0, Count).Select(optionFactory).ToArray();
         IncludeInPreset = includeInPreset;
-    }
-
-    /// <inheritdoc/>
-    public void SaveToPreset(ConfigFile presetConfig, bool saveDefault = false)
-    {
-        foreach (var option in Options)
-        {
-            option.SaveToPreset(presetConfig, saveDefault);
-        }
-    }
-
-    /// <inheritdoc/>
-    public void Bind(ConfigFile config)
-    {
-        foreach (var option in Options)
-        {
-            option.Bind(config);
-        }
-    }
-
-    /// <inheritdoc/>
-    public void LoadFromPreset(ConfigFile presetConfig)
-    {
-        foreach (var option in Options)
-        {
-            option.LoadFromPreset(presetConfig);
-        }
     }
 
     /// <inheritdoc/>

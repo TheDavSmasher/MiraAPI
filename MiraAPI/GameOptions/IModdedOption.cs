@@ -104,3 +104,31 @@ public interface IModdedOption
     /// <param name="presetConfig">The ConfigFile representing the preset configuration.</param>
     void LoadFromPreset(ConfigFile presetConfig);
 }
+
+/// <summary>
+/// Interface for list of modded options.
+/// </summary>
+public interface IModdedOptionList
+{
+    /// <summary>
+    /// Gets or sets the MiraPlugin that created this list of options.
+    /// </summary>
+    IMiraPlugin? ParentMod { get; set; }
+
+    /// <summary>
+    /// Gets the number of options in the list.
+    /// </summary>
+    int Count { get; }
+
+    /// <summary>
+    /// Gets the visibility function for the options.
+    /// Leaving it null will leave the options unchanged.
+    /// </summary>
+    Func<int, bool>? Visible { get; init; }
+
+    /// <summary>
+    /// Gets a value indicating whether the options should be included with presets.
+    /// Leaving it null will leave the options unchanged.
+    /// </summary>
+    bool? IncludeInPreset { get; init; }
+}
