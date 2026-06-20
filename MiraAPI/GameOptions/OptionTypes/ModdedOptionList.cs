@@ -263,3 +263,101 @@ public abstract class ModdedOptionList<T> : ModdedOptionList
     /// <returns>value of type <typeparamref name="T"/>.</returns>
     public T this[int idx] => Values[idx];
 }
+
+/// <summary>
+/// Represents a modded option list.
+/// </summary>
+/// <typeparam name="T">The option's type.</typeparam>
+public class ModdedOptionsList<T> : ModdedOptionList where T : IModdedOption
+{
+    protected override void OnParentModChange()
+    {
+        foreach (var option in Options)
+        {
+            option.ParentMod = _parentMod!;
+        }
+    }
+
+    /// <summary>
+    /// Gets the list of options.
+    /// </summary>
+    public T[] Options { get; }
+
+    /// <summary>
+    /// Gets the default option from its index.
+    /// </summary>
+    public Func<int, T> DefaultOption { get; }
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="ModdedOptionsList{T}"/> class.
+    /// </summary>
+    /// <param name="title">The options' title.</param>
+    /// <param name="count">The option list's length.</param>
+    /// <param name="defaultOption">The default option.</param>
+    /// <param name="includeInPreset">Whether to include the options in the preset.</param>
+    /// <param name="zeroIndexTitle">Whether the first option's title index is 0, else 1.</param>
+    protected ModdedOptionsList(string title, int count, Func<int, T> defaultOption, bool includeInPreset = true, bool zeroIndexTitle = false)
+        : base(title, count, includeInPreset, zeroIndexTitle)
+    {
+        DefaultOption = defaultOption;
+        Options = Enumerable.Range(0, Count).Select(defaultOption).ToArray();
+    }
+
+    /// <inheritdoc/>
+    public override void SaveToPreset(ConfigFile presetConfig, bool saveDefault = false)
+    {
+        foreach (var option in Options)
+        {
+            option.SaveToPreset(presetConfig, saveDefault);
+        }
+    }
+
+    /// <inheritdoc/>
+    public override void Bind(ConfigFile config)
+    {
+        foreach (var option in Options)
+        {
+            option.Bind(config);
+        }
+    }
+
+    /// <inheritdoc/>
+    public override void LoadFromPreset(ConfigFile presetConfig)
+    {
+        foreach (var option in Options)
+        {
+            option.LoadFromPreset(presetConfig);
+        }
+    }
+
+    /// <inheritdoc/>
+    public override float GetFloatData(int idx)
+    {
+        return Options[idx].GetFloatData();
+    }
+
+    /// <inheritdoc/>
+    public override NetData GetNetData(int idx)
+    {
+        return Options[idx].GetNetData();
+    }
+
+    /// <inheritdoc/>
+    public override void HandleNetData(int idx, byte[] data)
+    {
+        Options[idx].HandleNetData(data);
+    }
+
+    /// <inheritdoc/>
+    public override OptionBehaviour CreateOption(int idx, ToggleOption toggleOpt, NumberOption numberOpt, StringOption stringOpt, PlayerOption playerOpt, Transform container)
+    {
+        return _optionBehaviours[idx] = Options[idx].CreateOption(toggleOpt, numberOpt, stringOpt, playerOpt, container);
+    }
+
+    /// <summary>
+    /// Indexes the option of type <typeparamref name="T"/>.
+    /// </summary>
+    /// <param name="idx">The option's index.</param>
+    /// <returns>option of type <typeparamref name="T"/>.</returns>
+    public T this[int idx] => Options[idx];
+}
