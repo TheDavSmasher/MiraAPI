@@ -51,7 +51,7 @@ public static class NameplatesTabPatches
         }
         __instance.plateId = HatManager.Instance.GetNamePlateById(DataManager.Player.Customization.namePlate).ProdId;
 
-        if (!SortedNameplates.ContainsKey("Vanilla")) AddRange(DestroyableSingleton<HatManager>.Instance.GetUnlockedNamePlates().Select(x => ("Vanilla", x)));
+        if (!SortedNameplates.ContainsKey("Vanilla")) AddRange(HatManager.Instance.GetUnlockedNamePlates().Select(x => ("Vanilla", x)));
 
         InventoryUtility.CreateNextBackButtons(__instance, PreviousPage, NextPage);
 

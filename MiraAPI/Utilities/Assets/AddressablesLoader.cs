@@ -171,24 +171,24 @@ public static class AddressablesLoader
         var visorBehaviours = DiscoverAndReportData<VisorData>(RegisteredVisorKeys);
 
         var hatData = new List<HatData>();
-        hatData.AddRange(DestroyableSingleton<HatManager>.Instance.allHats);
+        hatData.AddRange(HatManager.Instance.allHats);
         hatData.ForEach(x => x.StoreName = "Vanilla");
-        DestroyableSingleton<HatManager>.Instance.allHats = PrepareArray(hatData, hatBehaviours);
+        HatManager.Instance.allHats = PrepareArray(hatData, hatBehaviours);
 
         var skinData = new List<SkinData>();
-        skinData.AddRange(DestroyableSingleton<HatManager>.Instance.allSkins);
+        skinData.AddRange(HatManager.Instance.allSkins);
         skinData.ForEach(x => x.StoreName = "Vanilla");
-        DestroyableSingleton<HatManager>.Instance.allSkins = PrepareArray(skinData, skinBehaviours);
+        HatManager.Instance.allSkins = PrepareArray(skinData, skinBehaviours);
 
         var visorData = new List<VisorData>();
-        visorData.AddRange(DestroyableSingleton<HatManager>.Instance.allVisors);
+        visorData.AddRange(HatManager.Instance.allVisors);
         VisorsTabPatches.AddRange(visorBehaviours);
-        DestroyableSingleton<HatManager>.Instance.allVisors = PrepareArray(visorData, visorBehaviours.Select(x=>x.Data).ToList());
+        HatManager.Instance.allVisors = PrepareArray(visorData, visorBehaviours.Select(x=>x.Data).ToList());
 
         var namePlateData = new List<NamePlateData>();
-        namePlateData.AddRange(DestroyableSingleton<HatManager>.Instance.allNamePlates);
+        namePlateData.AddRange(HatManager.Instance.allNamePlates);
         NameplatesTabPatches.AddRange(namePlateBehaviours);
-        DestroyableSingleton<HatManager>.Instance.allNamePlates = PrepareArray(namePlateData, namePlateBehaviours.Select(x => x.Data).ToList());
+        HatManager.Instance.allNamePlates = PrepareArray(namePlateData, namePlateBehaviours.Select(x => x.Data).ToList());
     }
 
     private static T[] PrepareArray<T>(List<T> data, List<T> behaviours) where T : CosmeticData

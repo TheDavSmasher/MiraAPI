@@ -208,7 +208,7 @@ public static class VotingUtils
         }
 
         MeetingHud.Instance.TitleText.text =
-            DestroyableSingleton<TranslationController>.Instance.GetString(
+            TranslationController.Instance.GetString(
                 StringNames.MeetingVotingResults,
                 Il2CppSystem.Array.Empty<Il2CppSystem.Object>());
 

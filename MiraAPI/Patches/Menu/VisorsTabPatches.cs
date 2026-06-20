@@ -51,7 +51,7 @@ public static class VisorsTabPatches
         }
         __instance.visorId = HatManager.Instance.GetVisorById(DataManager.Player.Customization.Visor).ProdId;
 
-        if (!SortedVisors.ContainsKey("Vanilla")) AddRange(DestroyableSingleton<HatManager>.Instance.GetUnlockedVisors().Select(x => ("Vanilla", x)));
+        if (!SortedVisors.ContainsKey("Vanilla")) AddRange(HatManager.Instance.GetUnlockedVisors().Select(x => ("Vanilla", x)));
 
         InventoryUtility.CreateNextBackButtons(__instance, PreviousPage, NextPage);
 

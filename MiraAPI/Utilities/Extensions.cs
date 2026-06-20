@@ -73,7 +73,7 @@ public static class Extensions
         }
         self.amClosing = Minigame.CloseState.Closing;
         self.logger.Info(string.Concat("Closing minigame ", self.GetType().Name));
-        IAnalyticsReporter analytics = DestroyableSingleton<DebugAnalytics>.Instance.Analytics;
+        IAnalyticsReporter analytics = DebugAnalytics.Instance.Analytics;
         NetworkedPlayerInfo data = PlayerControl.LocalPlayer.Data;
         TaskTypes taskType = self.TaskType;
         float realtimeSinceStartup = Time.realtimeSinceStartup - self.timeOpened;
