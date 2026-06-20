@@ -20,14 +20,16 @@ public interface IModdedOptionList
     IMiraPlugin? ParentMod { get; set; }
 
     /// <summary>
-    /// Gets or sets the visibility function for the options.
+    /// Gets the visibility function for the options.
+    /// Leaving it null will leave the options unchanged.
     /// </summary>
-    Func<int, bool> Visible { get; set; }
+    Func<int, bool>? Visible { get; init; }
 
     /// <summary>
-    /// Gets or sets a value indicating whether the options should be included with presets.
+    /// Gets a value indicating whether the options should be included with presets.
+    /// Leaving it null will leave the options unchanged.
     /// </summary>
-    bool IncludeInPreset { get; set; }
+    bool? IncludeInPreset { get; init; }
 
     /// <summary>
     /// Saves the options to a preset configuration file.
