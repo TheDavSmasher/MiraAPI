@@ -16,12 +16,12 @@ public abstract class ModdedOptionAttribute(string title, Type? roleType = null)
     /// <summary>
     /// Gets the title of the option.
     /// </summary>
-    public string Title { get; private set; } = title;
+    public string Title => title;
 
     /// <summary>
     /// Gets the role type of the option.
     /// </summary>
-    protected Type? RoleType { get; private set; } = roleType;
+    protected Type? RoleType => roleType;
 
     /// <summary>
     /// Sets the value of the option.
