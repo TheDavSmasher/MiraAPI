@@ -211,6 +211,12 @@ public sealed class MiraPluginManager
                 {
                     ModdedOptionsManager.RegisterPropertyOptionList(type, property, pluginInfo);
                 }
+
+                var listAttr = property.GetCustomAttribute<ModdedOptionListAttribute>();
+                if (listAttr != null)
+                {
+                    ModdedOptionsManager.RegisterAttributeOptionList(type, listAttr, property, pluginInfo);
+                }
             }
 
             foreach (var field in type.GetFields()

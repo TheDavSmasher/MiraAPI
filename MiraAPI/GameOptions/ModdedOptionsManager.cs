@@ -21,6 +21,7 @@ namespace MiraAPI.GameOptions;
 public static class ModdedOptionsManager
 {
     private static readonly Dictionary<PropertyInfo, ModdedOptionAttribute> OptionAttributes = [];
+    private static readonly Dictionary<PropertyInfo, ModdedOptionListAttribute> OptionListAttributes = [];
     private static readonly Dictionary<Type, AbstractOptionGroup> TypeToGroup = [];
 
     internal static readonly Dictionary<OptionBehaviour, ModdedPlayerOption> CreatedPlayerOptions = [];
@@ -100,11 +101,11 @@ public static class ModdedOptionsManager
         }
 
         var setterOriginal = property.GetSetMethod();
-        var setterPatch = typeof(ModdedOptionsManager).GetMethod(nameof(PropertySetterPatch));
+        var setterPatch = typeof(ModdedOptionsManager).GetMethod(nameof(PropertyListSetterPatch));
         PluginSingleton<MiraApiPlugin>.Instance.Harmony.Patch(setterOriginal, postfix: new HarmonyMethod(setterPatch));
 
         var getterOriginal = property.GetGetMethod();
-        var getterPatch = typeof(ModdedOptionsManager).GetMethod(nameof(PropertyGetterPatch));
+        var getterPatch = typeof(ModdedOptionsManager).GetMethod(nameof(PropertyListGetterPatch));
         PluginSingleton<MiraApiPlugin>.Instance.Harmony.Patch(getterOriginal, prefix: new HarmonyMethod(getterPatch));
 
         OptionAttributes.Add(property, attribute);
@@ -126,6 +127,51 @@ public static class ModdedOptionsManager
             Error($"Failed to get option list for {property.Name}");
             return;
         }
+
+        for (int i = 0; i < optionList.Count; i++)
+        {
+            RegisterOption(optionList[i], group, property.Name + i, pluginInfo);
+        }
+    }
+
+    internal static void RegisterAttributeOptionList(
+        Type type,
+        ModdedOptionListAttribute attribute,
+        PropertyInfo property,
+        MiraPluginInfo pluginInfo)
+    {
+        if (OptionListAttributes.ContainsKey(property))
+        {
+            Error($"Property {property.Name} already has an attribute registered.");
+            return;
+        }
+
+        if (!TypeToGroup.TryGetValue(type, out var group))
+        {
+            Error($"Failed to get group for {type.Name}");
+            return;
+        }
+
+        var optionList = attribute.CreateOptionList(property.GetValue(group), property);
+
+        if (optionList == null)
+        {
+            Error($"Failed to get option for {property.Name}");
+            return;
+        }
+
+        var setterOriginal = property.GetSetMethod();
+        var setterPatch = typeof(ModdedOptionsManager).GetMethod(nameof(PropertySetterPatch));
+        PluginSingleton<MiraApiPlugin>.Instance.Harmony.Patch(setterOriginal, postfix: new HarmonyMethod(setterPatch));
+
+        var getterOriginal = property.GetGetMethod();
+        var getterPatch = typeof(ModdedOptionsManager).GetMethod(nameof(PropertyGetterPatch));
+        PluginSingleton<MiraApiPlugin>.Instance.Harmony.Patch(getterOriginal, prefix: new HarmonyMethod(getterPatch));
+
+        // Add indexer patches
+
+        OptionListAttributes.Add(property, attribute);
+        attribute.HolderOptionList = optionList;
 
         for (int i = 0; i < optionList.Count; i++)
         {
@@ -219,6 +265,36 @@ public static class ModdedOptionsManager
 #pragma warning restore CA1707
     {
         var attribute = OptionAttributes.First(pair => pair.Key.GetGetMethod() == __originalMethod).Value;
+        __result = attribute.GetValue();
+        return false;
+    }
+
+    /// <summary>
+    /// Patches the setter of a list property to update the value of the options.
+    /// </summary>
+    /// <param name="__originalMethod">The original setter method.</param>
+    /// <param name="value">The new object value.</param>
+#pragma warning disable CA1707
+    [SuppressMessage("ReSharper", "InconsistentNaming", Justification = "Harmony naming convention")]
+    public static void PropertyListSetterPatch(MethodBase __originalMethod, object value)
+#pragma warning restore CA1707
+    {
+        var attribute = OptionListAttributes.First(pair => pair.Key.GetSetMethod() == __originalMethod).Value;
+        attribute.SetValue(value);
+    }
+
+    /// <summary>
+    /// Patches the getter of a list property to return the value of the options.
+    /// </summary>
+    /// <param name="__originalMethod">The original getter method.</param>
+    /// <param name="__result">The result of the property getter.</param>
+    /// <returns>False so the original getter gets skipped.</returns>
+#pragma warning disable CA1707
+    [SuppressMessage("ReSharper", "InconsistentNaming", Justification = "Harmony naming convention")]
+    public static bool PropertyListGetterPatch(MethodBase __originalMethod, ref object __result)
+#pragma warning restore CA1707
+    {
+        var attribute = OptionListAttributes.First(pair => pair.Key.GetGetMethod() == __originalMethod).Value;
         __result = attribute.GetValue();
         return false;
     }
