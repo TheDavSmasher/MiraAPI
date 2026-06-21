@@ -213,7 +213,8 @@ public sealed class MiraPluginManager
                 }
             }
 
-            foreach (var field in type.GetFields().Where(f => f.FieldType.IsAssignableTo(typeof(IModdedOption))))
+            foreach (var field in type.GetFields()
+                .Where(f => f.FieldType.IsAssignableTo(typeof(IModdedOption)) || f.FieldType.IsAssignableTo(typeof(IModdedOptionList))))
             {
                 Error($"{field.Name} is a field, not a property. Use properties for options.");
             }
