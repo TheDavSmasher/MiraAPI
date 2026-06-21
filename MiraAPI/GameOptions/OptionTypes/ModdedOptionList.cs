@@ -30,6 +30,16 @@ public class ModdedOptionList<T> : IModdedOptionList where T : IModdedOption
         Options = Enumerable.Range(0, Count).Select(optionFactory).ToArray();
     }
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="ModdedOptionList{T}"/> class.
+    /// </summary>
+    /// <param name="options">The options list.</param>
+    public ModdedOptionList(IEnumerable<T> options)
+    {
+        Count = options.Count();
+        Options = options.ToArray();
+    }
+
     /// <inheritdoc/>
     public IEnumerator<IModdedOption> GetEnumerator()
     {
