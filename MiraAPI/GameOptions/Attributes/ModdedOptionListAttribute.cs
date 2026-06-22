@@ -13,8 +13,6 @@ public abstract class ModdedOptionListAttribute(Func<int, string> titler) : Prop
 {
     internal IModdedOptionList? HolderOptionList { get; set; }
 
-    internal PropertyInfo? BaseProperty { get; set; }
-
     internal object? Value { get; set; }
 
     /// <summary>
@@ -32,7 +30,7 @@ public abstract class ModdedOptionListAttribute(Func<int, string> titler) : Prop
         var list = (IList)value;
         if (list.Count != HolderOptionList!.Count)
         {
-            throw new InvalidOperationException($"Value set to {BaseProperty!.Name} cannot change the list's length.");
+            throw new InvalidOperationException($"Value set to option list cannot change the list's length.");
         }
 
         for (int i = 0; i < list!.Count; i++)
