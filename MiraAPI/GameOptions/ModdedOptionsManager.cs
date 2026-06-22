@@ -295,30 +295,34 @@ public static class ModdedOptionsManager
     /// <summary>
     /// Patches the setter of a list property to update the value of the option.
     /// </summary>
-    /// <param name="__originalMethod">The original setter method.</param>
+    /// <param name="__instance">The list's instance.</param>
     /// <param name="index">The index to find in the list.</param>
     /// <param name="value">The new object value.</param>
 #pragma warning disable CA1707
     [SuppressMessage("ReSharper", "InconsistentNaming", Justification = "Harmony naming convention")]
-    public static void PropertyListSetterPatch(MethodBase __originalMethod, int index, object value)
+    public static void PropertyListSetterPatch(object __instance, int index, object value)
 #pragma warning restore CA1707
     {
-        // Actually implement
+        var attribute = (ModdedOptionListAttribute)OptionAttributes.First(
+            pair => pair.Value is ModdedOptionListAttribute list && ReferenceEquals(list.Value, __instance)).Value;
+        attribute.SetValue(attribute.HolderOptionList![index], value);
     }
 
     /// <summary>
     /// Patches the getter of a list property to return the value of the option.
     /// </summary>
-    /// <param name="__originalMethod">The original getter method.</param>
+    /// <param name="__instance">The list's instance.</param>
     /// <param name="index">The index to find in the list.</param>
     /// <param name="__result">The result of the property getter.</param>
     /// <returns>False so the original getter gets skipped.</returns>
 #pragma warning disable CA1707
     [SuppressMessage("ReSharper", "InconsistentNaming", Justification = "Harmony naming convention")]
-    public static bool PropertyListGetterPatch(MethodBase __originalMethod, int index, ref object __result)
+    public static bool PropertyListGetterPatch(object __instance, int index, ref object __result)
 #pragma warning restore CA1707
     {
-        // Actually implement
-        return true;
+        var attribute = (ModdedOptionListAttribute)OptionAttributes.First(
+            pair => pair.Value is ModdedOptionListAttribute list && ReferenceEquals(list.Value, __instance)).Value;
+        __result = attribute.GetValue(attribute.HolderOptionList![index]);
+        return false;
     }
 }
