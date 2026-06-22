@@ -305,7 +305,7 @@ public static class ModdedOptionsManager
     {
         var attribute = (ModdedOptionListAttribute)OptionAttributes.First(
             pair => pair.Value is ModdedOptionListAttribute list && ReferenceEquals(list.Value, __instance)).Value;
-        attribute.SetValue(attribute.HolderOptionList![index], value);
+        attribute.SetValue(index, value);
     }
 
     /// <summary>
@@ -322,7 +322,7 @@ public static class ModdedOptionsManager
     {
         var attribute = (ModdedOptionListAttribute)OptionAttributes.First(
             pair => pair.Value is ModdedOptionListAttribute list && ReferenceEquals(list.Value, __instance)).Value;
-        __result = attribute.GetValue(attribute.HolderOptionList![index]);
+        __result = attribute.GetValue(index);
         return false;
     }
 }

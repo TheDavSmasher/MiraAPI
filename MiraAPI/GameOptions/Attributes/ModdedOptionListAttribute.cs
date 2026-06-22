@@ -35,16 +35,16 @@ public abstract class ModdedOptionListAttribute(Func<int, string> titler) : Prop
 
         for (int i = 0; i < list!.Count; i++)
         {
-            SetValue(HolderOptionList![i], list[i]!);
+            SetValue(i, list[i]!);
         }
     }
 
     /// <summary>
     /// Sets the value of the specific option.
     /// </summary>
-    /// <param name="modOpt">The option to set.</param>
+    /// <param name="idx">The option to set.</param>
     /// <param name="value">The new value as an object.</param>
-    public abstract void SetValue(IModdedOption modOpt, object value);
+    public abstract void SetValue(int idx, object value);
 
     /// <summary>
     /// Gets the value of all the options.
@@ -58,9 +58,9 @@ public abstract class ModdedOptionListAttribute(Func<int, string> titler) : Prop
     /// <summary>
     /// Gets the value of the specific option.
     /// </summary>
-    /// <param name="modOpt">The option to set.</param>
+    /// <param name="idx">The option to set.</param>
     /// <returns>The value of the option as an object.</returns>
-    public abstract object GetValue(IModdedOption modOpt);
+    public abstract object GetValue(int idx);
 
-    internal abstract IModdedOptionList? CreateOptionList(object? value, PropertyInfo property);
+    internal abstract IModdedOptionList? CreateOptionList(IList value, PropertyInfo property);
 }
