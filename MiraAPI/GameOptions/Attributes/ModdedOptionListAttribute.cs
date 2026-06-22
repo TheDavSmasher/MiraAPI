@@ -9,7 +9,7 @@ namespace MiraAPI.GameOptions.Attributes;
 /// </summary>
 /// <param name="titler">A function to title of the options.</param>
 [AttributeUsage(AttributeTargets.Property)]
-public abstract class ModdedOptionListAttribute(Func<int, string> titler) : Attribute
+public abstract class ModdedOptionListAttribute(Func<int, string> titler) : PropertyOptionAttribute
 {
     internal IModdedOptionList? HolderOptionList { get; set; }
 
@@ -26,7 +26,7 @@ public abstract class ModdedOptionListAttribute(Func<int, string> titler) : Attr
     /// Sets the value of all the options.
     /// </summary>
     /// <param name="value">The new values as an object.</param>
-    public void SetValue(object value)
+    public override void SetValue(object value)
     {
         var list = (IList)value;
         if (list.Count != ((IList)BaseProperty!.GetValue(Group)!).Count ||
@@ -52,7 +52,7 @@ public abstract class ModdedOptionListAttribute(Func<int, string> titler) : Attr
     /// Gets the value of all the options.
     /// </summary>
     /// <returns>The value of the options as an object.</returns>
-    public object GetValue()
+    public override object GetValue()
     {
         var list = (IList)BaseProperty!.GetValue(Group)!;
         for (int i = 0; i < list!.Count; i++)
