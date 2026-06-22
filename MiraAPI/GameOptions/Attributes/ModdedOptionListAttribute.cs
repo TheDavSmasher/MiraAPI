@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Reflection;
 
 namespace MiraAPI.GameOptions.Attributes;
@@ -12,6 +13,10 @@ public abstract class ModdedOptionListAttribute(Func<int, string> titler) : Attr
 {
     internal IModdedOptionList? HolderOptionList { get; set; }
 
+    internal PropertyInfo? BaseProperty { get; set; }
+
+    internal AbstractOptionGroup? Group { get; set; }
+
     /// <summary>
     /// Gets the function to title of the options.
     /// </summary>
@@ -21,7 +26,20 @@ public abstract class ModdedOptionListAttribute(Func<int, string> titler) : Attr
     /// Sets the value of all the options.
     /// </summary>
     /// <param name="value">The new values as an object.</param>
-    public abstract void SetValue(object value);
+    public void SetValue(object value)
+    {
+        var list = (IList)value;
+        if (list.Count != ((IList)BaseProperty!.GetValue(Group)!).Count ||
+            list.Count != HolderOptionList!.Count)
+        {
+            throw new InvalidOperationException($"Value set to {BaseProperty!.Name} cannot change the list's length.");
+        }
+
+        for (int i = 0; i < list!.Count; i++)
+        {
+            SetValue(HolderOptionList![i], list[i]!);
+        }
+    }
 
     /// <summary>
     /// Sets the value of the specific option.
@@ -34,7 +52,15 @@ public abstract class ModdedOptionListAttribute(Func<int, string> titler) : Attr
     /// Gets the value of all the options.
     /// </summary>
     /// <returns>The value of the options as an object.</returns>
-    public abstract object GetValue();
+    public object GetValue()
+    {
+        var list = (IList)BaseProperty!.GetValue(Group)!;
+        for (int i = 0; i < list!.Count; i++)
+        {
+            list[i] = GetValue(HolderOptionList![i]);
+        }
+        return list;
+    }
 
     /// <summary>
     /// Gets the value of the specific option.
