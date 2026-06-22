@@ -194,6 +194,7 @@ public static class ModdedOptionsManager
 
         OptionAttributes.Add(property, attribute);
         attribute.HolderOptionList = optionList;
+        attribute.Value = propertyVal;
 
         for (int i = 0; i < optionList.Count; i++)
         {

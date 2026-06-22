@@ -15,7 +15,7 @@ public abstract class ModdedOptionListAttribute(Func<int, string> titler) : Prop
 
     internal PropertyInfo? BaseProperty { get; set; }
 
-    internal AbstractOptionGroup? Group { get; set; }
+    internal object? Value { get; set; }
 
     /// <summary>
     /// Gets the function to title of the options.
@@ -28,6 +28,7 @@ public abstract class ModdedOptionListAttribute(Func<int, string> titler) : Prop
     /// <param name="value">The new values as an object.</param>
     public override void SetValue(object value)
     {
+        Value = value;
         var list = (IList)value;
         if (list.Count != HolderOptionList!.Count)
         {
@@ -53,7 +54,7 @@ public abstract class ModdedOptionListAttribute(Func<int, string> titler) : Prop
     /// <returns>The value of the options as an object.</returns>
     public override object GetValue()
     {
-        return BaseProperty!.GetValue(Group)!;
+        return Value!;
     }
 
     /// <summary>
