@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
@@ -151,7 +152,16 @@ public static class ModdedOptionsManager
             return;
         }
 
-        var optionList = attribute.CreateOptionList(property.GetValue(group), property);
+        var propertyVal = property.GetValue(group);
+
+        if (propertyVal == null)
+        {
+            Error("Cannot initialize option list with null value.");
+            return;
+        }
+
+        var propertyList = (IList)propertyVal;
+        var optionList = attribute.CreateOptionList(propertyList, property);
 
         if (optionList == null)
         {
