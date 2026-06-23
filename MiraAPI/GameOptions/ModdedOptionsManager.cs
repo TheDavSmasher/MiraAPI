@@ -16,7 +16,7 @@ using Reactor.Utilities;
 namespace MiraAPI.GameOptions;
 
 /// <summary>
-/// Handles modded options.
+/// Handles <see cref="IModdedOption"/>s.
 /// </summary>
 public static class ModdedOptionsManager
 {

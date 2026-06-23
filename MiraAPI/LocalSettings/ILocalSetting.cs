@@ -19,7 +19,7 @@ public interface ILocalSetting
     string Description { get; }
 
     /// <summary>
-    /// Gets the setting's gameobject.
+    /// Gets the setting's <see cref="GameObject"/>.
     /// </summary>
     GameObject? Setting { get; }
 
@@ -31,12 +31,12 @@ public interface ILocalSetting
     /// <summary>
     /// Used to create the setting.
     /// </summary>
-    /// <param name="toggle">Toggle template.</param>
-    /// <param name="slider">Slider template.</param>
-    /// <param name="parent">The parent of the setting.</param>
+    /// <param name="toggle"><see cref="ToggleButtonBehaviour"/> template.</param>
+    /// <param name="slider"><see cref="SlideBar"/> template.</param>
+    /// <param name="parent">The parent <see cref="Transform"/> of the setting.</param>
     /// <param name="offset">The offset.</param>
     /// <param name="order">The order.</param>
     /// <param name="last">Whether it's the last on the row.</param>
-    /// <returns>The created setting.</returns>
+    /// <returns>The created setting's <see cref="GameObject"/>.</returns>
     GameObject? CreateOption(ToggleButtonBehaviour toggle, SlideBar slider, Transform parent, ref float offset, ref int order, bool last);
 }

@@ -23,24 +23,24 @@ public abstract class CustomGameMode
     public abstract int Id { get; }
 
     /// <summary>
-    /// Called when Intro Cutscene is destroyed.
+    /// Called when <see cref="IntroCutscene"/> is destroyed.
     /// </summary>
     public virtual void Initialize()
     {
     }
 
     /// <summary>
-    /// Called on HudManager.Start().
+    /// Called on <see cref="HudManager.Start"/>.
     /// </summary>
-    /// <param name="instance">Instance of HudManager.</param>
+    /// <param name="instance">Instance of <see cref="HudManager"/>.</param>
     public virtual void HudStart(HudManager instance)
     {
     }
 
     /// <summary>
-    /// Called every frame on HudManager.Update().
+    /// Called every frame on <see cref="HudManager.Update"/>.
     /// </summary>
-    /// <param name="instance">Instance of HudManager.</param>
+    /// <param name="instance">Instance of <see cref="HudManager"/>.</param>
     public virtual void HudUpdate(HudManager instance)
     {
     }
@@ -48,7 +48,7 @@ public abstract class CustomGameMode
     /// <summary>
     /// Called when a player is killed.
     /// </summary>
-    /// <param name="player">PlayerControl that was killed.</param>
+    /// <param name="player"><see cref="PlayerControl"/> that was killed.</param>
     public virtual void OnDeath(PlayerControl player)
     {
     }
@@ -57,7 +57,7 @@ public abstract class CustomGameMode
     /// Calculate Game End logic.
     /// </summary>
     /// <param name="runOriginal">Should original game end logic be used.</param>
-    /// <param name="instance">Instance of LogicGameFlowNormal.</param>
+    /// <param name="instance">Instance of <see cref="LogicGameFlowNormal"/>.</param>
     public virtual void CheckGameEnd(out bool runOriginal, LogicGameFlowNormal instance)
     {
         runOriginal = true;
@@ -67,7 +67,7 @@ public abstract class CustomGameMode
     /// Custom role assignment.
     /// </summary>
     /// <param name="runOriginal">Should original role assignment be used.</param>
-    /// <param name="instance">Instance of LogicRoleSelection.</param>
+    /// <param name="instance">Instance of <see cref="LogicRoleSelection"/>.</param>
     public virtual void AssignRoles(out bool runOriginal, LogicRoleSelectionNormal instance)
     {
         runOriginal = true;
@@ -78,7 +78,7 @@ public abstract class CustomGameMode
     /// </summary>
     /// <param name="runOriginal">Should the original murder logic be used.</param>
     /// <param name="result">Result of custom murder logic.</param>
-    /// <param name="target">Target player for murder.</param>
+    /// <param name="target">Target <see cref="PlayerControl"/> for murder.</param>
     public virtual void CanKill(out bool runOriginal, out bool result, PlayerControl target)
     {
         result = false;
@@ -104,7 +104,7 @@ public abstract class CustomGameMode
     public virtual List<NetworkedPlayerInfo>? CalculateWinners() => null;
 
     /// <summary>
-    /// Show gamemode in Intro Cutscene.
+    /// Show gamemode in <see cref="IntroCutscene"/>.
     /// </summary>
     /// <returns>True if the game mode should be shown in the intro cutscene.</returns>
     public virtual bool ShowGameModeIntroCutscene() => false;
@@ -117,17 +117,17 @@ public abstract class CustomGameMode
     public virtual bool CanUseMapConsole(MapConsole console) => true;
 
     /// <summary>
-    /// Can a body be reported in this gamemode.
+    /// Can a <see cref="DeadBody"/> be reported in this gamemode.
     /// </summary>
-    /// <param name="body">Target body for reporting.</param>
-    /// <returns>True if dead bodies can be reported.</returns>
+    /// <param name="body">Target <see cref="DeadBody"/> for reporting.</param>
+    /// <returns>True if <see cref="DeadBody"/>s can be reported.</returns>
     public virtual bool CanReport(DeadBody body) => true;
 
     /// <summary>
-    /// Can system consoles be used in this gamemode.
+    /// Can <see cref="SystemConsole"/>s be used in this gamemode.
     /// </summary>
     /// <param name="console">System Console.</param>
-    /// <returns>True if system consoles are enabled in this mode.</returns>
+    /// <returns>True if <see cref="SystemConsole"/>s are enabled in this mode.</returns>
     public virtual bool CanUseSystemConsole(SystemConsole console) => true;
 
     /// <summary>
@@ -140,7 +140,7 @@ public abstract class CustomGameMode
     /// <summary>
     /// Should the sabotage map be used when attempting to open sabotage overlay.
     /// </summary>
-    /// <param name="map">MapBehaviour object.</param>
+    /// <param name="map"><see cref="MapBehaviour"/> object.</param>
     /// <returns>True if the sabotage map should be shown.</returns>
     public virtual bool ShouldShowSabotageMap(MapBehaviour map) => true;
 

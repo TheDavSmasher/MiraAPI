@@ -1,7 +1,7 @@
 ﻿namespace MiraAPI.Events.Vanilla.Map;
 
 /// <summary>
-/// Cancelable event that is invoked before a system is updated. Usually used for sabotage events.
+/// <see cref="MiraCancelableEvent"/> that is invoked before a system is updated. Usually used for sabotage events.
 /// </summary>
 public class UpdateSystemEvent : MiraCancelableEvent
 {
@@ -11,7 +11,7 @@ public class UpdateSystemEvent : MiraCancelableEvent
     public SystemTypes SystemType { get; }
 
     /// <summary>
-    /// Gets the player that is updating the system.
+    /// Gets the <see cref="PlayerControl"/> that is updating the system.
     /// </summary>
     public PlayerControl Player { get; }
 
@@ -21,10 +21,10 @@ public class UpdateSystemEvent : MiraCancelableEvent
     public byte Amount { get; }
 
     /// <summary>
-    ///  Initializes a new instance of the <see cref="UpdateSystemEvent"/> class.
+    /// Initializes a new instance of the <see cref="UpdateSystemEvent"/> class.
     /// </summary>
-    /// <param name="systemType">The SystemType being updated.</param>
-    /// <param name="player">The player that is updating the system.</param>
+    /// <param name="systemType">The <see cref="SystemTypes"/> being updated.</param>
+    /// <param name="player">The <see cref="PlayerControl"/> that is updating the system.</param>
     /// <param name="amount">Amount to update System to.</param>
     public UpdateSystemEvent(SystemTypes systemType, PlayerControl player, byte amount)
     {

@@ -15,10 +15,10 @@ namespace MiraAPI.Roles;
 public static class CustomRoleUtils
 {
     /// <summary>
-    /// Determines whether the specified role can spawn in general, accounting for gamemodes and everything else.
+    /// Determines whether the specified <see cref="RoleBehaviour"/> can spawn in general, accounting for gamemodes and everything else.
     /// </summary>
-    /// <param name="role">The role you would like to check for.</param>
-    /// <returns>True if the role is able to spawn, otherwise false.</returns>
+    /// <param name="role">The <see cref="RoleBehaviour"/> you would like to check for.</param>
+    /// <returns>True if the <see cref="RoleBehaviour"/> is able to spawn, otherwise false.</returns>
     public static bool CanSpawnOnCurrentMode(RoleBehaviour role)
     {
         if (role is ICustomRole custom)
@@ -73,7 +73,7 @@ public static class CustomRoleUtils
     /// <summary>
     /// Gets all active in-game roles.
     /// </summary>
-    /// <returns>A list of roles.</returns>
+    /// <returns>An <see cref="IEnumerable{T}"/> of <see cref="RoleBehaviour"/>s.</returns>
     // ReSharper disable once MemberCanBePrivate.Global
     public static IEnumerable<RoleBehaviour> GetActiveRoles() => PlayerControl.AllPlayerControls.ToArray().Select(x => x.Data.Role);
 
@@ -85,17 +85,17 @@ public static class CustomRoleUtils
     public static IEnumerable<RoleBehaviour> GetActiveRolesOfTeam(ModdedRoleTeams team) => GetActiveRoles().Where(x => x is ICustomRole customRole && customRole.Team == team);
 
     /// <summary>
-    /// Gets all active in-game roles of a certain type.
+    /// Gets all active in-game <typeparamref name="T"/> roles.
     /// </summary>
-    /// <typeparam name="T">The role Type you would like to check for. Must be a RoleBehaviour.</typeparam>
-    /// <returns>A list of roles with that specific type.</returns>
+    /// <typeparam name="T">The <see cref="RoleBehaviour"/> you would like to check for.</typeparam>
+    /// <returns>An <see cref="IEnumerable{T}"/> of <typeparamref name="T"/>s.</returns>
     public static IEnumerable<T> GetActiveRolesOfType<T>() where T : RoleBehaviour => GetActiveRoles().OfType<T>();
 
     /// <summary>
-    /// Creates a string builder for the Role Tab.
+    /// Creates a <see cref="StringBuilder"/> for the Role Tab.
     /// </summary>
-    /// <param name="role">The ICustomRole object.</param>
-    /// <returns>A StringBuilder.</returns>
+    /// <param name="role">The <see cref="ICustomRole"/> object.</param>
+    /// <returns>A <see cref="StringBuilder"/>.</returns>
     public static StringBuilder CreateForRole(ICustomRole role)
     {
         var taskStringBuilder = new StringBuilder();
@@ -109,7 +109,7 @@ public static class CustomRoleUtils
     /// Returns an intro sound from a role.
     /// </summary>
     /// <param name="roleType">The role type.</param>
-    /// <returns>The intro sound.</returns>
+    /// <returns>The intro <see cref="AudioClip"/>.</returns>
     public static LoadableAsset<AudioClip>? GetIntroSound(RoleTypes roleType)
     {
         var role = CustomRoleManager.AllRoles.FirstOrDefault(role => role.Role == roleType);
@@ -122,10 +122,10 @@ public static class CustomRoleUtils
     }
 
     /// <summary>
-    /// Determines if a role is a custom role or not.
+    /// Determines if a <see cref="RoleBehaviour"/> is a custom role or not.
     /// </summary>
-    /// <param name="role">The RoleBehaviour to check.</param>
-    /// <returns>True if the role is a custom role, false otherwise.</returns>
+    /// <param name="role">The <see cref="RoleBehaviour"/> to check.</param>
+    /// <returns>True if the <see cref="RoleBehaviour"/> is a custom role, false otherwise.</returns>
     public static bool IsCustomRole(this RoleBehaviour role)
     {
         return CustomRoleManager.CustomRoles.ContainsKey((ushort)role.Role);

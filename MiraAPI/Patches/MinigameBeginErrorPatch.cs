@@ -3,7 +3,7 @@
 namespace MiraAPI.Patches;
 
 /// <summary>
-/// Used to fix the Minigame crash errors (credits Submerged/PH Gaming for the fix).
+/// Used to fix the <see cref="Minigame"/> crash errors (credits Submerged/PH Gaming for the fix).
 /// </summary>
 [HarmonyPatch]
 public static class MinigameBeginErrorPatch

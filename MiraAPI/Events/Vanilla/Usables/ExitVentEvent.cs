@@ -6,20 +6,20 @@
 public class ExitVentEvent : MiraCancelableEvent
 {
     /// <summary>
-    /// Gets the player that is exiting the vent.
+    /// Gets the <see cref="PlayerControl"/> that is exiting the <see cref="Vent"/>.
     /// </summary>
     public PlayerControl Player { get; }
 
     /// <summary>
-    /// Gets the vent that the player is exiting.
+    /// Gets the <see cref="global::Vent"/> that the <see cref="Player"/> is exiting.
     /// </summary>
     public Vent? Vent { get; }
 
     /// <summary>
     /// Initializes a new instance of the <see cref="ExitVentEvent"/> class.
     /// </summary>
-    /// <param name="player">The player who is exiting the vent.</param>
-    /// <param name="vent">The vent being exited from.</param>
+    /// <param name="player">The <see cref="PlayerControl"/> who is exiting the <paramref name="vent"/>.</param>
+    /// <param name="vent">The <see cref="global::Vent"/> being exited from.</param>
     public ExitVentEvent(PlayerControl player, Vent? vent)
     {
         Player = player;

@@ -3,20 +3,20 @@
 namespace MiraAPI.Events.Mira;
 
 /// <summary>
-/// Invoked when a Mira Button click is cancelled. Do not use for vanilla buttons.
+/// Invoked when a <see cref="CustomActionButton"/> click is cancelled. Do not use for vanilla <see cref="AbilityButton"/>s.
 /// </summary>
-/// <typeparam name="T">The Mira Button type.</typeparam>
+/// <typeparam name="T">The <see cref="CustomActionButton"/> type.</typeparam>
 public sealed class MiraButtonCancelledEvent<T> : MiraEvent where T : CustomActionButton
 {
     /// <summary>
-    /// Gets Mira Button whose click was cancelled.
+    /// Gets the <see cref="CustomActionButton"/> whose click was cancelled.
     /// </summary>
     public T Button { get; }
 
     /// <summary>
     /// Initializes a new instance of the <see cref="MiraButtonCancelledEvent{T}"/> class.
     /// </summary>
-    /// <param name="button">The Mira Button whose click was cancelled.</param>
+    /// <param name="button">The <see cref="CustomActionButton"/> whose click was cancelled.</param>
     public MiraButtonCancelledEvent(T button)
     {
         Button = button;
@@ -24,19 +24,19 @@ public sealed class MiraButtonCancelledEvent<T> : MiraEvent where T : CustomActi
 }
 
 /// <summary>
-/// Invoked when a Mira Button click is cancelled. Do not use for vanilla buttons.
+/// Invoked when a <see cref="CustomActionButton"/> click is cancelled. Do not use for vanilla <see cref="AbilityButton"/>s.
 /// </summary>
 public sealed class MiraButtonCancelledEvent : MiraEvent
 {
     /// <summary>
-    /// Gets Mira Button whose click was cancelled.
+    /// Gets the <see cref="CustomActionButton"/> whose click was cancelled.
     /// </summary>
     public CustomActionButton Button { get; }
 
     /// <summary>
     /// Initializes a new instance of the <see cref="MiraButtonCancelledEvent"/> class.
     /// </summary>
-    /// <param name="button">The Mira Button whose click was cancelled.</param>
+    /// <param name="button">The <see cref="CustomActionButton"/> whose click was cancelled.</param>
     public MiraButtonCancelledEvent(CustomActionButton button)
     {
         Button = button;

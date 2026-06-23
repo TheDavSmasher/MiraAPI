@@ -8,7 +8,7 @@ using MiraAPI.Utilities;
 namespace MiraAPI.Patches.Events;
 
 /// <summary>
-/// Patch to invoke AfterMurderEvent after a kill animation is performed.
+/// Patch to invoke <see cref="AfterMurderEvent"/> after a kill animation is performed.
 /// </summary>
 [HarmonyPatch]
 public static class KillAnimationMurderEventPatch

@@ -10,7 +10,7 @@ using UnityEngine;
 namespace MiraAPI.Presets;
 
 /// <summary>
-/// Provides functionality to manage and load game option presets for plugins.
+/// Provides functionality to manage and load game <see cref="OptionPreset"/>s for plugins.
 /// </summary>
 public static class PresetManager
 {
@@ -23,7 +23,7 @@ public static class PresetManager
     internal static List<OptionPreset> InternalMasterPresets { get; } = [];
 
     /// <summary>
-    /// Gets a read only dictionary of this plugin's custom presets.
+    /// Gets a <see cref="IReadOnlyCollection{T}"/> of this plugin's <see cref="OptionPreset"/>s.
     /// </summary>
     public static IReadOnlyCollection<OptionPreset> MasterPresets { get; internal set; } = null!;
 
@@ -52,9 +52,9 @@ public static class PresetManager
     }
 
     /// <summary>
-    /// Loads the presets for the specified plugin by reading the configuration files from the preset directory.
+    /// Loads the <see cref="OptionPreset"/>s for the specified plugin by reading the <see cref="ConfigFile"/>s from the preset directory.
     /// </summary>
-    /// <param name="plugin">>The plugin for which the presets should be loaded.</param>
+    /// <param name="plugin">>The plugin for which the <see cref="OptionPreset"/>s should be loaded.</param>
     public static void LoadPresets(MiraPluginInfo plugin)
     {
         foreach (var btn in plugin.InternalPresets.Select(x=>x.PresetButton))
@@ -105,7 +105,7 @@ public static class PresetManager
     }
 
     /// <summary>
-    /// Loads the master presets by reading the configuration files from the preset directory.
+    /// Loads the master presets by reading the <see cref="ConfigFile"/>s from the preset directory.
     /// </summary>
     public static void LoadMasterPreset()
     {

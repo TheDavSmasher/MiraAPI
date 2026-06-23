@@ -30,17 +30,17 @@ public interface ICustomRole : IOptionable
     string RoleLongDescription { get; }
 
     /// <summary>
-    /// Gets the color of the role.
+    /// Gets the <see cref="Color"/> of the role.
     /// </summary>
     Color RoleColor { get; }
 
     /// <summary>
-    /// Gets the color that should be used in the options menu.
+    /// Gets the <see cref="Color"/> that should be used in the options menu.
     /// </summary>
     Color OptionsMenuColor => RoleColor;
 
     /// <summary>
-    /// Gets the team of the role.
+    /// Gets the <see cref="ModdedRoleTeams"/> of the role.
     /// </summary>
     ModdedRoleTeams Team { get; }
 
@@ -50,7 +50,7 @@ public interface ICustomRole : IOptionable
     CustomRoleConfiguration Configuration { get; }
 
     /// <summary>
-    /// Gets the role options group.
+    /// Gets the <see cref="RoleOptionsGroup"/>.
     /// </summary>
     RoleOptionsGroup RoleOptionsGroup => Team switch
     {
@@ -88,9 +88,9 @@ public interface ICustomRole : IOptionable
     }
 
     /// <summary>
-    /// Saves the role's configuration to a preset ConfigFile.
+    /// Saves the role's configuration to a preset <see cref="ConfigFile"/>.
     /// </summary>
-    /// <param name="presetConfig">The ConfigFile to save the preset configuration to.</param>
+    /// <param name="presetConfig">The <see cref="ConfigFile"/> to save the preset configuration to.</param>
     /// <param name="useDefault">Whether to use the default values for the configuration.</param>
     public virtual void SaveToPreset(ConfigFile presetConfig, bool useDefault=false)
     {
@@ -100,9 +100,9 @@ public interface ICustomRole : IOptionable
     }
 
     /// <summary>
-    /// Loads the role's configuration from a preset ConfigFile.
+    /// Loads the role's configuration from a preset <see cref="ConfigFile"/>.
     /// </summary>
-    /// <param name="presetConfig">The ConfigFile containing the preset configuration.</param>
+    /// <param name="presetConfig">The <see cref="ConfigFile"/> containing the preset configuration.</param>
     public virtual void LoadFromPreset(ConfigFile presetConfig)
     {
         if (presetConfig.TryGetEntry(NumConfigDefinition, out ConfigEntry<int> numEntry))
@@ -186,7 +186,7 @@ public interface ICustomRole : IOptionable
     }
 
     /// <summary>
-    /// Whether the local player can see this role.
+    /// Whether the <see cref="PlayerControl.LocalPlayer"/> can see this role.
     /// </summary>
     /// <param name="player">The player with the role.</param>
     /// <returns>Whether they can see the role (name color) or not.</returns>
@@ -228,14 +228,14 @@ public interface ICustomRole : IOptionable
     /// <summary>
     /// Get the custom Role Tab text for this role.
     /// </summary>
-    /// <returns>A StringBuilder with the role tab text.</returns>
+    /// <returns>A <see cref="StringBuilder"/> with the role tab text.</returns>
     StringBuilder SetTabText() => CustomRoleUtils.CreateForRole(this);
 
     /// <summary>
-    /// Determine whether a given modifier can be applied to this role.
+    /// Determine whether a given <see cref="BaseModifier"/> can be applied to this role.
     /// </summary>
     /// <param name="modifier">The modifier to be tested.</param>
-    /// <returns>True if the modifier is valid on this role, false otherwise.</returns>
+    /// <returns>True if the <see cref="BaseModifier"/> is valid on this role, false otherwise.</returns>
     bool IsModifierApplicable(BaseModifier modifier)
     {
         return true;

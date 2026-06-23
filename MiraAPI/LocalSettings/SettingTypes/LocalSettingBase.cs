@@ -56,9 +56,9 @@ public abstract class LocalSettingBase<T> : ILocalSetting
     }
 
     /// <summary>
-    /// Gets the value of the config entry, cast to the setting type.
+    /// Gets the value of the config entry, cast to <typeparamref name="T"/>.
     /// </summary>
-    /// <returns>The value.</returns>
+    /// <returns>The <typeparamref name="T"/> value.</returns>
     public virtual T GetValue()
     {
         return (T)ConfigEntry.BoxedValue;

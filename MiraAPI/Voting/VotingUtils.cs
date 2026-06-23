@@ -17,9 +17,9 @@ public static class VotingUtils
     private const byte SkipVoteId = 253;
 
     /// <summary>
-    /// Gets the exiled player from the list of votes. Returns null if no player is to be exiled.
+    /// Gets the exiled player from the list of <see cref="CustomVote"/>s. Returns null if no player is to be exiled.
     /// </summary>
-    /// <param name="votes">>The list of votes to check.</param>
+    /// <param name="votes">>The list of <see cref="CustomVote"/>s to check.</param>
     /// <param name="isTie">Whether the vote is a tie.</param>
     /// <returns>The player to be exiled. Will be null if no player is to be exiled.</returns>
     public static NetworkedPlayerInfo? GetExiled(List<CustomVote> votes, out bool isTie)
@@ -39,7 +39,7 @@ public static class VotingUtils
     /// <summary>
     /// Handles when a vote is added and allows for other mods to override/modify.
     /// </summary>
-    /// <param name="voteData">The player's vote data.</param>
+    /// <param name="voteData">The player's <see cref="PlayerVoteData"/>.</param>
     /// <param name="suspectIdx">Who the player voted for.</param>
     /// <param name="cancelVote">Whether you want the vote to commence or not.</param>
     private static void HandleVote(PlayerVoteData voteData, byte suspectIdx, out bool cancelVote)
@@ -68,7 +68,7 @@ public static class VotingUtils
     /// <summary>
     /// Networks the removal of votes. Used to remove votes when a player disconnects.
     /// </summary>
-    /// <param name="source">The player who is sending the RPC. Should be the host.</param>
+    /// <param name="source">The <see cref="PlayerControl"/> who is sending the RPC. Should be the host.</param>
     /// <param name="voterId">The player who voted.</param>
     /// <param name="votedFor">The player who the voter voted for.</param>
     [MethodRpc((uint)MiraRpc.RemoveVote)]
@@ -104,7 +104,7 @@ public static class VotingUtils
     /// <summary>
     /// Networks the casting of a vote. We replace the vanilla solution with a custom version that works for the use case.
     /// </summary>
-    /// <param name="source">The player who sent this RPC.</param>
+    /// <param name="source">The <see cref="PlayerControl"/> who sent this RPC.</param>
     /// <param name="srcPlayerId">The id of the player who casted the vote.</param>
     /// <param name="suspectPlayerId">The voted player's id.</param>
     [MethodRpc((uint)MiraRpc.CastVote)]
@@ -163,7 +163,7 @@ public static class VotingUtils
     /// <summary>
     /// Calculates the total number of votes.
     /// </summary>
-    /// <param name="votes">A list of calculated votes.</param>
+    /// <param name="votes">A list of calculated <see cref="CustomVote"/>s.</param>
     /// <returns>The total votes.</returns>
     public static Dictionary<byte, float> CalculateNumVotes(IEnumerable<CustomVote> votes)
     {
@@ -183,7 +183,7 @@ public static class VotingUtils
     /// <summary>
     /// Calculates votes to check if all players have voted.
     /// </summary>
-    /// <returns>The list of votes.</returns>
+    /// <returns>The <see cref="List{T}"/> of <see cref="CustomVote"/>s.</returns>
     public static List<CustomVote> CalculateVotes()
     {
         return
@@ -196,7 +196,7 @@ public static class VotingUtils
     /// <summary>
     /// Handles the populating of results locally. Called by the PopulateResultsRpc.
     /// </summary>
-    /// <param name="votes">The list of networked votes.</param>
+    /// <param name="votes">The list of <see cref="CustomVote"/>s.</param>
     public static void HandlePopulateResults(List<CustomVote> votes)
     {
         PopulateResultsEvent @event = new PopulateResultsEvent(votes);

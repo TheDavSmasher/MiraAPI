@@ -15,7 +15,7 @@ public class DummyVoteEvent : MiraCancelableEvent
     public DummyBehaviour Dummy { get; }
 
     /// <summary>
-    /// Gets the instance of the dummy's vote data.
+    /// Gets the instance of the dummy's <see cref="PlayerVoteData"/>.
     /// </summary>
     public PlayerVoteData VoteData { get; }
 

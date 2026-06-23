@@ -11,19 +11,19 @@ public abstract class GameModifier : BaseModifier
     /// <summary>
     /// Gets the chance of the modifier being assigned to a player.
     /// </summary>
-    /// <returns>An int value between 0 and 100 representing percent.</returns>
+    /// <returns>An <see langword="int"/> value between 0 and 100 representing percent.</returns>
     public abstract int GetAssignmentChance();
 
     /// <summary>
     /// Gets the amount of players that can have this modifier in a game.
     /// </summary>
-    /// <returns>An int value greater than or equal to zero.</returns>
+    /// <returns>An <see langword="int"/> value greater than or equal to zero.</returns>
     public abstract int GetAmountPerGame();
 
     /// <summary>
     /// Gets the priority at which the modifier will spawn. The higher the value, the higher up on the assignment list.
     /// </summary>
-    /// <returns>An int value greater than or equal to -1.</returns>
+    /// <returns>An <see langword="int"/> value greater than or equal to -1.</returns>
     public virtual int Priority() => -1;
 
     /// <summary>

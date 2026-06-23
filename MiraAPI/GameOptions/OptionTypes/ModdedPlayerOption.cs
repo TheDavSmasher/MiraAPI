@@ -9,7 +9,7 @@ using Object = UnityEngine.Object;
 namespace MiraAPI.GameOptions.OptionTypes;
 
 /// <summary>
-/// An option for selecting an ingame player. It returns an index of the values list, NOT A PLAYER ID. To get a player out of this, index the Values list.
+/// An option for selecting an ingame player. It returns an index of the values list, NOT A PLAYER ID. To get a player out of this, index the <see cref="Values"/> list.
 /// </summary>
 public class ModdedPlayerOption : ModdedOption<int>
 {
@@ -91,7 +91,7 @@ public class ModdedPlayerOption : ModdedOption<int>
     }
 
     /// <summary>
-    /// Returns a player from the value. If AllowNone is enabled and none is enabled this will return null.
+    /// Returns a player from the value. If <see cref="AllowNone"/> is enabled and none is enabled this will return null.
     /// </summary>
     /// <returns>A player or null if chosen none.</returns>
     public NetworkedPlayerInfo? GetPlayerValue()

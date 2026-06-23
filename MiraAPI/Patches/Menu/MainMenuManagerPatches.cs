@@ -8,7 +8,7 @@ using UnityEngine;
 namespace MiraAPI.Patches.Menu;
 
 /// <summary>
-/// General MainMenuManage patches.
+/// General <see cref="MainMenuManager"/> patches.
 /// </summary>
 [HarmonyPatch(typeof(MainMenuManager))]
 public static class MainMenuManagerPatches

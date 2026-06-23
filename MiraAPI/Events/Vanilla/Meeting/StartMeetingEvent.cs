@@ -7,14 +7,14 @@
 public class StartMeetingEvent : MiraEvent
 {
     /// <summary>
-    /// Gets the MeetingHud instance.
+    /// Gets the <see cref="global::MeetingHud"/> instance.
     /// </summary>
     public MeetingHud MeetingHud { get; }
 
     /// <summary>
     /// Initializes a new instance of the <see cref="StartMeetingEvent"/> class.
     /// </summary>
-    /// <param name="meetingHud">The MeetingHud instance.</param>
+    /// <param name="meetingHud">The <see cref="global::MeetingHud"/> instance.</param>
     public StartMeetingEvent(MeetingHud meetingHud)
     {
         MeetingHud = meetingHud;

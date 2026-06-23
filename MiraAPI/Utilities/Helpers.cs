@@ -66,11 +66,11 @@ public static class Helpers
     }
 
     /// <summary>
-    /// Creates a draggable scroller. Add items into the scroller.Inner transform. This does not automatically position children.
+    /// Creates a draggable <see cref="Scroller"/>. Add items into the <see cref="Scroller.Inner"/> transform. This does not automatically position children.
     /// </summary>
-    /// <param name="parent">Where the scroller should be parented to.</param>
-    /// <param name="hitBoxCollider">The collider of the scroller. Used to drag.</param>
-    /// <returns>The created scroller object.</returns>
+    /// <param name="parent">Where the <see cref="Scroller"/> should be parented to.</param>
+    /// <param name="hitBoxCollider">The collider of the <see cref="Scroller"/>. Used to drag.</param>
+    /// <returns>The created <see cref="Scroller"/> object.</returns>
     public static Scroller CreateScroller(Transform parent, BoxCollider2D hitBoxCollider)
     {
         var scrollObj = new GameObject("Scroller");
@@ -95,7 +95,7 @@ public static class Helpers
     /// <summary>
     /// Divides a button/etc by a certain amount by resizing colliders and renderer sizes.
     /// </summary>
-    /// <param name="obj">The object you want to divide.</param>
+    /// <param name="obj">The <see cref="GameObject"/> you want to divide.</param>
     /// <param name="amount">How much you want to divide by.</param>
     public static void DivideSize(GameObject obj, float amount)
     {
@@ -147,21 +147,21 @@ public static class Helpers
     }
 
     /// <summary>
-    /// Retrieves a vent from the ID.
+    /// Retrieves a <see cref="Vent"/> from the ID.
     /// </summary>
     /// <param name="id">The vent ID.</param>
-    /// <returns>The vent.</returns>
+    /// <returns>The <see cref="Vent"/>.</returns>
     public static Vent? GetVentById(int id)
     {
         return ShipStatus.Instance.AllVents.FirstOrDefault(vent => vent.Id == id);
     }
 
     /// <summary>
-    /// Creates an arrow.
+    /// Creates an <see cref="ArrowBehaviour"/>.
     /// </summary>
-    /// <param name="parent">The arrow gameObject's parent.</param>
+    /// <param name="parent">The arrow <see cref="GameObject"/>'s parent.</param>
     /// <param name="color">The color of the arrow.</param>
-    /// <returns>The created ArrowBehaviour.</returns>
+    /// <returns>The created <see cref="ArrowBehaviour"/>.</returns>
     public static ArrowBehaviour CreateArrow(Transform parent, Color color)
     {
         var prefab = Object.FindObjectOfType<ArrowBehaviour>(true);
@@ -174,10 +174,10 @@ public static class Helpers
     }
 
     /// <summary>
-    /// Get the closest object of a specific type.
+    /// Get the closest <typeparamref name="T"/>.
     /// </summary>
-    /// <param name="objectList">A list of all the objects you'd like to check the distance for.</param>
-    /// <param name="position">The position of where you want to check from. For example: PlayerControl.LocalPlayer.transform.position.</param>
+    /// <param name="objectList">A list of all <typeparamref name="T"/>s you'd like to check the distance for.</param>
+    /// <param name="position">The position of where you want to check from. For example: <c>PlayerControl.LocalPlayer.transform.position</c>.</param>
     /// <typeparam name="T">The object type.</typeparam>
     /// <returns>The closest object.</returns>
     public static T? FindClosestObjectOfType<T>(List<T> objectList, Vector3 position) where T : MonoBehaviour
@@ -207,9 +207,9 @@ public static class Helpers
     /// Creates and shows a notification.
     /// </summary>
     /// <param name="text">The text you want to display.</param>
-    /// <param name="color">The color of the text and image.</param>
+    /// <param name="color">The <see cref="Color"/> of the text and image.</param>
     /// <param name="clip">The sound you want to play with the notification.</param>
-    /// <param name="spr">The sprite beside the notification.</param>
+    /// <param name="spr">The <see cref="Sprite"/> beside the notification.</param>
     /// <returns>The created notification.</returns>
     public static LobbyNotificationMessage CreateAndShowNotification(string text, Color color, AudioClip? clip = null, Sprite? spr = null)
     {
@@ -220,10 +220,10 @@ public static class Helpers
     /// Creates and shows a notification.
     /// </summary>
     /// <param name="text">The text you want to display.</param>
-    /// <param name="color">The color of the text and image.</param>
+    /// <param name="color">The <see cref="Color"/> of the text and image.</param>
     /// <param name="localPos">The position of the notification.</param>
     /// <param name="clip">The sound you want to play with the notification.</param>
-    /// <param name="spr">The sprite beside the notification.</param>
+    /// <param name="spr">The <see cref="Sprite"/> beside the notification.</param>
     /// <returns>The created notification.</returns>
     public static LobbyNotificationMessage CreateAndShowNotification(string text, Color color, Vector3 localPos, AudioClip? clip = null, Sprite? spr = null)
     {
@@ -252,10 +252,10 @@ public static class Helpers
     }
 
     /// <summary>
-    /// Creates a ContactFilter2D from a layer mask.
+    /// Creates a <see cref="ContactFilter2D"/> from a layer mask.
     /// </summary>
     /// <param name="layerMask">The layer mask.</param>
-    /// <returns>A new ContactFilter2D that represents the layer mask.</returns>
+    /// <returns>A new <see cref="ContactFilter2D"/> that represents the layer mask.</returns>
     public static ContactFilter2D CreateFilter(int layerMask)
     {
         return ContactFilter2D.CreateLegacyFilter(layerMask, float.MinValue, float.MaxValue);
@@ -272,12 +272,12 @@ public static class Helpers
     }
 
     /// <summary>
-    /// Gets a list of dead bodies within a radius.
+    /// Gets a list of <see cref="DeadBody"/>s within a radius.
     /// </summary>
     /// <param name="source">The source location.</param>
     /// <param name="radius">The radius to search in.</param>
     /// <param name="filter">The contact filter.</param>
-    /// <returns>A list of dead bodies.</returns>
+    /// <returns>A <see cref="List{T}"/> of <see cref="DeadBody"/>s.</returns>
     public static List<DeadBody> GetNearestDeadBodies(Vector2 source, float radius, ContactFilter2D filter)
     {
         var results = new Il2CppSystem.Collections.Generic.List<Collider2D>();
@@ -288,14 +288,14 @@ public static class Helpers
     }
 
     /// <summary>
-    /// Gets a list of objects within a radius.
+    /// Gets a list of <typeparamref name="T"/> within a radius.
     /// </summary>
     /// <param name="source">The source point.</param>
     /// <param name="radius">The radius to search in.</param>
     /// <param name="filter">The contact filter.</param>
     /// <param name="colliderTag">An optional collider tag.</param>
     /// <typeparam name="T">The type of the object.</typeparam>
-    /// <returns>A list of objects of type T.</returns>
+    /// <returns>A <see cref="List{T}"/> of <typeparamref name="T"/>s.</returns>
     public static List<T> GetNearestObjectsOfType<T>(Vector2 source, float radius, ContactFilter2D filter, string? colliderTag = null)
         where T : Component
     {
@@ -307,12 +307,12 @@ public static class Helpers
     }
 
     /// <summary>
-    /// Gets the closest players to a specific point.
+    /// Gets the closest <see cref="PlayerControl"/>s to a specific point.
     /// </summary>
     /// <param name="source">The source point.</param>
     /// <param name="radius">The radius to search in.</param>
     /// <param name="ignoreColliders">Whether colliders should be ignored.</param>
-    /// <returns>A list of Player Controls in the radius.</returns>
+    /// <returns>A <see cref="List{T}"/> of <see cref="PlayerControl"/>s in the radius.</returns>
     public static List<PlayerControl> GetClosestPlayersInCircle(
         Vector2 source,
         float radius,
@@ -337,13 +337,13 @@ public static class Helpers
     }
 
     /// <summary>
-    /// Gets the closest players to a specific player.
+    /// Gets the closest <see cref="PlayerControl"/>s to a specific <see cref="PlayerControl"/>.
     /// </summary>
-    /// <param name="source">The source player.</param>
+    /// <param name="source">The source <see cref="PlayerControl"/>.</param>
     /// <param name="distance">Distance to search in.</param>
     /// <param name="ignoreColliders">Whether to ignore colliders.</param>
-    /// <param name="ignoreSource">Whether to ignore the source player.</param>
-    /// <returns>A list of PlayerControls.</returns>
+    /// <param name="ignoreSource">Whether to ignore the <paramref name="source"/> player.</param>
+    /// <returns>A <see cref="List{T}"/> of <see cref="PlayerControl"/>s.</returns>
     public static List<PlayerControl> GetClosestPlayers(
         PlayerControl source,
         float distance = 2f,
@@ -362,12 +362,12 @@ public static class Helpers
     }
 
     /// <summary>
-    /// Gets the closest players to a specific point.
+    /// Gets the closest <see cref="PlayerControl"/>s to a specific point.
     /// </summary>
     /// <param name="source">The source point.</param>
     /// <param name="distance">The distance to search in.</param>
     /// <param name="ignoreColliders">Whether to ignore colliders.</param>
-    /// <returns>A list of Player Controls.</returns>
+    /// <returns>A <see cref="List{T}"/> of <see cref="PlayerControl"/>s.</returns>
     public static List<PlayerControl> GetClosestPlayers(
         Vector2 source,
         float distance = 2f,
@@ -415,15 +415,15 @@ public static class Helpers
     }
 
     /// <summary>
-    /// Creates a TextMeshPro object with the specified parameters.
+    /// Creates a <see cref="TextMeshPro"/> with the specified parameters.
     /// </summary>
     /// <param name="name">The name of the object.</param>
-    /// <param name="parent">The object parent.</param>
-    /// <param name="alignment">The alignment of the TMP object.</param>
+    /// <param name="parent">The object's parent.</param>
+    /// <param name="alignment">The alignment of the <see cref="TextMeshPro"/>.</param>
     /// <param name="distance">The distance from the edge.</param>
     /// <param name="fontSize">The font size.</param>
     /// <param name="textAlignment">The text alignment.</param>
-    /// <returns>A new TMP object.</returns>
+    /// <returns>A new <see cref="TextMeshPro"/>.</returns>
     public static TextMeshPro CreateTextLabel(
         string name,
         Transform parent,
@@ -456,20 +456,20 @@ public static class Helpers
     }
 
     /// <summary>
-    /// Gets a DeadBody by its parent ID.
+    /// Gets a <see cref="DeadBody"/> by its parent ID.
     /// </summary>
     /// <param name="id">The player ID.</param>
-    /// <returns>A dead body or null if its not found.</returns>
+    /// <returns>A <see cref="DeadBody"/> or null if its not found.</returns>
     public static DeadBody? GetBodyById(byte id)
     {
         return Object.FindObjectsOfType<DeadBody>().FirstOrDefault(body => body.ParentId == id);
     }
 
     /// <summary>
-    /// Gets the suffix for a MiraNumberSuffixes enum.
+    /// Gets the suffix for a <see cref="MiraNumberSuffixes"/> <see langword="enum"/>.
     /// </summary>
-    /// <param name="suffix">The MiraNumberSuffixes enum.</param>
-    /// <returns>A suffix based on the enum.</returns>
+    /// <param name="suffix">The <see cref="MiraNumberSuffixes"/> <see langword="enum"/>.</param>
+    /// <returns>A suffix based on the <see langword="enum"/>.</returns>
     public static string GetSuffix(MiraNumberSuffixes suffix)
     {
         return suffix switch
@@ -525,10 +525,10 @@ public static class Helpers
     }
 
     /// <summary>
-    /// Returns the string of a role.
+    /// Returns the string of a <see cref="RoleBehaviour"/>.
     /// </summary>
-    /// <param name="role">The role to find.</param>
-    /// <returns>The role name.</returns>
+    /// <param name="role">The <see cref="RoleBehaviour"/> to find.</param>
+    /// <returns>The <see cref="RoleBehaviour"/>'s name.</returns>
     public static string GetRoleName(this RoleBehaviour role)
     {
         if (role is ICustomRole custom)
@@ -539,10 +539,10 @@ public static class Helpers
     }
 
     /// <summary>
-    /// Returns whether the role is blacklisted from appearing and spawning. (Only applicable to vanilla roles)
+    /// Returns whether the <see cref="RoleBehaviour"/> is blacklisted from appearing and spawning. (Only applicable to vanilla roles).
     /// </summary>
-    /// <param name="role">The role to check.</param>
-    /// <returns>The role's blacklist status.</returns>
+    /// <param name="role">The <see cref="RoleBehaviour"/> to check.</param>
+    /// <returns>The <see cref="RoleBehaviour"/>'s blacklist status.</returns>
     public static bool IsRoleBlacklisted(this RoleBehaviour role)
     {
         // This should be patchable by mods when a vanilla role is meant to be replaced by a custom role.

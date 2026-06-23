@@ -8,7 +8,7 @@ namespace MiraAPI.Events.Vanilla.Gameplay;
 public class SetRoleEvent : MiraEvent
 {
     /// <summary>
-    /// Gets the player whos role was changed.
+    /// Gets the <see cref="PlayerControl"/> whose role was changed.
     /// </summary>
     public PlayerControl Player { get; }
 

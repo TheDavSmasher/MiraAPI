@@ -24,7 +24,7 @@ public class StateMachineWrapper<T> where T : Il2CppObjectBase
     private T? _parentInstance;
 
     /// <summary>
-    /// Gets the instance of the parent class that owns the state machine.
+    /// Gets the instance of the <typeparamref name="T"/>.
     /// </summary>
     public T Instance => _parentInstance ??= (T)_thisProperty.GetValue(_stateMachine)!;
 
@@ -68,7 +68,7 @@ public class StateMachineWrapper<T> where T : Il2CppObjectBase
     public void SetRecentReturn(Object newReturn) => _currentProperty.SetValue(_stateMachine, newReturn);
 
     /// <summary>
-    /// Gets a parameter from the state machine by its name.
+    /// Gets a parameter of type <typeparamref name="TField"/> from the state machine by its name.
     /// </summary>
     /// <param name="parameterName">The name of the parameter to retrieve.</param>
     /// <typeparam name="TField">The type of the parameter to retrieve.</typeparam>

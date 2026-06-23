@@ -8,7 +8,7 @@ using Reactor.Networking.Serialization;
 namespace MiraAPI.Networking.Modifiers;
 
 /// <summary>
-/// Remote procedure call for adding a modifier.
+/// Remote procedure call for adding a <see cref="BaseModifier"/>.
 /// </summary>
 /// <param name="plugin">Mira plugin.</param>
 /// <param name="id">RPC ID.</param>

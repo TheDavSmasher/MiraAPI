@@ -2,7 +2,7 @@
 
 /// <summary>
 /// The event that is invoked when a body is reported.
-/// This is invoked in CmdReportBody.
+/// This is invoked in <see cref="PlayerControl.CmdReportDeadBody(NetworkedPlayerInfo)"/>.
 /// </summary>
 public class ReportBodyEvent : MiraCancelableEvent
 {
@@ -17,7 +17,7 @@ public class ReportBodyEvent : MiraCancelableEvent
     public NetworkedPlayerInfo? Target { get; }
 
     /// <summary>
-    /// Gets the body that is being reported. Will be null for emergency meeting.
+    /// Gets the <see cref="DeadBody"/> that is being reported. Will be null for emergency meeting.
     /// </summary>
     public DeadBody? Body { get; }
 
@@ -26,7 +26,7 @@ public class ReportBodyEvent : MiraCancelableEvent
     /// </summary>
     /// <param name="reporter">The player who reported the body.</param>
     /// <param name="target">The player being reported.</param>
-    /// <param name="body">The body being reported.</param>
+    /// <param name="body">The <see cref="DeadBody"/> being reported.</param>
     public ReportBodyEvent(PlayerControl reporter, NetworkedPlayerInfo? target, DeadBody? body)
     {
         Reporter = reporter;

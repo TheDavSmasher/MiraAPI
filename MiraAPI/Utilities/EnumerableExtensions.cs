@@ -10,23 +10,23 @@ namespace MiraAPI.Utilities;
 public static class EnumerableExtensions
 {
     /// <summary>
-    /// Shuffle the elements of the source enumerable using a new instance of Random.
+    /// Shuffle the elements of the <paramref name="source"/> <see cref="IEnumerable{T}"/> using a new instance of <see cref="Random"/>.
     /// </summary>
-    /// <param name="source">The source enumerable.</param>
+    /// <param name="source">The source <see cref="IEnumerable{T}"/>.</param>
     /// <typeparam name="T">The type of the elements.</typeparam>
-    /// <returns>>The shuffled enumerable.</returns>
+    /// <returns>>The shuffled <see cref="IEnumerable{T}"/>.</returns>
     public static IEnumerable<T> Shuffle<T>(this IEnumerable<T> source)
     {
         return source.Shuffle(new Random());
     }
 
     /// <summary>
-    /// Shuffle the elements of the source enumerable using the provided Random instance.
+    /// Shuffle the elements of the <paramref name="source"/> <see cref="IEnumerable{T}"/> using the provided <see cref="Random"/> instance.
     /// </summary>
-    /// <param name="source">The source enumerable.</param>
-    /// <param name="rng">The Random instance to use for shuffling.</param>
+    /// <param name="source">The source <see cref="IEnumerable{T}"/>.</param>
+    /// <param name="rng">The <see cref="Random"/> instance to use for shuffling.</param>
     /// <typeparam name="T">The type of the elements.</typeparam>
-    /// <returns>>The shuffled enumerable.</returns>
+    /// <returns>>The shuffled <see cref="IEnumerable{T}"/>.</returns>
     public static IEnumerable<T> Shuffle<T>(this IEnumerable<T> source, Random rng)
     {
         ArgumentNullException.ThrowIfNull(source);

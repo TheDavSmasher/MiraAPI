@@ -13,7 +13,7 @@ namespace MiraAPI.GameOptions;
 public class MiraNumberOptionComponent(IntPtr cppPtr) : MonoBehaviour(cppPtr)
 {
     /// <summary>
-    /// Gets or sets the modded option associated with the object.
+    /// Gets or sets the <see cref="ModdedNumberOption"/> associated with the object.
     /// </summary>
     [HideFromIl2Cpp]
     public ModdedNumberOption NumberOption { get; set; }

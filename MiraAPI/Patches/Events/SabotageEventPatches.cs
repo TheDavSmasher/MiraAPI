@@ -5,7 +5,7 @@ using MiraAPI.Events.Vanilla.Map;
 namespace MiraAPI.Patches.Events;
 
 /// <summary>
-/// Used for patching sabotage/system related MiraEvents.
+/// Used for patching sabotage/system related <see cref="MiraEvent"/>s.
 /// </summary>
 [HarmonyPatch]
 public static class SabotageEventPatches

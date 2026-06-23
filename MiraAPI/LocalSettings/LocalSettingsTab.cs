@@ -23,7 +23,7 @@ public abstract class LocalSettingsTab(ConfigFile config)
     public abstract string TabName { get; }
 
     /// <summary>
-    /// Gets the tab appearance.
+    /// Gets the tab's <see cref="LocalSettingTabAppearance"/>.
     /// </summary>
     public virtual LocalSettingTabAppearance TabAppearance { get; } = new();
 
@@ -38,7 +38,7 @@ public abstract class LocalSettingsTab(ConfigFile config)
     protected virtual bool ShouldCreateLabels => true;
 
     /// <summary>
-    /// Gets the mod's config file. Automatically found in the plugin loader.
+    /// Gets the mod's <see cref="ConfigFile"/>. Automatically found in the plugin loader.
     /// </summary>
     public ConfigFile Config { get; } = config ?? throw new ArgumentNullException(nameof(config));
 
@@ -48,12 +48,12 @@ public abstract class LocalSettingsTab(ConfigFile config)
     public TabGroup? TabButton { get; internal set; }
 
     /// <summary>
-    /// Gets the list of settings.
+    /// Gets the list of <see cref="ILocalSetting"/>s.
     /// </summary>
     public List<ILocalSetting> Settings { get; } = [];
 
     /// <summary>
-    /// Gets the list of buttons.
+    /// Gets the list of <see cref="LocalSettingsButton"/>s.
     /// </summary>
     public List<LocalSettingsButton> Buttons { get; } = [];
 

@@ -48,13 +48,13 @@ public abstract class AbstractOptionGroup
     public virtual Func<bool> GroupVisible => () => true;
 
     /// <summary>
-    /// Gets the group color. This is used to color the group in the options menu.
+    /// Gets the group <see cref="Color"/>. This is used to color the group in the options menu.
     /// </summary>
     public virtual Color GroupColor => MiraApiPlugin.DefaultHeaderColor;
 
     /// <summary>
     /// Gets the group priority. This is used to determine the order in which groups are displayed in the options menu.
-    /// Zero is the highest priority, and the default value is the max uint value.
+    /// Zero is the highest priority, and the default value is the max <see langword="uint"/> value.
     /// </summary>
     public virtual uint GroupPriority => uint.MaxValue;
 

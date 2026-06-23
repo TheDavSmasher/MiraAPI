@@ -162,7 +162,7 @@ internal static class GameSettingMenuPatches
     /// <summary>
     /// Prefix for the <see cref="GameSettingMenu.Start"/> method. Sets up the custom options.
     /// </summary>
-    /// <param name="__instance">The GameSettingMenu instance.</param>
+    /// <param name="__instance">The <see cref="GameSettingMenu"/> instance.</param>
     [HarmonyPrefix]
     [HarmonyPatch(nameof(GameSettingMenu.Start))]
     public static void StartPrefix(GameSettingMenu __instance)

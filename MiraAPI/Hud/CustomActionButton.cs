@@ -18,7 +18,7 @@ using Object = UnityEngine.Object;
 namespace MiraAPI.Hud;
 
 /// <summary>
-/// Class for making custom action buttons. More customizable than the default Action/Ability buttons in the base game.
+/// Class for making custom action buttons. More customizable than the default <see cref="ActionButton"/>/<see cref="AbilityButton"/>s in the base game.
 /// </summary>
 public abstract class CustomActionButton
 {
@@ -84,12 +84,12 @@ public abstract class CustomActionButton
     public virtual BaseKeybind? Keybind => null;
 
     /// <summary>
-    /// Gets the button's text outline color.
+    /// Gets the button's text outline <see cref="Color"/>.
     /// </summary>
     public virtual Color TextOutlineColor => Color.clear;
 
     /// <summary>
-    /// Gets or sets the location of the button on the screen.
+    /// Gets or sets the <see cref="ButtonLocation"/> on the screen.
     /// </summary>
     public virtual ButtonLocation Location { get; set; } = ButtonLocation.BottomLeft;
 
@@ -119,12 +119,12 @@ public abstract class CustomActionButton
     public float Timer { get; set; }
 
     /// <summary>
-    /// Gets or sets the button object in game. This is created by Mira API automatically.
+    /// Gets or sets the <see cref="ActionButton"/> object in game. This is created by Mira API automatically.
     /// </summary>
     public ActionButton? Button { get; set; }
 
     /// <summary>
-    /// Gets the gameObject used for the keybind icon.
+    /// Gets the <see cref="GameObject"/> used for the keybind icon.
     /// </summary>
     public GameObject? KeybindIcon { get; private set; }
 
@@ -316,18 +316,18 @@ public abstract class CustomActionButton
     }
 
     /// <summary>
-    /// A utility function to change the outline color of the button's text.
+    /// A utility function to change the outline <see cref="Color"/> of the button's text.
     /// </summary>
-    /// <param name="color">The new color.</param>
+    /// <param name="color">The new <see cref="Color"/>.</param>
     public virtual void SetTextOutline(Color color)
     {
         Button?.buttonLabelText.SetOutlineColor(color);
     }
 
     /// <summary>
-    /// A utility function to override the sprite of the button.
+    /// A utility function to override the <see cref="UnityEngine.Sprite"/> of the button.
     /// </summary>
-    /// <param name="sprite">The new sprite to override with.</param>
+    /// <param name="sprite">The new <see cref="UnityEngine.Sprite"/> to override with.</param>
     public virtual void OverrideSprite(Sprite sprite)
     {
         if (Button != null)
@@ -415,7 +415,7 @@ public abstract class CustomActionButton
     }
 
     /// <summary>
-    /// A utility function that runs with the local PlayerControl's FixedUpdate if the button is enabled.
+    /// A utility function that runs with the local player's <see cref="PlayerControl.FixedUpdate"/> if the button is enabled.
     /// </summary>
     /// <param name="playerControl">the local PlayerControl.</param>
     protected virtual void FixedUpdate(PlayerControl playerControl)
@@ -431,7 +431,7 @@ public abstract class CustomActionButton
     /// This method determines if the button should be active or not.
     /// True means the button is active, false means the button is disabled.
     /// </summary>
-    /// <param name="role">The role of the local player.</param>
+    /// <param name="role">The <see cref="RoleBehaviour"/> of the local player.</param>
     /// <returns>True if the button is enabled, false otherwise.</returns>
     public abstract bool Enabled(RoleBehaviour? role);
 
@@ -473,12 +473,12 @@ public abstract class CustomActionButton
     }
 
     /// <summary>
-    /// This method is called on the HudManager.SetHudActive method. It determines whether the button should be visible or not.
+    /// This method is called on the <see cref="HudManager.SetHudActive(PlayerControl, RoleBehaviour, bool)"/> method. It determines whether the button should be visible or not.
     /// The default behavior is to show the button if the <paramref name="visible"/> parameter and the <see cref="Enabled"/> method return true.
     /// It can be overridden for custom behavior.
     /// </summary>
-    /// <param name="visible">Passed in from HudManager.SetHudActive, should hud be active.</param>
-    /// <param name="role">Passed in from HudManager.SetHudActive, the current role of the player.</param>
+    /// <param name="visible">Passed in from <see cref="HudManager.SetHudActive(PlayerControl, RoleBehaviour, bool)"/>, should hud be active.</param>
+    /// <param name="role">Passed in from <see cref="HudManager.SetHudActive(PlayerControl, RoleBehaviour, bool)"/>, the current role of the player.</param>
     public virtual void SetActive(bool visible, RoleBehaviour role)
     {
         Button?.ToggleVisible(visible && Enabled(role));
@@ -522,7 +522,7 @@ public abstract class CustomActionButton
     }
 
     /// <summary>
-    /// This method is called on the PlayerControl.FixedUpdate method. It is a wrapper for the <see cref="FixedUpdate"/> method.
+    /// This method is called on the <see cref="PlayerControl.FixedUpdate"/> method. It is a wrapper for the <see cref="FixedUpdate"/> method.
     /// By default, it handles the cooldown and effect timers, and sets the button to enabled or disabled.
     /// It can be overridden for custom behavior.
     /// </summary>
@@ -580,39 +580,39 @@ public abstract class CustomActionButton
 }
 
 /// <summary>
-/// Custom action button that has a target object.
+/// Custom action button that has a target <typeparamref name="T"/>.
 /// </summary>
 /// <typeparam name="T">The type of the target object.</typeparam>
 public abstract class CustomActionButton<T> : CustomActionButton where T : MonoBehaviour
 {
     /// <summary>
-    /// Gets or sets the target object of the button.
+    /// Gets or sets the target <typeparamref name="T"/> of the button.
     /// </summary>
     public T? Target { get; set; }
 
     /// <summary>
-    /// Gets the distance the player must be from the target object to use the button.
+    /// Gets the distance the player must be from the target <typeparamref name="T"/> to use the button.
     /// </summary>
     public virtual float Distance => PlayerControl.LocalPlayer.Data.Role.GetAbilityDistance();
 
     /// <summary>
-    /// Determines if the target object is valid.
+    /// Determines if the target <typeparamref name="T"/> is valid.
     /// </summary>
-    /// <param name="target">The target object being checked.</param>
-    /// <returns>True if the target object is valid, false otherwise.</returns>
+    /// <param name="target">The target <typeparamref name="T"/> being checked.</param>
+    /// <returns>True if the target <typeparamref name="T"/> is valid, false otherwise.</returns>
     public virtual bool IsTargetValid(T? target)
     {
         return target != null;
     }
 
     /// <summary>
-    /// The method used to get the target object.
+    /// The method used to get the target <typeparamref name="T"/>.
     /// </summary>
-    /// <returns>The target object or null if it isn't found.</returns>
+    /// <returns>The target <typeparamref name="T"/> or null if it isn't found.</returns>
     public abstract T? GetTarget();
 
     /// <summary>
-    /// Sets the outline of the target object.
+    /// Sets the outline of the target <typeparamref name="T"/>.
     /// </summary>
     /// <param name="active">Should the outline be active.</param>
     public abstract void SetOutline(bool active);

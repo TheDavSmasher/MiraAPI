@@ -23,12 +23,12 @@ public class OptionPreset
     public MiraPluginInfo Plugin { get; }
 
     /// <summary>
-    /// Gets the configuration file of the plugin associated with the preset.
+    /// Gets the <see cref="ConfigFile"/> of the plugin associated with the preset.
     /// </summary>
     public ConfigFile PluginConfig { get; }
 
     /// <summary>
-    /// Gets the configuration file for the preset.
+    /// Gets the <see cref="ConfigFile"/> for the preset.
     /// </summary>
     public ConfigFile PresetConfig { get; }
 
