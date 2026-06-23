@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
@@ -7,9 +8,11 @@ using System.Text.RegularExpressions;
 using HarmonyLib;
 using MiraAPI.GameOptions;
 using MiraAPI.Networking;
+using MiraAPI.Patches.Menu;
 using MiraAPI.Roles;
 using MiraAPI.Voting;
 using Reactor.Utilities;
+using Reactor.Utilities.Extensions;
 using Rewired;
 using Rewired.Data;
 using TMPro;
@@ -53,7 +56,7 @@ public static class Extensions
         bool isComplete;
         if (self.amClosing == Minigame.CloseState.Closing)
         {
-            UnityEngine.Object.Destroy(self.gameObject);
+            self.gameObject.DeepDestroy();
             return;
         }
         if (self.CloseSound && Constants.ShouldPlaySfx())
@@ -70,7 +73,7 @@ public static class Extensions
         }
         self.amClosing = Minigame.CloseState.Closing;
         self.logger.Info(string.Concat("Closing minigame ", self.GetType().Name));
-        IAnalyticsReporter analytics = DestroyableSingleton<DebugAnalytics>.Instance.Analytics;
+        IAnalyticsReporter analytics = DebugAnalytics.Instance.Analytics;
         NetworkedPlayerInfo data = PlayerControl.LocalPlayer.Data;
         TaskTypes taskType = self.TaskType;
         float realtimeSinceStartup = Time.realtimeSinceStartup - self.timeOpened;
@@ -217,6 +220,135 @@ public static class Extensions
     public static bool IsInteger(this float number)
     {
         return Mathf.Approximately(number, Mathf.Round(number));
+    }
+
+    /// <summary>
+    /// Destroys the object properly.
+    /// </summary>
+    /// <param name="obj">The object to destroy.</param>
+    /// <param name="clearGc">Whether to run the garbage collector immediately.</param>
+    public static void DeepDestroy(this GameObject obj, bool clearGc = true)
+    {
+        if (MainMenuManagerPatches.NeedsDeepDestroy)
+        {
+            Coroutines.Start(Nuke(obj, clearGc));
+        }
+        else
+        {
+            obj?.Destroy();
+        }
+    }
+
+    private static IEnumerator Nuke(GameObject? go, bool clearGc)
+    {
+        if (go == null)
+            yield break;
+
+        try
+        {
+            go.transform.SetParent(null, false);
+        }
+        catch
+        {
+            // ignored
+        }
+
+        try
+        {
+            go.SetActive(false);
+        }
+        catch
+        {
+            // ignored
+        }
+
+        foreach (var mb in go.GetComponentsInChildren<MonoBehaviour>(true))
+        {
+            if (mb == null)
+                continue;
+
+            try
+            {
+                mb.StopAllCoroutines();
+            }
+            catch
+            {
+                // ignored
+            }
+
+            try
+            {
+                mb.enabled = false;
+            }
+            catch
+            {
+                // ignored
+            }
+        }
+
+        foreach (var renderer in go.GetComponentsInChildren<Renderer>(true))
+        {
+            if (renderer == null)
+                continue;
+
+            try
+            {
+                foreach (var mat in renderer.materials)
+                {
+                    if (mat != null)
+                        UnityEngine.Object.Destroy(mat);
+                }
+            }
+            catch
+            {
+                // ignored
+            }
+        }
+
+        foreach (var filter in go.GetComponentsInChildren<MeshFilter>(true))
+        {
+            if (filter == null)
+                continue;
+
+            try
+            {
+                var mesh = filter.mesh;
+                if (mesh != null)
+                    UnityEngine.Object.Destroy(mesh);
+            }
+            catch
+            {
+                // ignored
+            }
+        }
+
+        UnityEngine.Object.Destroy(go);
+        yield return null;
+        if (clearGc)
+        {
+            yield return CoFreeResources();
+        }
+    }
+
+    /// <summary>
+    /// Clears up the Garbage Collector manually if necessary.
+    /// </summary>
+    public static void ClearGarbageCollector()
+    {
+        if (!MainMenuManagerPatches.NeedsDeepDestroy)
+        {
+            return;
+        }
+        Coroutines.Start(CoFreeResources());
+    }
+
+    private static IEnumerator CoFreeResources()
+    {
+        yield return Resources.UnloadUnusedAssets();
+
+        GC.Collect(0, GCCollectionMode.Forced, blocking: true);
+        GC.WaitForPendingFinalizers();
+        GC.Collect(0, GCCollectionMode.Forced, blocking: true);
     }
 
     /// <summary>

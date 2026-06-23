@@ -51,7 +51,7 @@ public static class VisorsTabPatches
         }
         __instance.visorId = HatManager.Instance.GetVisorById(DataManager.Player.Customization.Visor).ProdId;
 
-        if (!SortedVisors.ContainsKey("Vanilla")) AddRange(DestroyableSingleton<HatManager>.Instance.GetUnlockedVisors().Select(x => ("Vanilla", x)));
+        if (!SortedVisors.ContainsKey("Vanilla")) AddRange(HatManager.Instance.GetUnlockedVisors().Select(x => ("Vanilla", x)));
 
         InventoryUtility.CreateNextBackButtons(__instance, PreviousPage, NextPage);
 
@@ -81,9 +81,10 @@ public static class VisorsTabPatches
 
     private static void GenerateHats(VisorsTab __instance, int page)
     {
-        foreach (ColorChip instanceColorChip in __instance.ColorChips) instanceColorChip.gameObject.Destroy();
+        foreach (var instanceColorChip in __instance.ColorChips) instanceColorChip.gameObject.DeepDestroy(false);
         __instance.ColorChips.Clear();
-        __instance.scroller.Inner.GetComponentsInChildren<TextMeshPro>().Do(x => x.gameObject.Destroy());
+        __instance.scroller.Inner.GetComponentsInChildren<TextMeshPro>().Do(x => x.gameObject.DeepDestroy(false));
+        Utilities.Extensions.ClearGarbageCollector();
 
         var groupNameText = __instance.GetComponentInChildren<TextMeshPro>(false);
 

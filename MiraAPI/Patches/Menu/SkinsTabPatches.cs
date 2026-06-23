@@ -83,9 +83,10 @@ public static class SkinsTabPatches
 
     private static void GenerateHats(SkinsTab __instance, int page)
     {
-        foreach (ColorChip instanceColorChip in __instance.ColorChips) instanceColorChip.gameObject.Destroy();
+        foreach (var instanceColorChip in __instance.ColorChips) instanceColorChip.gameObject.DeepDestroy(false);
         __instance.ColorChips.Clear();
-        __instance.scroller.Inner.GetComponentsInChildren<TextMeshPro>().Do(x => x.gameObject.Destroy());
+        __instance.scroller.Inner.GetComponentsInChildren<TextMeshPro>().Do(x => x.gameObject.DeepDestroy(false));
+        Utilities.Extensions.ClearGarbageCollector();
 
         var groupNameText = __instance.GetComponentInChildren<TextMeshPro>(false);
 

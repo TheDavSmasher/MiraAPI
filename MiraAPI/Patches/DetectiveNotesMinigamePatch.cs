@@ -26,7 +26,7 @@ public static class DetectiveNotesMinigamePatch
             return;
         }
         __instance.impostorButton = new List<GameObject>();
-        var allRoles = DestroyableSingleton<RoleManager>.Instance.AllRoles;
+        var allRoles = RoleManager.Instance.AllRoles;
         var customRoles = CustomRoleManager.CustomRoleBehaviours;
         foreach (var role in allRoles)
         {
