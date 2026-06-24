@@ -48,7 +48,7 @@ public class PlayerVoteData(nint cppPtr) : MonoBehaviour(cppPtr)
     /// Returns whether the owner has voted for the specified player.
     /// </summary>
     /// <param name="playerId">The target's playerId.</param>
-    /// <returns>True if the owner voted for the specified player, false otherwise.</returns>
+    /// <returns><see langword="true"/> if the owner voted for the specified player, <see langword="false"/> otherwise.</returns>
     public bool VotedFor(byte playerId)
     {
         return Votes.Exists(x => x.Suspect == playerId);

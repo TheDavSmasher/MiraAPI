@@ -207,7 +207,7 @@ public static class CustomRoleManager
     /// </summary>
     /// <param name="roleType">The <see cref="RoleTypes"/> <see langword="enum"/>.</param>
     /// <param name="result">The <see cref="ICustomRole"/> result.</param>
-    /// <returns>True if the role was found.</returns>
+    /// <returns><see langword="true"/> if the role was found.</returns>
     public static bool GetCustomRoleBehaviour(RoleTypes roleType, out ICustomRole? result)
     {
         CustomRoles.TryGetValue((ushort)roleType, out var temp);

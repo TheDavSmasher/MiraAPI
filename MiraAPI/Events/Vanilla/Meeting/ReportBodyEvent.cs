@@ -12,12 +12,12 @@ public class ReportBodyEvent : MiraCancelableEvent
     public PlayerControl Reporter { get; }
 
     /// <summary>
-    /// Gets the player that is being reported. Will be null for emergency meeting.
+    /// Gets the player that is being reported. Will be <see langword="null"/> for emergency meeting.
     /// </summary>
     public NetworkedPlayerInfo? Target { get; }
 
     /// <summary>
-    /// Gets the <see cref="DeadBody"/> that is being reported. Will be null for emergency meeting.
+    /// Gets the <see cref="DeadBody"/> that is being reported. Will be <see langword="null"/> for emergency meeting.
     /// </summary>
     public DeadBody? Body { get; }
 

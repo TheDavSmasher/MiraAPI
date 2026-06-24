@@ -175,7 +175,7 @@ public static class Extensions
     /// Checks if a <see cref="PlayerControl"/> is the game's host.
     /// </summary>
     /// <param name="playerControl">The <see cref="PlayerControl"/> you're checking for.</param>
-    /// <returns>If the player is the host, true, else false.</returns>
+    /// <returns>If the player is the host, <see langword="true"/>, else <see langword="false"/>.</returns>
     public static bool IsHost(this PlayerControl playerControl)
     {
         return TutorialManager.InstanceExists || AmongUsClient.Instance.HostId == playerControl.OwnerId;
@@ -185,7 +185,7 @@ public static class Extensions
     /// Checks if a <see cref="PlayerControl"/> is protected by a Guardian Angel.
     /// </summary>
     /// <param name="playerControl">The <see cref="PlayerControl"/> you're checking for.</param>
-    /// <returns>If the player is protected, true, else false.</returns>
+    /// <returns>If the player is protected, <see langword="true"/>, else <see langword="false"/>.</returns>
     public static bool ProtectedByGa(this PlayerControl playerControl)
     {
         return playerControl.protectedByGuardianId > -1;
@@ -213,7 +213,7 @@ public static class Extensions
     /// Determines if a <see langword="float"/> is an integer.
     /// </summary>
     /// <param name="number">The <see langword="float"/> number.</param>
-    /// <returns>True if the <see langword="float"/> is an integer, false otherwise.</returns>
+    /// <returns><see langword="true"/> if the <see langword="float"/> is an integer, <see langword="false"/> otherwise.</returns>
     public static bool IsInteger(this float number)
     {
         return Mathf.Approximately(number, Mathf.Round(number));
@@ -228,7 +228,7 @@ public static class Extensions
     /// Gets the <see cref="PlayerVoteData"/> of a <see cref="PlayerControl"/>.
     /// </summary>
     /// <param name="player">The <see cref="PlayerControl"/> object.</param>
-    /// <returns>A <see cref="PlayerVoteData"/> if there is one, null otherwise.</returns>
+    /// <returns>A <see cref="PlayerVoteData"/> if there is one, <see langword="null"/> otherwise.</returns>
     public static PlayerVoteData GetVoteData(this PlayerControl player)
     {
         if (VoteDataComponents.TryGetValue(player, out var component))
@@ -379,7 +379,7 @@ public static class Extensions
     /// Checks if a type is static.
     /// </summary>
     /// <param name="type">The type being checked.</param>
-    /// <returns>True if the type is static, false otherwise.</returns>
+    /// <returns><see langword="true"/> if the type is static, <see langword="false"/> otherwise.</returns>
     public static bool IsStatic(this Type type)
     {
         return type is { IsClass: true, IsAbstract: true, IsSealed: true };
@@ -460,7 +460,7 @@ public static class Extensions
     /// Determines if a given <see cref="OptionBehaviour"/> is for a custom option.
     /// </summary>
     /// <param name="optionBehaviour">The <see cref="OptionBehaviour"/> to be tested.</param>
-    /// <returns>True if the <see cref="OptionBehaviour"/> is for a custom options, false otherwise.</returns>
+    /// <returns><see langword="true"/> if the <see cref="OptionBehaviour"/> is for a custom options, <see langword="false"/> otherwise.</returns>
     public static bool IsCustom(this OptionBehaviour optionBehaviour)
     {
         return ModdedOptionsManager.ModdedOptions.Values.Any(
@@ -514,7 +514,7 @@ public static class Extensions
     /// </summary>
     /// <param name="playerControl">The <see cref="PlayerControl"/> object.</param>
     /// <param name="radius">The radius to search within.</param>
-    /// <returns>The <see cref="DeadBody"/> if it is found, or null there is none within the radius.</returns>
+    /// <returns>The <see cref="DeadBody"/> if it is found, or <see langword="null"/> there is none within the radius.</returns>
     public static DeadBody? GetNearestDeadBody(this PlayerControl playerControl, float radius)
     {
         return Helpers
@@ -531,7 +531,7 @@ public static class Extensions
     /// <param name="colliderTag">An optional collider tag.</param>
     /// <param name="predicate">Optional predicate to test if the <typeparamref name="T"/> is valid.</param>
     /// <typeparam name="T">The type of the object.</typeparam>
-    /// <returns>The <typeparamref name="T"/> if it was found, or null if there is none within the radius.</returns>
+    /// <returns>The <typeparamref name="T"/> if it was found, or <see langword="null"/> if there is none within the radius.</returns>
     public static T? GetNearestObjectOfType<T>(
         this PlayerControl playerControl,
         float radius,
@@ -552,7 +552,7 @@ public static class Extensions
     /// <param name="ignoreColliders">Whether colliders should be ignored when searching.</param>
     /// <param name="includeGhosts">Determines if Ghosts are included.</param>
     /// <param name="predicate">Optional predicate to test if the <see cref="PlayerControl"/> is valid.</param>
-    /// <returns>The closest <see cref="PlayerControl"/> if there is one, false otherwise.</returns>
+    /// <returns>The closest <see cref="PlayerControl"/> if there is one, <see langword="false"/> otherwise.</returns>
     public static PlayerControl? GetClosestPlayer(
         this PlayerControl playerControl,
         bool includeImpostors,

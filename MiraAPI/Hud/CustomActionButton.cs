@@ -54,7 +54,7 @@ public abstract class CustomActionButton
     public virtual string CooldownTimerFormatString => "0";
 
     /// <summary>
-    /// Gets a value indicating whether the button has an effect ability. By default true if <see cref="EffectDuration"/> is greater than 0.
+    /// Gets a value indicating whether the button has an effect ability. By default <see langword="true"/> if <see cref="EffectDuration"/> is greater than 0.
     /// </summary>
     public virtual bool HasEffect => EffectDuration > 0;
 
@@ -79,7 +79,7 @@ public abstract class CustomActionButton
     public virtual ButtonUsesMode UsesMode => ButtonUsesMode.PerGame;
 
     /// <summary>
-    /// Gets the keybind for this button. If null, no keybind will be added.
+    /// Gets the keybind for this button. If <see langword="null"/>, no keybind will be added.
     /// </summary>
     public virtual BaseKeybind? Keybind => null;
 
@@ -429,10 +429,10 @@ public abstract class CustomActionButton
 
     /// <summary>
     /// This method determines if the button should be active or not.
-    /// True means the button is active, false means the button is disabled.
+    /// <see langword="true"/> means the button is active, <see langword="false"/> means the button is disabled.
     /// </summary>
     /// <param name="role">The <see cref="RoleBehaviour"/> of the local player.</param>
-    /// <returns>True if the button is enabled, false otherwise.</returns>
+    /// <returns><see langword="true"/> if the button is enabled, <see langword="false"/> otherwise.</returns>
     public abstract bool Enabled(RoleBehaviour? role);
 
     /// <summary>
@@ -445,7 +445,7 @@ public abstract class CustomActionButton
 
     /// <summary>
     /// Returns a value indicating whether the effect can be ended early by the player.
-    /// Always false by default.
+    /// Always <see langword="false"/> by default.
     /// </summary>
     /// <returns>Can the effect be canceled.</returns>
     public virtual bool IsEffectCancellable() => false;
@@ -474,7 +474,7 @@ public abstract class CustomActionButton
 
     /// <summary>
     /// This method is called on the <see cref="HudManager.SetHudActive(PlayerControl, RoleBehaviour, bool)"/> method. It determines whether the button should be visible or not.
-    /// The default behavior is to show the button if the <paramref name="visible"/> parameter and the <see cref="Enabled"/> method return true.
+    /// The default behavior is to show the button if the <paramref name="visible"/> parameter and the <see cref="Enabled"/> method return <see langword="true"/>.
     /// It can be overridden for custom behavior.
     /// </summary>
     /// <param name="visible">Passed in from <see cref="HudManager.SetHudActive(PlayerControl, RoleBehaviour, bool)"/>, should hud be active.</param>
@@ -599,7 +599,7 @@ public abstract class CustomActionButton<T> : CustomActionButton where T : MonoB
     /// Determines if the target <typeparamref name="T"/> is valid.
     /// </summary>
     /// <param name="target">The target <typeparamref name="T"/> being checked.</param>
-    /// <returns>True if the target <typeparamref name="T"/> is valid, false otherwise.</returns>
+    /// <returns><see langword="true"/> if the target <typeparamref name="T"/> is valid, <see langword="false"/> otherwise.</returns>
     public virtual bool IsTargetValid(T? target)
     {
         return target != null;
@@ -608,7 +608,7 @@ public abstract class CustomActionButton<T> : CustomActionButton where T : MonoB
     /// <summary>
     /// The method used to get the target <typeparamref name="T"/>.
     /// </summary>
-    /// <returns>The target <typeparamref name="T"/> or null if it isn't found.</returns>
+    /// <returns>The target <typeparamref name="T"/> or <see langword="null"/> if it isn't found.</returns>
     public abstract T? GetTarget();
 
     /// <summary>

@@ -19,7 +19,7 @@ public abstract class CustomGameOver
     /// </summary>
     /// <param name="playerControl">The <see cref="PlayerControl"/> that requested the Game Over.</param>
     /// <param name="winners">The collection of winners.</param>
-    /// <returns>True if the condition is met, otherwise false.</returns>
+    /// <returns><see langword="true"/> if the condition is met, otherwise <see langword="false"/>.</returns>
     public virtual bool VerifyCondition(PlayerControl playerControl, NetworkedPlayerInfo[] winners)
     {
         return true;
@@ -29,7 +29,7 @@ public abstract class CustomGameOver
     /// Runs before the base game calls <see cref="EndGameManager.SetEverythingUp"/>.
     /// </summary>
     /// <param name="endGameManager">The <see cref="EndGameManager"/> instance.</param>
-    /// <returns>Return True to use the run the original method, return False to skip it.</returns>
+    /// <returns>Return <see langword="true"/> to use the run the original method, return <see langword="false"/> to skip it.</returns>
     public virtual bool BeforeEndGameSetup(EndGameManager endGameManager)
     {
         return true;

@@ -32,7 +32,7 @@ public static class RoleOptionsCollectionPatch
     /// <summary>
     /// Set the role chance for custom Launchpad roles based on config.
     /// </summary>
-    /// <returns>Return false to skip original method, true to not.</returns>
+    /// <returns>Return <see langword="false"/> to skip original method, <see langword="true"/> to not.</returns>
     [HarmonyPrefix]
     [HarmonyPatch(nameof(RoleOptionsCollectionV10.GetChancePerGame))]
     public static bool GetChancePrefix(RoleTypes role, ref int __result)
@@ -62,7 +62,7 @@ public static class RoleOptionsCollectionPatch
     /// <summary>
     /// Set the amount for custom Launchpad roles based on config.
     /// </summary>
-    /// <returns>Return false to skip original method, true to not.</returns>
+    /// <returns>Return <see langword="false"/> to skip original method, <see langword="true"/> to not.</returns>
     [HarmonyPrefix]
     [HarmonyPatch(nameof(RoleOptionsCollectionV10.GetNumPerGame))]
     public static bool GetNumPrefix(RoleTypes role, ref int __result)

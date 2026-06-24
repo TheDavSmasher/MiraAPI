@@ -144,7 +144,7 @@ public record struct CustomRoleConfiguration
     public string FreeplayFolder { get; set; }
 
     /// <summary>
-    /// Gets or sets the outline <see cref="Color"/> for the <see cref="KillButton"/> if <see cref="UseVanillaKillButton"/> is true.
+    /// Gets or sets the outline <see cref="Color"/> for the <see cref="KillButton"/> if <see cref="UseVanillaKillButton"/> is <see langword="true"/>.
     /// </summary>
     public Color KillButtonOutlineColor { get; set; }
 

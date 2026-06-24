@@ -17,11 +17,11 @@ public static class VotingUtils
     private const byte SkipVoteId = 253;
 
     /// <summary>
-    /// Gets the exiled player from the list of <see cref="CustomVote"/>s. Returns null if no player is to be exiled.
+    /// Gets the exiled player from the list of <see cref="CustomVote"/>s. Returns <see langword="null"/> if no player is to be exiled.
     /// </summary>
     /// <param name="votes">>The list of <see cref="CustomVote"/>s to check.</param>
     /// <param name="isTie">Whether the vote is a tie.</param>
-    /// <returns>The player to be exiled. Will be null if no player is to be exiled.</returns>
+    /// <returns>The player to be exiled. Will be <see langword="null"/> if no player is to be exiled.</returns>
     public static NetworkedPlayerInfo? GetExiled(List<CustomVote> votes, out bool isTie)
     {
         var max = CalculateNumVotes(votes).MaxPair(out var tie);

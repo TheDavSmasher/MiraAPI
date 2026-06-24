@@ -129,7 +129,7 @@ public static class Helpers
     /// Determines whether a given probability check succeeds.
     /// </summary>
     /// <param name="probability">An integer value representing the success probability (0-100).</param>
-    /// <returns>True if the number falls in the range, false if not.</returns>
+    /// <returns><see langword="true"/> if the number falls in the range, <see langword="false"/> if not.</returns>
     public static bool CheckChance(int probability)
     {
         switch (probability)
@@ -459,7 +459,7 @@ public static class Helpers
     /// Gets a <see cref="DeadBody"/> by its parent ID.
     /// </summary>
     /// <param name="id">The player ID.</param>
-    /// <returns>A <see cref="DeadBody"/> or null if its not found.</returns>
+    /// <returns>A <see cref="DeadBody"/> or <see langword="null"/> if its not found.</returns>
     public static DeadBody? GetBodyById(byte id)
     {
         return Object.FindObjectsOfType<DeadBody>().FirstOrDefault(body => body.ParentId == id);

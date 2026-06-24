@@ -20,7 +20,7 @@ public static class SettingPatches
     /// <param name="__instance">The <see cref="FloatGameSetting"/> instance.</param>
     /// <param name="__result">The result of the <see cref="FloatGameSetting.GetValueString"/> method.</param>
     /// <param name="value">The <see langword="float"/> value.</param>
-    /// <returns>False to skip original method.</returns>
+    /// <returns><see langword="false"/> to skip original method.</returns>
     [HarmonyPrefix]
     [HarmonyPatch(typeof(FloatGameSetting), nameof(FloatGameSetting.GetValueString))]
     public static bool ValueStringPatch(

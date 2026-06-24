@@ -206,10 +206,10 @@ public class ModifierComponent(IntPtr cppPtr) : MonoBehaviour(cppPtr)
     /// <summary>
     /// Tries to get a <typeparamref name="T"/>.
     /// </summary>
-    /// <param name="modifier">The <typeparamref name="T"/> or null.</param>
+    /// <param name="modifier">The <typeparamref name="T"/> or <see langword="null"/>.</param>
     /// <param name="predicate">The predicate to check the <typeparamref name="T"/> by.</param>
     /// <typeparam name="T">The Type of the <see cref="BaseModifier"/>.</typeparam>
-    /// <returns>True if the <typeparamref name="T"/> was found, false otherwise.</returns>
+    /// <returns><see langword="true"/> if the <typeparamref name="T"/> was found, <see langword="false"/> otherwise.</returns>
     [HideFromIl2Cpp]
     public bool TryGetModifier<T>([NotNullWhen(true)] out T? modifier, Func<T, bool>? predicate = null) where T : BaseModifier
     {
@@ -221,9 +221,9 @@ public class ModifierComponent(IntPtr cppPtr) : MonoBehaviour(cppPtr)
     /// Tries to get a <see cref="BaseModifier"/> by its type.
     /// </summary>
     /// <param name="type">The modifier type.</param>
-    /// <param name="modifier">The <see cref="BaseModifier"/> or null.</param>
+    /// <param name="modifier">The <see cref="BaseModifier"/> or <see langword="null"/>.</param>
     /// <param name="predicate">The predicate to check the <see cref="BaseModifier"/> by.</param>
-    /// <returns>True if the <see cref="BaseModifier"/> was found, false otherwise.</returns>
+    /// <returns><see langword="true"/> if the <see cref="BaseModifier"/> was found, <see langword="false"/> otherwise.</returns>
     [HideFromIl2Cpp]
     public bool TryGetModifier(Type type, [NotNullWhen(true)] out BaseModifier? modifier, Func<BaseModifier, bool>? predicate = null)
     {
@@ -235,9 +235,9 @@ public class ModifierComponent(IntPtr cppPtr) : MonoBehaviour(cppPtr)
     /// Tries to get a <see cref="BaseModifier"/> by its type ID.
     /// </summary>
     /// <param name="id">The <see cref="BaseModifier"/>'s type ID.</param>
-    /// <param name="modifier">The <see cref="BaseModifier"/> or null.</param>
+    /// <param name="modifier">The <see cref="BaseModifier"/> or <see langword="null"/>.</param>
     /// <param name="predicate">The predicate to check the <see cref="BaseModifier"/> by.</param>
-    /// <returns>True if the <see cref="BaseModifier"/> was found, false otherwise.</returns>
+    /// <returns><see langword="true"/> if the <see cref="BaseModifier"/> was found, <see langword="false"/> otherwise.</returns>
     [HideFromIl2Cpp]
     public bool TryGetModifier(uint id, [NotNullWhen(true)] out BaseModifier? modifier, Func<BaseModifier, bool>? predicate = null)
     {
@@ -249,8 +249,8 @@ public class ModifierComponent(IntPtr cppPtr) : MonoBehaviour(cppPtr)
     /// Tries to get a <see cref="BaseModifier"/> by its unique ID.
     /// </summary>
     /// <param name="modifierGuid">The <see cref="BaseModifier"/>'s unique ID.</param>
-    /// <param name="modifier">The <see cref="BaseModifier"/> or null.</param>
-    /// <returns>True if the <see cref="BaseModifier"/> was found, false otherwise.</returns>
+    /// <param name="modifier">The <see cref="BaseModifier"/> or <see langword="null"/>.</param>
+    /// <returns><see langword="true"/> if the <see cref="BaseModifier"/> was found, <see langword="false"/> otherwise.</returns>
     [HideFromIl2Cpp]
     public bool TryGetModifier(Guid modifierGuid, [NotNullWhen(true)] out BaseModifier? modifier)
     {
@@ -263,7 +263,7 @@ public class ModifierComponent(IntPtr cppPtr) : MonoBehaviour(cppPtr)
     /// </summary>
     /// <param name="predicate">The predicate to check the <typeparamref name="T"/> by.</param>
     /// <typeparam name="T">The Type of the <see cref="BaseModifier"/>.</typeparam>
-    /// <returns>The <typeparamref name="T"/> if it is found, null otherwise.</returns>
+    /// <returns>The <typeparamref name="T"/> if it is found, <see langword="null"/> otherwise.</returns>
     [HideFromIl2Cpp]
     public T? GetModifier<T>(Func<T, bool>? predicate = null) where T : BaseModifier
     {
@@ -275,7 +275,7 @@ public class ModifierComponent(IntPtr cppPtr) : MonoBehaviour(cppPtr)
     /// </summary>
     /// <param name="type">The modifier type.</param>
     /// <param name="predicate">The predicate to check the <see cref="BaseModifier"/> by.</param>
-    /// <returns>The <see cref="BaseModifier"/> if it is found, null otherwise.</returns>
+    /// <returns>The <see cref="BaseModifier"/> if it is found, <see langword="null"/> otherwise.</returns>
     [HideFromIl2Cpp]
     public BaseModifier? GetModifier(Type type, Func<BaseModifier, bool>? predicate = null)
     {
@@ -287,7 +287,7 @@ public class ModifierComponent(IntPtr cppPtr) : MonoBehaviour(cppPtr)
     /// </summary>
     /// <param name="id">The <see cref="BaseModifier"/> ID.</param>
     /// <param name="predicate">The predicate to check the <see cref="BaseModifier"/> by.</param>
-    /// <returns>The <see cref="BaseModifier"/> if it is found, null otherwise.</returns>
+    /// <returns>The <see cref="BaseModifier"/> if it is found, <see langword="null"/> otherwise.</returns>
     [HideFromIl2Cpp]
     public BaseModifier? GetModifier(uint id, Func<BaseModifier, bool>? predicate = null)
     {
@@ -301,7 +301,7 @@ public class ModifierComponent(IntPtr cppPtr) : MonoBehaviour(cppPtr)
     /// Gets a <see cref="BaseModifier"/> by unique ID.
     /// </summary>
     /// <param name="modifierGuid">The <see cref="BaseModifier"/>'s unique ID.</param>
-    /// <returns>The <see cref="BaseModifier"/> if it is found, or null.</returns>
+    /// <returns>The <see cref="BaseModifier"/> if it is found, or <see langword="null"/>.</returns>
     [HideFromIl2Cpp]
     public BaseModifier? GetModifier(Guid modifierGuid)
     {
@@ -469,7 +469,7 @@ public class ModifierComponent(IntPtr cppPtr) : MonoBehaviour(cppPtr)
     /// </summary>
     /// <param name="id">The ID of the <see cref="BaseModifier"/>.</param>
     /// <param name="args">The arguments to initialize the <see cref="BaseModifier"/> with.</param>
-    /// <returns>The <see cref="BaseModifier"/> if it was created, or null if it failed.</returns>
+    /// <returns>The <see cref="BaseModifier"/> if it was created, or <see langword="null"/> if it failed.</returns>
     [HideFromIl2Cpp]
     public BaseModifier? AddModifier(uint id, params object[] args)
     {
@@ -484,7 +484,7 @@ public class ModifierComponent(IntPtr cppPtr) : MonoBehaviour(cppPtr)
     /// </summary>
     /// <param name="predicate">The predicate to check the <typeparamref name="T"/>.</param>
     /// <typeparam name="T">The Type of the <see cref="BaseModifier"/>.</typeparam>
-    /// <returns>True if the <typeparamref name="T"/> is present, false otherwise.</returns>
+    /// <returns><see langword="true"/> if the <typeparamref name="T"/> is present, <see langword="false"/> otherwise.</returns>
     [HideFromIl2Cpp]
     public bool HasModifier<T>(Func<T, bool>? predicate=null) where T : BaseModifier
     {
@@ -496,7 +496,7 @@ public class ModifierComponent(IntPtr cppPtr) : MonoBehaviour(cppPtr)
     /// </summary>
     /// <param name="type">The modifier type.</param>
     /// <param name="predicate">The predicate to check the <see cref="BaseModifier"/>.</param>
-    /// <returns>True if the <see cref="BaseModifier"/> is present, false otherwise.</returns>
+    /// <returns><see langword="true"/> if the <see cref="BaseModifier"/> is present, <see langword="false"/> otherwise.</returns>
     [HideFromIl2Cpp]
     public bool HasModifier(Type type, Func<BaseModifier, bool>? predicate=null)
     {
@@ -508,7 +508,7 @@ public class ModifierComponent(IntPtr cppPtr) : MonoBehaviour(cppPtr)
     /// </summary>
     /// <param name="id">The <see cref="BaseModifier"/>'s type ID.</param>
     /// <param name="predicate">The predicate to check the <see cref="BaseModifier"/>.</param>
-    /// <returns>True if the <see cref="BaseModifier"/> is present, false otherwise.</returns>
+    /// <returns><see langword="true"/> if the <see cref="BaseModifier"/> is present, <see langword="false"/> otherwise.</returns>
     [HideFromIl2Cpp]
     public bool HasModifier(uint id, Func<BaseModifier, bool>? predicate=null)
     {
@@ -522,7 +522,7 @@ public class ModifierComponent(IntPtr cppPtr) : MonoBehaviour(cppPtr)
     /// Checks if a player has an active <see cref="BaseModifier"/> by its unique ID.
     /// </summary>
     /// <param name="id">The <see cref="BaseModifier"/>'s guid.</param>
-    /// <returns>True if the <see cref="BaseModifier"/> is present, false otherwise.</returns>
+    /// <returns><see langword="true"/> if the <see cref="BaseModifier"/> is present, <see langword="false"/> otherwise.</returns>
     [HideFromIl2Cpp]
     public bool HasModifier(Guid id)
     {
@@ -535,7 +535,7 @@ public class ModifierComponent(IntPtr cppPtr) : MonoBehaviour(cppPtr)
     /// <param name="checkInactive">Whether to check inactive <typeparamref name="T"/>s (those pending to be added).</param>
     /// <param name="predicate">The predicate to check the <typeparamref name="T"/>.</param>
     /// <typeparam name="T">The Type of the <see cref="BaseModifier"/>.</typeparam>
-    /// <returns>True if the <typeparamref name="T"/> is present, false otherwise.</returns>
+    /// <returns><see langword="true"/> if the <typeparamref name="T"/> is present, <see langword="false"/> otherwise.</returns>
     [HideFromIl2Cpp]
     public bool HasModifier<T>(bool checkInactive, Func<T, bool>? predicate=null) where T : BaseModifier
     {
@@ -549,7 +549,7 @@ public class ModifierComponent(IntPtr cppPtr) : MonoBehaviour(cppPtr)
     /// <param name="type">The modifier type.</param>
     /// <param name="checkInactive">Whether to check inactive <see cref="BaseModifier"/>s (those pending to be added).</param>
     /// <param name="predicate">The predicate to check the <see cref="BaseModifier"/>.</param>
-    /// <returns>True if the <see cref="BaseModifier"/> is present, false otherwise.</returns>
+    /// <returns><see langword="true"/> if the <see cref="BaseModifier"/> is present, <see langword="false"/> otherwise.</returns>
     [HideFromIl2Cpp]
     public bool HasModifier(Type type, bool checkInactive, Func<BaseModifier, bool>? predicate=null)
     {
@@ -563,7 +563,7 @@ public class ModifierComponent(IntPtr cppPtr) : MonoBehaviour(cppPtr)
     /// <param name="id">The <see cref="BaseModifier"/>'s type ID.</param>
     /// <param name="checkInactive">Whether to check inactive <see cref="BaseModifier"/>s (those pending to be added).</param>
     /// <param name="predicate">The predicate to check the <see cref="BaseModifier"/>.</param>
-    /// <returns>True if the <see cref="BaseModifier"/> is present, false otherwise.</returns>
+    /// <returns><see langword="true"/> if the <see cref="BaseModifier"/> is present, <see langword="false"/> otherwise.</returns>
     [HideFromIl2Cpp]
     public bool HasModifier(uint id, bool checkInactive, Func<BaseModifier, bool>? predicate=null)
     {
@@ -578,7 +578,7 @@ public class ModifierComponent(IntPtr cppPtr) : MonoBehaviour(cppPtr)
     /// </summary>
     /// <param name="id">The <see cref="BaseModifier"/>'s guid.</param>
     /// <param name="checkInactive">Whether to check inactive <see cref="BaseModifier"/>s (those pending to be added).</param>
-    /// <returns>True if the <see cref="BaseModifier"/> is present, false otherwise.</returns>
+    /// <returns><see langword="true"/> if the <see cref="BaseModifier"/> is present, <see langword="false"/> otherwise.</returns>
     [HideFromIl2Cpp]
     public bool HasModifier(Guid id, bool checkInactive)
     {

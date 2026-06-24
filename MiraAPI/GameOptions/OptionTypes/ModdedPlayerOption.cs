@@ -91,9 +91,9 @@ public class ModdedPlayerOption : ModdedOption<int>
     }
 
     /// <summary>
-    /// Returns a player from the value. If <see cref="AllowNone"/> is enabled and none is enabled this will return null.
+    /// Returns a player from the value. If <see cref="AllowNone"/> is enabled and none is enabled this will return <see langword="null"/>.
     /// </summary>
-    /// <returns>A player or null if chosen none.</returns>
+    /// <returns>A player or <see langword="null"/> if chosen none.</returns>
     public NetworkedPlayerInfo? GetPlayerValue()
     {
         return Value < 0 ? null : Values[Value];

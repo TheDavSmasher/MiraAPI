@@ -123,7 +123,7 @@ public static class ModifierExtensions
     /// Gets the <see cref="ModifierComponent"/> for a <see cref="PlayerControl"/>.
     /// </summary>
     /// <param name="player">The <see cref="PlayerControl"/> object.</param>
-    /// <returns>A <see cref="ModifierComponent"/> if there is one, null otherwise.</returns>
+    /// <returns>A <see cref="ModifierComponent"/> if there is one, <see langword="null"/> otherwise.</returns>
     public static ModifierComponent GetModifierComponent(this PlayerControl player)
     {
         if (ModifierComponents.TryGetValue(player, out var component))
@@ -147,7 +147,7 @@ public static class ModifierExtensions
     /// <typeparam name="T">The type of the <see cref="BaseModifier"/>.</typeparam>
     /// <param name="player">The <see cref="PlayerControl"/> instance.</param>
     /// <param name="predicate">Optional predicate to filter the <see cref="BaseModifier"/>s.</param>
-    /// <returns>True if the <see cref="PlayerControl"/> has the <typeparamref name="T"/>, false otherwise.</returns>
+    /// <returns><see langword="true"/> if the <see cref="PlayerControl"/> has the <typeparamref name="T"/>, <see langword="false"/> otherwise.</returns>
     public static bool HasModifier<T>(this PlayerControl player, Func<T, bool>? predicate = null) where T : BaseModifier
     {
         return player.GetModifierComponent().HasModifier(predicate);
@@ -159,7 +159,7 @@ public static class ModifierExtensions
     /// <param name="player">The <see cref="PlayerControl"/> instance.</param>
     /// <param name="type">The type of the modifier.</param>
     /// <param name="predicate">Optional predicate to filter the <see cref="BaseModifier"/>s.</param>
-    /// <returns>True if the <see cref="PlayerControl"/> has the <see cref="BaseModifier"/>, false otherwise.</returns>
+    /// <returns><see langword="true"/> if the <see cref="PlayerControl"/> has the <see cref="BaseModifier"/>, <see langword="false"/> otherwise.</returns>
     public static bool HasModifier(this PlayerControl player, Type type, Func<BaseModifier, bool>? predicate = null)
     {
         return player.GetModifierComponent().HasModifier(type, predicate);
@@ -171,7 +171,7 @@ public static class ModifierExtensions
     /// <param name="player">The <see cref="PlayerControl"/> instance.</param>
     /// <param name="typeId">The type ID of the <see cref="BaseModifier"/>.</param>
     /// <param name="predicate">Optional predicate to filter the <see cref="BaseModifier"/>s.</param>
-    /// <returns>True if the <see cref="PlayerControl"/> has the <see cref="BaseModifier"/>, false otherwise.</returns>
+    /// <returns><see langword="true"/> if the <see cref="PlayerControl"/> has the <see cref="BaseModifier"/>, <see langword="false"/> otherwise.</returns>
     public static bool HasModifier(
         this PlayerControl player,
         uint typeId,
@@ -185,7 +185,7 @@ public static class ModifierExtensions
     /// </summary>
     /// <param name="player">The <see cref="PlayerControl"/> instance.</param>
     /// <param name="uniqueId">The unique ID of the <see cref="BaseModifier"/>.</param>
-    /// <returns>True if the <see cref="PlayerControl"/> has the <see cref="BaseModifier"/>, false otherwise.</returns>
+    /// <returns><see langword="true"/> if the <see cref="PlayerControl"/> has the <see cref="BaseModifier"/>, <see langword="false"/> otherwise.</returns>
     public static bool HasModifier(this PlayerControl player, Guid uniqueId)
     {
         return player.GetModifierComponent().HasModifier(uniqueId);
@@ -219,10 +219,10 @@ public static class ModifierExtensions
     /// Tries to get a <typeparamref name="T"/>.
     /// </summary>
     /// <param name="player">The <see cref="PlayerControl"/> instance.</param>
-    /// <param name="modifier">The <typeparamref name="T"/> or null.</param>
+    /// <param name="modifier">The <typeparamref name="T"/> or <see langword="null"/>.</param>
     /// <param name="predicate">The predicate to check the <typeparamref name="T"/> by.</param>
     /// <typeparam name="T">The Type of the <see cref="BaseModifier"/>.</typeparam>
-    /// <returns>True if the <typeparamref name="T"/> was found, false otherwise.</returns>
+    /// <returns><see langword="true"/> if the <typeparamref name="T"/> was found, <see langword="false"/> otherwise.</returns>
     public static bool TryGetModifier<T>(this PlayerControl player, [NotNullWhen(true)] out T? modifier, Func<T, bool>? predicate = null) where T : BaseModifier
     {
         return player.GetModifierComponent().TryGetModifier(out modifier, predicate);
@@ -233,9 +233,9 @@ public static class ModifierExtensions
     /// </summary>
     /// <param name="player">The <see cref="PlayerControl"/> instance.</param>
     /// <param name="type">The modifier type.</param>
-    /// <param name="modifier">The <see cref="BaseModifier"/> or null.</param>
+    /// <param name="modifier">The <see cref="BaseModifier"/> or <see langword="null"/>.</param>
     /// <param name="predicate">The predicate to check the <see cref="BaseModifier"/> by.</param>
-    /// <returns>True if the <see cref="BaseModifier"/> was found, false otherwise.</returns>
+    /// <returns><see langword="true"/> if the <see cref="BaseModifier"/> was found, <see langword="false"/> otherwise.</returns>
     public static bool TryGetModifier(this PlayerControl player, Type type, [NotNullWhen(true)] out BaseModifier? modifier, Func<BaseModifier, bool>? predicate = null)
     {
         return player.GetModifierComponent().TryGetModifier(type, out modifier, predicate);
@@ -246,9 +246,9 @@ public static class ModifierExtensions
     /// </summary>
     /// <param name="player">The <see cref="PlayerControl"/> instance.</param>
     /// <param name="id">The <see cref="BaseModifier"/> type ID.</param>
-    /// <param name="modifier">The <see cref="BaseModifier"/> or null.</param>
+    /// <param name="modifier">The <see cref="BaseModifier"/> or <see langword="null"/>.</param>
     /// <param name="predicate">The predicate to check the <see cref="BaseModifier"/> by.</param>
-    /// <returns>True if the <see cref="BaseModifier"/> was found, false otherwise.</returns>
+    /// <returns><see langword="true"/> if the <see cref="BaseModifier"/> was found, <see langword="false"/> otherwise.</returns>
     public static bool TryGetModifier(this PlayerControl player, uint id, [NotNullWhen(true)] out BaseModifier? modifier, Func<BaseModifier, bool>? predicate = null)
     {
         return player.GetModifierComponent().TryGetModifier(id, out modifier, predicate);
@@ -259,8 +259,8 @@ public static class ModifierExtensions
     /// </summary>
     /// <param name="player">The <see cref="PlayerControl"/> instance.</param>
     /// <param name="modifierGuid">The <see cref="BaseModifier"/> unique ID.</param>
-    /// <param name="modifier">The <see cref="BaseModifier"/> or null.</param>
-    /// <returns>True if the <see cref="BaseModifier"/> was found, false otherwise.</returns>
+    /// <param name="modifier">The <see cref="BaseModifier"/> or <see langword="null"/>.</param>
+    /// <returns><see langword="true"/> if the <see cref="BaseModifier"/> was found, <see langword="false"/> otherwise.</returns>
     public static bool TryGetModifier(this PlayerControl player, Guid modifierGuid, [NotNullWhen(true)] out BaseModifier? modifier)
     {
         return player.GetModifierComponent().TryGetModifier(modifierGuid, out modifier);
@@ -272,7 +272,7 @@ public static class ModifierExtensions
     /// <typeparam name="T">The type of the <see cref="BaseModifier"/>.</typeparam>
     /// <param name="player">The <see cref="PlayerControl"/> instance.</param>
     /// <param name="predicate">Optional predicate to filter the <typeparamref name="T"/>s.</param>
-    /// <returns>The <typeparamref name="T"/> if found, null otherwise.</returns>
+    /// <returns>The <typeparamref name="T"/> if found, <see langword="null"/> otherwise.</returns>
     public static T? GetModifier<T>(this PlayerControl player, Func<T, bool>? predicate = null) where T : BaseModifier
     {
         return player.GetModifierComponent().GetModifier(predicate);
@@ -284,7 +284,7 @@ public static class ModifierExtensions
     /// <param name="player">The <see cref="PlayerControl"/> instance.</param>
     /// <param name="type">The type of the modifier.</param>
     /// <param name="predicate">Optional predicate to filter the <see cref="BaseModifier"/>s.</param>
-    /// <returns>The <see cref="BaseModifier"/> if found, null otherwise.</returns>
+    /// <returns>The <see cref="BaseModifier"/> if found, <see langword="null"/> otherwise.</returns>
     public static BaseModifier? GetModifier(
         this PlayerControl player,
         Type type,
@@ -299,7 +299,7 @@ public static class ModifierExtensions
     /// <param name="player">The <see cref="PlayerControl"/> instance.</param>
     /// <param name="typeId">The type ID of the <see cref="BaseModifier"/>.</param>
     /// <param name="predicate">Optional predicate to filter the <see cref="BaseModifier"/>s.</param>
-    /// <returns>The <see cref="BaseModifier"/> if found, null otherwise.</returns>
+    /// <returns>The <see cref="BaseModifier"/> if found, <see langword="null"/> otherwise.</returns>
     public static BaseModifier? GetModifier(
         this PlayerControl player,
         uint typeId,
@@ -313,7 +313,7 @@ public static class ModifierExtensions
     /// </summary>
     /// <param name="player">The <see cref="PlayerControl"/> instance.</param>
     /// <param name="uniqueId">The GUID of the <see cref="BaseModifier"/>.</param>
-    /// <returns>The <see cref="BaseModifier"/> if found, null otherwise.</returns>
+    /// <returns>The <see cref="BaseModifier"/> if found, <see langword="null"/> otherwise.</returns>
     public static BaseModifier? GetModifier(
         this PlayerControl player,
         Guid uniqueId)

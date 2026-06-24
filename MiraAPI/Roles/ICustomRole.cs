@@ -200,7 +200,7 @@ public interface ICustomRole : IOptionable
     /// </summary>
     /// <param name="instance">The intro cutscene instance.</param>
     /// <param name="yourTeam">The reference to the list of player in the team.</param>
-    /// <returns>True to use the original team intro code, false to skip.</returns>
+    /// <returns><see langword="true"/> to use the original team intro code, <see langword="false"/> to skip.</returns>
     public virtual bool SetupIntroTeam(IntroCutscene instance, ref Il2CppSystem.Collections.Generic.List<PlayerControl> yourTeam)
     {
         if (Team == ModdedRoleTeams.Custom)
@@ -216,10 +216,10 @@ public interface ICustomRole : IOptionable
     }
 
     /// <summary>
-    /// Gets a custom ejection message for the role. Return null to use the default message.
+    /// Gets a custom ejection message for the role. Return <see langword="null"/> to use the default message.
     /// </summary>
     /// <param name="player">The NetworkedPlayerInfo object for this player.</param>
-    /// <returns>A string with a custom ejection message or null.</returns>
+    /// <returns>A string with a custom ejection message or <see langword="null"/>.</returns>
     string? GetCustomEjectionMessage(NetworkedPlayerInfo player)
     {
         return Team == ModdedRoleTeams.Impostor ? $"{player.PlayerName} was The {RoleName}" : null;
@@ -235,7 +235,7 @@ public interface ICustomRole : IOptionable
     /// Determine whether a given <see cref="BaseModifier"/> can be applied to this role.
     /// </summary>
     /// <param name="modifier">The modifier to be tested.</param>
-    /// <returns>True if the <see cref="BaseModifier"/> is valid on this role, false otherwise.</returns>
+    /// <returns><see langword="true"/> if the <see cref="BaseModifier"/> is valid on this role, <see langword="false"/> otherwise.</returns>
     bool IsModifierApplicable(BaseModifier modifier)
     {
         return true;
@@ -244,7 +244,7 @@ public interface ICustomRole : IOptionable
     /// <summary>
     /// Determines whether the role can spawn in general, accounting for gamemodes and everything else.
     /// </summary>
-    /// <returns>True if the role is able to spawn, otherwise false.</returns>
+    /// <returns><see langword="true"/> if the role is able to spawn, otherwise <see langword="false"/>.</returns>
     public virtual bool CanSpawnOnCurrentMode() => !GameManager.Instance.IsHideAndSeek();
 
     /// <summary>

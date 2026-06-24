@@ -50,7 +50,7 @@ public abstract class BaseModifier : IOptionable
     public abstract string ModifierName { get; }
 
     /// <summary>
-    /// Gets the modifier icon. Useless if <see cref="HideOnUi"/> is true.
+    /// Gets the modifier icon. Useless if <see cref="HideOnUi"/> is <see langword="true"/>.
     /// </summary>
     public virtual LoadableAsset<Sprite>? ModifierIcon => null;
 
@@ -70,12 +70,12 @@ public abstract class BaseModifier : IOptionable
     public virtual Color FreeplayFileColor => Color.gray;
 
     /// <summary>
-    /// Gets a value indicating whether the modifier is unique. If true, the player can only have one instance of this modifier.
+    /// Gets a value indicating whether the modifier is unique. If <see langword="true"/>, the player can only have one instance of this modifier.
     /// </summary>
     public virtual bool Unique => true;
 
     /// <summary>
-    /// Gets the HUD description for this modifier. Does nothing if <see cref="HideOnUi"/> is true. Required to be visible on UI.
+    /// Gets the HUD description for this modifier. Does nothing if <see cref="HideOnUi"/> is <see langword="true"/>. Required to be visible on UI.
     /// </summary>
     /// <returns>The description string for the HUD.</returns>
     public virtual string GetDescription() => string.Empty;
@@ -126,6 +126,6 @@ public abstract class BaseModifier : IOptionable
     /// <summary>
     /// Determines whether the player can vent.
     /// </summary>
-    /// <returns>True if the player can vent, false otherwise. Null for no effect.</returns>
+    /// <returns><see langword="true"/> if the player can vent, <see langword="false"/> otherwise. <see langword="null"/> for no effect.</returns>
     public virtual bool? CanVent() => null;
 }

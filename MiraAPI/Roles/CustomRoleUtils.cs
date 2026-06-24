@@ -18,7 +18,7 @@ public static class CustomRoleUtils
     /// Determines whether the specified <see cref="RoleBehaviour"/> can spawn in general, accounting for gamemodes and everything else.
     /// </summary>
     /// <param name="role">The <see cref="RoleBehaviour"/> you would like to check for.</param>
-    /// <returns>True if the <see cref="RoleBehaviour"/> is able to spawn, otherwise false.</returns>
+    /// <returns><see langword="true"/> if the <see cref="RoleBehaviour"/> is able to spawn, otherwise <see langword="false"/>.</returns>
     public static bool CanSpawnOnCurrentMode(RoleBehaviour role)
     {
         if (role is ICustomRole custom)
@@ -125,7 +125,7 @@ public static class CustomRoleUtils
     /// Determines if a <see cref="RoleBehaviour"/> is a custom role or not.
     /// </summary>
     /// <param name="role">The <see cref="RoleBehaviour"/> to check.</param>
-    /// <returns>True if the <see cref="RoleBehaviour"/> is a custom role, false otherwise.</returns>
+    /// <returns><see langword="true"/> if the <see cref="RoleBehaviour"/> is a custom role, <see langword="false"/> otherwise.</returns>
     public static bool IsCustomRole(this RoleBehaviour role)
     {
         return CustomRoleManager.CustomRoles.ContainsKey((ushort)role.Role);

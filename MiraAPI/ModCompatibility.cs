@@ -17,8 +17,8 @@ public static class ModCompatibility
     /// <summary>
     /// Checks if the Submerged mod is loaded.
     /// </summary>
-    /// <param name="submergedAssembly">Submerged mod assembly if loaded, null otherwise.</param>
-    /// <returns>True if the Submerged mod is loaded, false otherwise.</returns>
+    /// <param name="submergedAssembly">Submerged mod assembly if loaded, <see langword="null"/> otherwise.</param>
+    /// <returns><see langword="true"/> if the Submerged mod is loaded, <see langword="false"/> otherwise.</returns>
     public static bool SubmergedLoaded([NotNullWhen(true)] out Assembly? submergedAssembly)
     {
         var result = IL2CPPChainloader.Instance.Plugins.TryGetValue(SubmergedId, out var plugin);
