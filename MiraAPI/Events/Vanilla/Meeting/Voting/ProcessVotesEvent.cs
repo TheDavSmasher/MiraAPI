@@ -10,7 +10,7 @@ namespace MiraAPI.Events.Vanilla.Meeting.Voting;
 /// <remarks>
 /// Initializes a new instance of the <see cref="ProcessVotesEvent"/> class.
 /// </remarks>
-/// <param name="votes">>The list of <see cref="CustomVote"/>s that are being processed.</param>
+/// <param name="votes">The list of <see cref="CustomVote"/>s that are being processed.</param>
 /// <param name="exiledPlayer">The player to be exiled. Will be <see langword="null"/> if no player is to be exiled.</param>
 public class ProcessVotesEvent(List<CustomVote> votes, NetworkedPlayerInfo? exiledPlayer = null) : MiraEvent
 {

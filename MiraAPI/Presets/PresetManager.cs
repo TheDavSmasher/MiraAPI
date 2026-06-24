@@ -54,7 +54,7 @@ public static class PresetManager
     /// <summary>
     /// Loads the <see cref="OptionPreset"/>s for the specified plugin by reading the <see cref="ConfigFile"/>s from the preset directory.
     /// </summary>
-    /// <param name="plugin">>The plugin for which the <see cref="OptionPreset"/>s should be loaded.</param>
+    /// <param name="plugin">The plugin for which the <see cref="OptionPreset"/>s should be loaded.</param>
     public static void LoadPresets(MiraPluginInfo plugin)
     {
         foreach (var btn in plugin.InternalPresets.Select(x=>x.PresetButton))

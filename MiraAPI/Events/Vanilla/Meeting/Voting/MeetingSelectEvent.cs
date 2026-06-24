@@ -32,7 +32,7 @@ public class MeetingSelectEvent : MiraEvent
     /// </summary>
     /// <param name="playerVoteData">The voter's <see cref="PlayerVoteData"/>.</param>
     /// <param name="targetId">The target's playerId.</param>
-    /// <param name="allowSelect">>Whether the player is allowed to select the target.</param>
+    /// <param name="allowSelect">Whether the player is allowed to select the target.</param>
     public MeetingSelectEvent(PlayerVoteData playerVoteData, int targetId, bool allowSelect)
     {
         VoteData = playerVoteData;

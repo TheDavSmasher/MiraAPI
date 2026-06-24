@@ -72,7 +72,7 @@ public class StateMachineWrapper<T> where T : Il2CppObjectBase
     /// </summary>
     /// <param name="parameterName">The name of the parameter to retrieve.</param>
     /// <typeparam name="TField">The type of the parameter to retrieve.</typeparam>
-    /// <returns>>The value of the specified parameter.</returns>
+    /// <returns>The value of the specified parameter.</returns>
     /// <exception cref="MissingFieldException">Thrown if the specified parameter does not exist.</exception>
     public TField GetParameter<TField>(string parameterName)
     {

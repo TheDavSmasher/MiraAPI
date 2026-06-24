@@ -40,9 +40,9 @@ public class OptionPreset
     /// <summary>
     /// Initializes a new instance of the <see cref="OptionPreset"/> class with the specified name and configuration file.
     /// </summary>
-    /// <param name="name">>The name of the preset.</param>
+    /// <param name="name">The name of the preset.</param>
     /// <param name="plugin">The plugin associated with the preset.</param>
-    /// <param name="presetConfig">>The configuration file for the preset.</param>
+    /// <param name="presetConfig">The configuration file for the preset.</param>
     public OptionPreset(string name, MiraPluginInfo plugin, ConfigFile presetConfig)
     {
         Name = name;
@@ -87,7 +87,7 @@ public class OptionPreset
     /// <summary>
     /// Gets whether the specified option is included in the preset.
     /// </summary>
-    /// <returns>>The value of whether the option is in the preset.</returns>
+    /// <returns>The value of whether the option is in the preset.</returns>
     public bool IsOptionInPreset(OptionBehaviour baseOption)
     {
         var selectedOpt = Plugin.InternalOptions.First(x => x.OptionBehaviour == baseOption);

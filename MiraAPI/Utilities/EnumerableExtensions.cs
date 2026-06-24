@@ -14,7 +14,7 @@ public static class EnumerableExtensions
     /// </summary>
     /// <param name="source">The source <see cref="IEnumerable{T}"/>.</param>
     /// <typeparam name="T">The type of the elements.</typeparam>
-    /// <returns>>The shuffled <see cref="IEnumerable{T}"/>.</returns>
+    /// <returns>The shuffled <see cref="IEnumerable{T}"/>.</returns>
     public static IEnumerable<T> Shuffle<T>(this IEnumerable<T> source)
     {
         return source.Shuffle(new Random());
@@ -26,7 +26,7 @@ public static class EnumerableExtensions
     /// <param name="source">The source <see cref="IEnumerable{T}"/>.</param>
     /// <param name="rng">The <see cref="Random"/> instance to use for shuffling.</param>
     /// <typeparam name="T">The type of the elements.</typeparam>
-    /// <returns>>The shuffled <see cref="IEnumerable{T}"/>.</returns>
+    /// <returns>The shuffled <see cref="IEnumerable{T}"/>.</returns>
     public static IEnumerable<T> Shuffle<T>(this IEnumerable<T> source, Random rng)
     {
         ArgumentNullException.ThrowIfNull(source);
