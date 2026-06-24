@@ -96,7 +96,7 @@ public class CustomPlayerMenu(IntPtr il2CppPtr) : Minigame(il2CppPtr)
             onClick(null);
         }));
 
-        DestroyableSingleton<DebugAnalytics>.Instance.Analytics.MinigameOpened(PlayerControl.LocalPlayer.Data, TaskType);
+        DebugAnalytics.Instance.Analytics.MinigameOpened(PlayerControl.LocalPlayer.Data, TaskType);
         var list = PlayerControl.AllPlayerControls.ToArray().Where(playerMatch).ToList();
         potentialVictims = [];
         var list2 = new Il2CppSystem.Collections.Generic.List<UiElement>();
