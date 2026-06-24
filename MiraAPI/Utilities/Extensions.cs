@@ -223,9 +223,9 @@ public static class Extensions
     }
 
     /// <summary>
-    /// Destroys the object properly.
+    /// Destroys the <see cref="GameObject"/> properly.
     /// </summary>
-    /// <param name="obj">The object to destroy.</param>
+    /// <param name="obj">The <see cref="GameObject"/> to destroy.</param>
     /// <param name="clearGc">Whether to run the garbage collector immediately.</param>
     public static void DeepDestroy(this GameObject obj, bool clearGc = true)
     {
