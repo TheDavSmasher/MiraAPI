@@ -178,6 +178,7 @@ public static class RoleSettingMenuPatches
             .ThenBy(x => x.Key.Name);
 
         var quotaThing = __instance.categoryHeaderEditRoleOrigin.transform.FindChild("QuotaHeader");
+        var usingNewQuota = false;
         var template = __instance.transform.parent.parent.GetComponent<GameSettingMenu>().GameSettingsTab.categoryHeaderOrigin;
 
         foreach (var grouping in sortedRoleGroups)
@@ -216,12 +217,17 @@ public static class RoleSettingMenuPatches
             var countText = quotaInst.transform.FindChild("# Text");
             countText.transform.localPosition = new Vector3(1.9f, 0.0993f, 0f);
 
-            var blankLabel = quotaInst.transform.FindChild("BlankLabel").gameObject;
-            var chanceLabel = quotaInst.transform.FindChild("Chance Label").gameObject;
-            var countLabel = quotaInst.transform.FindChild("# Label").gameObject;
-            blankLabel.DeepDestroy(false);
-            chanceLabel.DeepDestroy(false);
-            countLabel.DeepDestroy(false);
+            if (!usingNewQuota)
+            {
+                var blankLabel = quotaInst.transform.FindChild("BlankLabel").gameObject;
+                var chanceLabel = quotaInst.transform.FindChild("Chance Label").gameObject;
+                var countLabel = quotaInst.transform.FindChild("# Label").gameObject;
+                blankLabel.DeepDestroy(false);
+                chanceLabel.DeepDestroy(false);
+                countLabel.DeepDestroy(false);
+                usingNewQuota = true;
+                quotaThing = quotaInst;
+            }
 
             categoryHeaderMasked.Background.sprite = MiraAssets.CategoryHeader.LoadAsset();
             categoryHeaderMasked.Background.sprite.texture.filterMode = FilterMode.Bilinear;

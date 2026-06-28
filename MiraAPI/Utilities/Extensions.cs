@@ -335,10 +335,6 @@ public static class Extensions
     /// </summary>
     public static void ClearGarbageCollector()
     {
-        if (!MainMenuManagerPatches.NeedsDeepDestroy)
-        {
-            return;
-        }
         Coroutines.Start(CoFreeResources());
     }
 
