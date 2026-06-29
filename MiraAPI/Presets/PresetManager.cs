@@ -134,7 +134,7 @@ public static class PresetManager
         {
             var fileName = Path.GetFileName(file);
             Info($"Loading preset file {fileName}");
-            var presetName = Path.GetFileNameWithoutExtension(file);
+            // var presetName = Path.GetFileNameWithoutExtension(file);
             var presetConfig = new ConfigFile(file, false)
             {
                 SaveOnConfigSet = false,

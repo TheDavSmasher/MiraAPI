@@ -56,7 +56,9 @@ public static class CustomRoleUtils
         var roleOptions = currentGameOptions.RoleOptions;
 
         var role = GetRegisteredRole(roleType);
-        var assignmentData = new RoleManager.RoleAssignmentData(role, roleOptions.GetNumPerGame(role!.Role),
+        var assignmentData = new RoleManager.RoleAssignmentData(
+            role,
+            roleOptions.GetNumPerGame(role!.Role),
             roleOptions.GetChancePerGame(role.Role));
 
         return assignmentData;

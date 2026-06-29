@@ -40,7 +40,6 @@ public static class VisorsTabPatches
         GenerateHats(tab, currentPage);
     }
 
-
     [HarmonyPatch(nameof(VisorsTab.OnEnable))]
     [HarmonyPrefix]
     public static bool OnEnablePrefix(VisorsTab __instance)

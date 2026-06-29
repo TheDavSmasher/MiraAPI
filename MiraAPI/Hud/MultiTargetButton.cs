@@ -36,8 +36,11 @@ public abstract class MultiTargetButton<T> : CustomActionButton where T : MonoBe
     /// <returns>The list of target objects.</returns>
     public abstract T[] GetTargets();
 
-    /// <inheritdoc cref="CustomActionButton{T}.SetOutline"/>
+    /// <summary>
+    /// Sets the outline of the target <typeparamref name="T"/>.
+    /// </summary>
     /// <param name="target">The target <typeparamref name="T"/> to set the oultine.</param>
+    /// <param name="active">Should the outline be active.</param>
     public abstract void SetOutline(T target, bool active);
 
     /// <inheritdoc cref="CustomActionButton{T}.CanUse"/>

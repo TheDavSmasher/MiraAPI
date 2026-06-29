@@ -43,6 +43,12 @@ public abstract class LocalSettingBase<T> : ILocalSetting
     /// <summary>
     /// Creates an instance of the setting.
     /// </summary>
+    /// <param name="toggle">Toggle option to create.</param>
+    /// <param name="slider">Slider option to create.</param>
+    /// <param name="parent">The parent options menu.</param>
+    /// <param name="offset">the Y Offset for the option in the menu.</param>
+    /// <param name="order">The order of the option.</param>
+    /// <param name="last">Whether the option is the last in a row.</param>
     /// <returns>The created setting.</returns>
     public abstract GameObject CreateOption(ToggleButtonBehaviour toggle, SlideBar slider, Transform parent, ref float offset, ref int order, bool last);
 

@@ -75,6 +75,7 @@ public class OptionPreset
     /// <summary>
     /// Resets the specified option with the preset provided.
     /// </summary>
+    /// <param name="baseOption">The option to reset.</param>
     public void ResetOption(OptionBehaviour baseOption)
     {
         var selectedOpt = Plugin.InternalOptions.First(x => x.OptionBehaviour == baseOption);
@@ -87,6 +88,7 @@ public class OptionPreset
     /// <summary>
     /// Gets whether the specified option is included in the preset.
     /// </summary>
+    /// <param name="baseOption">The option to check.</param>
     /// <returns>The value of whether the option is in the preset.</returns>
     public bool IsOptionInPreset(OptionBehaviour baseOption)
     {
