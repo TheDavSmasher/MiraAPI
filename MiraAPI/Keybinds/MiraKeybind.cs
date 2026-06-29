@@ -19,8 +19,8 @@ public class MiraKeybind : BaseKeybind
     public KeyboardKeyCode DefaultKey { get; }
 
     /// <summary>
-    /// Gets the modifier keys assigned to this keybind.
-    /// Due to Rewired limitations, there can only be 3 modifier keys.
+    /// Gets the <see cref="ModifierKey"/>s assigned to this keybind.
+    /// Due to Rewired limitations, there can only be 3 <see cref="ModifierKey"/>s.
     /// </summary>
     public ModifierKey[] ModifierKeys { get; }
 
@@ -36,7 +36,7 @@ public class MiraKeybind : BaseKeybind
     /// </summary>
     /// <param name="name">The name of the keybind.</param>
     /// <param name="defaultKeycode">The default keycode.</param>
-    /// <param name="modifierKeys">Up to 3 optional modifier keys.</param>
+    /// <param name="modifierKeys">Up to 3 optional <see cref="ModifierKey"/>s.</param>
     /// <param name="exclusive">Is exclusive.</param>
     public MiraKeybind(
         string name,

@@ -5,7 +5,7 @@ using MiraAPI.GameOptions.OptionTypes;
 namespace MiraAPI.GameOptions.Attributes;
 
 /// <summary>
-/// Attribute for a toggle option.
+/// Attribute for a <see cref="ModdedToggleOption"/>.
 /// </summary>
 /// <param name="title">The option title.</param>
 [AttributeUsage(AttributeTargets.Property)]

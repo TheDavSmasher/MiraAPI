@@ -2,6 +2,7 @@
 using HarmonyLib;
 using Innersloth.Assets;
 using MiraAPI.Utilities;
+using MiraAPI.Utilities.Assets;
 using Reactor.Utilities.Extensions;
 using System;
 using System.Collections.Generic;
@@ -44,9 +45,13 @@ public static class NameplatesTabPatches
     [HarmonyPrefix]
     public static bool OnEnablePrefix(NameplatesTab __instance)
     {
+        if (!AddressablesLoader.AddressableNameplatesExist)
+        {
+            return true;
+        }
         __instance.plateId = HatManager.Instance.GetNamePlateById(DataManager.Player.Customization.namePlate).ProdId;
 
-        if (!SortedNameplates.ContainsKey("Vanilla")) AddRange(DestroyableSingleton<HatManager>.Instance.GetUnlockedNamePlates().Select(x => ("Vanilla", x)));
+        if (!SortedNameplates.ContainsKey("Vanilla")) AddRange(HatManager.Instance.GetUnlockedNamePlates().Select(x => ("Vanilla", x)));
 
         InventoryUtility.CreateNextBackButtons(__instance, PreviousPage, NextPage);
 
@@ -60,6 +65,10 @@ public static class NameplatesTabPatches
 
     public static void UpdatePrefix(NameplatesTab __instance)
     {
+        if (!AddressablesLoader.AddressableNameplatesExist)
+        {
+            return;
+        }
         if (Input.GetKeyDown(KeyCode.LeftControl) || Input.GetKeyDown(KeyCode.RightControl) || Input.GetKeyDown(KeyCode.LeftArrow))
         {
             PreviousPage(__instance);
@@ -72,9 +81,10 @@ public static class NameplatesTabPatches
 
     private static void GenerateHats(NameplatesTab __instance, int page)
     {
-        foreach (ColorChip instanceColorChip in __instance.ColorChips) instanceColorChip.gameObject.Destroy();
+        foreach (var instanceColorChip in __instance.ColorChips) instanceColorChip.gameObject.DeepDestroy(false);
         __instance.ColorChips.Clear();
-        __instance.scroller.Inner.GetComponentsInChildren<TextMeshPro>().Do(x => x.gameObject.Destroy());
+        __instance.scroller.Inner.GetComponentsInChildren<TextMeshPro>().Do(x => x.gameObject.DeepDestroy(false));
+        Utilities.Extensions.ClearGarbageCollector();
 
         var groupNameText = __instance.GetComponentInChildren<TextMeshPro>(false);
 

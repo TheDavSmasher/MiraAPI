@@ -15,10 +15,10 @@ public abstract class LocalSettingAttribute(
     ) : Attribute
 {
     /// <summary>
-    /// Returns the created setting object.
+    /// Returns the created <see cref="ILocalSetting"/> object.
     /// </summary>
     /// <param name="tab">Gets the tab where the setting is located.</param>
     /// <param name="configEntryBase">Gets the config entry the setting is attached to.</param>
-    /// <returns>The created class.</returns>
+    /// <returns>The created <see cref="ILocalSetting"/>.</returns>
     public abstract ILocalSetting CreateSetting(Type tab, ConfigEntryBase configEntryBase);
 }

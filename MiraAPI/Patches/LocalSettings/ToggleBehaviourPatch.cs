@@ -7,7 +7,7 @@ namespace MiraAPI.Patches.LocalSettings;
 public static class ToggleBehaviourPatch
 {
     /// <summary>
-    /// ResetText was inlined ofc.
+    /// <see cref="ToggleButtonBehaviour.ResetText"/> was inlined ofc.
     /// Skill issue.
     /// </summary>
     [HarmonyPrefix]
@@ -21,8 +21,8 @@ public static class ToggleBehaviourPatch
         // Used to mask the text
         __instance.Text.richText = true;
         __instance.Text.text = $"<font=\"LiberationSans SDF\" material=\"LiberationSans SDF - Chat Message Masked\">" +
-                               $"{DestroyableSingleton<TranslationController>.Instance.GetString(__instance.BaseText)}: <b>" +
-                               $"{DestroyableSingleton<TranslationController>.Instance.GetString(__instance.onState ? StringNames.SettingsOn : StringNames.SettingsOff)}</b></font>";
+                               $"{TranslationController.Instance.GetString(__instance.BaseText)}: <b>" +
+                               $"{TranslationController.Instance.GetString(__instance.onState ? StringNames.SettingsOn : StringNames.SettingsOff)}</b></font>";
         __instance.Text.sortingOrder = 151;
         __instance.Text.renderer.sortingLayerName = "Default";
         __instance.Text.renderer.sortingOrder = 151;

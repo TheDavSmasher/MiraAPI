@@ -6,7 +6,7 @@ using MiraAPI.Utilities;
 namespace MiraAPI.LocalSettings.Attributes;
 
 /// <summary>
-/// Creates a number setting for the <see cref="ConfigEntry{T}"/>.
+/// Creates a <see cref="LocalNumberSetting"/> for the <see cref="ConfigEntry{T}"/>.
 /// </summary>
 /// <param name="min">Minimum range.</param>
 /// <param name="max">Maximum range.</param>

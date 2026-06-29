@@ -5,12 +5,12 @@ using HarmonyLib;
 namespace MiraAPI.Colors;
 
 /// <summary>
-/// Used to register and track custom colors.
+/// Used to register and track <see cref="CustomColor"/>s.
 /// </summary>
 public static class PaletteManager
 {
     /// <summary>
-    /// Gets all registered custom colors.
+    /// Gets all registered <see cref="CustomColor"/>s.
     /// </summary>
     public static CustomColor[] RegisteredColors => [.. CustomColors];
 

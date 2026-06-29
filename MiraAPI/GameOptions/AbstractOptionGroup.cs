@@ -29,9 +29,12 @@ public abstract class AbstractOptionGroup
     public virtual Type? OptionableType => null;
 
     /// <summary>
-    /// Gets a value indicating whether the group should be shown in the modifiers menu. This is deprecated, please use ParentMenu!
+    /// Gets a value indicating whether the group should be shown in the modifiers menu.
     /// </summary>
     // TODO: make this not a boolean
+#pragma warning disable S1133
+    [Obsolete("Use ParentMenu instead.")]
+#pragma warning restore S1133
     public virtual bool ShowInModifiersMenu => false;
 
     /// <summary>
@@ -45,13 +48,13 @@ public abstract class AbstractOptionGroup
     public virtual Func<bool> GroupVisible => () => true;
 
     /// <summary>
-    /// Gets the group color. This is used to color the group in the options menu.
+    /// Gets the group <see cref="Color"/>. This is used to color the group in the options menu.
     /// </summary>
     public virtual Color GroupColor => MiraApiPlugin.DefaultHeaderColor;
 
     /// <summary>
     /// Gets the group priority. This is used to determine the order in which groups are displayed in the options menu.
-    /// Zero is the highest priority, and the default value is the max uint value.
+    /// Zero is the highest priority, and the default value is the max <see langword="uint"/> value.
     /// </summary>
     public virtual uint GroupPriority => uint.MaxValue;
 
@@ -90,11 +93,33 @@ public abstract class AbstractOptionGroup<T> : AbstractOptionGroup where T : IOp
     }
 }
 
+/// <summary>
+/// Menu categories for option groups.
+/// </summary>
 public enum MenuCategory
 {
+    /// <summary>
+    /// Determines the option group is in the game settings tab.
+    /// </summary>
     Game,
+
+    /// <summary>
+    /// Determines the option group is in the role settings tab.
+    /// </summary>
     Roles,
+
+    /// <summary>
+    /// Determines the option group is in the modifier settings tab.
+    /// </summary>
     Modifiers,
+
+    /// <summary>
+    /// Determines the option group is in the first custom settings tab.
+    /// </summary>
     CustomOne,
-    CustomTwo
+
+    /// <summary>
+    /// Determines the option group is in the second custom settings tab.
+    /// </summary>
+    CustomTwo,
 }

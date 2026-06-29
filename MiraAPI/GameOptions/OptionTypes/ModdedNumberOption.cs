@@ -237,7 +237,7 @@ public class ModdedNumberOption : ModdedOption<float>
     }
 
     /// <summary>
-    /// Implicitly converts the option to an int.
+    /// Implicitly converts the option to an <see langword="int"/>.
     /// </summary>
     /// <param name="option">The option.</param>
     /// <returns>Integer value.</returns>

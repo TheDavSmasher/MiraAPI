@@ -132,7 +132,7 @@ public static class LobbyViewPanePatches
         ModifiersTabButton?.SelectButton(true);
 
         var filteredGroups = SelectedMod.InternalOptionGroups
-            .Where(x => x.GroupVisible() && (x.ShowInModifiersMenu || (x.OptionableType != null && x.OptionableType.IsAssignableTo(typeof(BaseModifier)))));
+            .Where(x => x.GroupVisible() && (x.ParentMenu is MenuCategory.Modifiers || (x.OptionableType != null && x.OptionableType.IsAssignableTo(typeof(BaseModifier)))));
 
         DrawOptions(__instance, filteredGroups);
     }
@@ -152,7 +152,7 @@ public static class LobbyViewPanePatches
         }
 
         var filteredGroups = SelectedMod.InternalOptionGroups
-            .Where(x => x is { ShowInModifiersMenu: false, OptionableType: null } && x.GroupVisible());
+            .Where(x => x is { ParentMenu: not MenuCategory.Modifiers, OptionableType: null } && x.GroupVisible());
 
         DrawOptions(__instance, filteredGroups);
         return false;

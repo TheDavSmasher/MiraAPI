@@ -13,17 +13,17 @@ using Random = System.Random;
 namespace MiraAPI.Modifiers;
 
 /// <summary>
-/// The manager for handling modifiers.
+/// The manager for handling <see cref="BaseModifier"/>s.
 /// </summary>
 public static class ModifierManager
 {
     /// <summary>
-    /// Gets or sets a value indicating whether modifiers should be assigned to players.
+    /// Gets or sets a value indicating whether <see cref="BaseModifier"/>s should be assigned to players.
     /// </summary>
     public static bool MiraAssignsModifiers { get; set; } = true;
 
     /// <summary>
-    /// Gets the list of all registered modifiers.
+    /// Gets the list of all registered <see cref="BaseModifier"/>s.
     /// </summary>
     public static IReadOnlyList<BaseModifier> Modifiers { get; internal set; } = [];
 

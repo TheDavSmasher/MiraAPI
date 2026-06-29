@@ -1,7 +1,7 @@
 ﻿namespace MiraAPI.Events.Vanilla.Gameplay;
 
 /// <summary>
-/// Invoked before RpcEndGame is called, allowing cancellation of the game end entirely.
+/// Invoked before <see cref="GameManager.RpcEndGame"/> is called, allowing cancellation of the game end entirely.
 /// </summary>
 public class BeforeGameEndEvent : MiraCancelableEvent
 {

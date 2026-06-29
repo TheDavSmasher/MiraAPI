@@ -6,7 +6,7 @@ namespace MiraAPI.Roles;
 /// Represents a group of roles.
 /// </summary>
 /// <param name="Name">The group's name.</param>
-/// <param name="Color">The group's color.</param>
+/// <param name="Color">The group's <see cref="Color"/>.</param>
 /// <param name="Priority">The priority to sort by on role setting screen. Negative means first.</param>
 public record struct RoleOptionsGroup(string Name, Color Color, int Priority = 0)
 {

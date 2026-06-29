@@ -25,6 +25,26 @@ public static class AddressablesLoader
     private static readonly List<string> RegisteredSkinKeys = [];
 
     /// <summary>
+    /// Gets a value indicating whether hats have been loaded by the addressables system.
+    /// </summary>
+    public static bool AddressableHatsExist { get; private set; }
+
+    /// <summary>
+    /// Gets a value indicating whether visors have been loaded by the addressables system.
+    /// </summary>
+    public static bool AddressableVisorsExist { get; private set; }
+
+    /// <summary>
+    /// Gets a value indicating whether nameplates have been loaded by the addressables system.
+    /// </summary>
+    public static bool AddressableNameplatesExist { get; private set; }
+
+    /// <summary>
+    /// Gets a value indicating whether skins have been loaded by the addressables system.
+    /// </summary>
+    public static bool AddressableSkinsExist { get; private set; }
+
+    /// <summary>
     /// Registers a specific addressables package to load asynchronously at the start of the game, when possible.
     /// </summary>
     /// <param name="location">The location, remote or otherwise, of the addressables.</param>
@@ -52,6 +72,7 @@ public static class AddressablesLoader
             return;
         }
 
+        AddressableHatsExist = true;
         RegisteredHatKeys.Add(addressablesKey);
     }
 
@@ -67,6 +88,7 @@ public static class AddressablesLoader
             return;
         }
 
+        AddressableSkinsExist = true;
         RegisteredSkinKeys.Add(addressablesKey);
     }
 
@@ -83,6 +105,7 @@ public static class AddressablesLoader
             return;
         }
 
+        AddressableNameplatesExist = true;
         RegisteredNameplateKeys.Add((addressablesKey, groupTitle));
     }
 
@@ -99,6 +122,7 @@ public static class AddressablesLoader
             return;
         }
 
+        AddressableVisorsExist = true;
         RegisteredVisorKeys.Add((addressablesKey, groupTitle));
     }
 
@@ -142,29 +166,33 @@ public static class AddressablesLoader
         while (!AmongUsClient.Instance || CatalogLocations.Select(x=>x.Location).Any(x=>!LoadedLocations.Contains(x))) yield return null;
 
         var hatBehaviours = DiscoverData<HatData>(RegisteredHatKeys);
+        hatBehaviours = hatBehaviours.OrderBy(x => x.StoreName).ToList();
         var skinBehaviours = DiscoverData<SkinData>(RegisteredSkinKeys);
+        skinBehaviours = skinBehaviours.OrderBy(x => x.StoreName).ToList();
         var namePlateBehaviours = DiscoverAndReportData<NamePlateData>(RegisteredNameplateKeys);
+        namePlateBehaviours = namePlateBehaviours.OrderBy(x => x.Category).ToList();
         var visorBehaviours = DiscoverAndReportData<VisorData>(RegisteredVisorKeys);
+        visorBehaviours = visorBehaviours.OrderBy(x => x.Category).ToList();
 
         var hatData = new List<HatData>();
-        hatData.AddRange(DestroyableSingleton<HatManager>.Instance.allHats);
+        hatData.AddRange(HatManager.Instance.allHats);
         hatData.ForEach(x => x.StoreName = "Vanilla");
-        DestroyableSingleton<HatManager>.Instance.allHats = PrepareArray(hatData, hatBehaviours);
+        HatManager.Instance.allHats = PrepareArray(hatData, hatBehaviours);
 
         var skinData = new List<SkinData>();
-        skinData.AddRange(DestroyableSingleton<HatManager>.Instance.allSkins);
+        skinData.AddRange(HatManager.Instance.allSkins);
         skinData.ForEach(x => x.StoreName = "Vanilla");
-        DestroyableSingleton<HatManager>.Instance.allSkins = PrepareArray(skinData, skinBehaviours);
+        HatManager.Instance.allSkins = PrepareArray(skinData, skinBehaviours);
 
         var visorData = new List<VisorData>();
-        visorData.AddRange(DestroyableSingleton<HatManager>.Instance.allVisors);
+        visorData.AddRange(HatManager.Instance.allVisors);
         VisorsTabPatches.AddRange(visorBehaviours);
-        DestroyableSingleton<HatManager>.Instance.allVisors = PrepareArray(visorData, visorBehaviours.Select(x=>x.Data).ToList());
+        HatManager.Instance.allVisors = PrepareArray(visorData, visorBehaviours.Select(x=>x.Data).ToList());
 
         var namePlateData = new List<NamePlateData>();
-        namePlateData.AddRange(DestroyableSingleton<HatManager>.Instance.allNamePlates);
+        namePlateData.AddRange(HatManager.Instance.allNamePlates);
         NameplatesTabPatches.AddRange(namePlateBehaviours);
-        DestroyableSingleton<HatManager>.Instance.allNamePlates = PrepareArray(namePlateData, namePlateBehaviours.Select(x => x.Data).ToList());
+        HatManager.Instance.allNamePlates = PrepareArray(namePlateData, namePlateBehaviours.Select(x => x.Data).ToList());
     }
 
     private static T[] PrepareArray<T>(List<T> data, List<T> behaviours) where T : CosmeticData

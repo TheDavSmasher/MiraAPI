@@ -7,7 +7,7 @@ namespace MiraAPI.Patches.Roles;
 public static class SabotageButtonPatch
 {
     /// <summary>
-    /// Patches the Sabotage button to check if the player's custom role can use sabotage.
+    /// Patches the <see cref="SabotageButton"/> to check if the player's custom role can use sabotage.
     /// </summary>
     [HarmonyPatch(nameof(SabotageButton.DoClick))]
     [HarmonyPrefix]

@@ -8,7 +8,7 @@ using MiraAPI.Utilities;
 namespace MiraAPI.Modifiers;
 
 /// <summary>
-/// Factory for creating instances of a modifier. More efficient than using reflection.
+/// Factory for creating instances of a <see cref="BaseModifier"/>. More efficient than using reflection.
 /// </summary>
 public static class ModifierFactory
 {
@@ -39,11 +39,11 @@ public static class ModifierFactory
     }
 
     /// <summary>
-    /// Creates a modifier with the specified type and arguments.
+    /// Creates a <see cref="BaseModifier"/> with the specified type and arguments.
     /// </summary>
     /// <param name="type">Modifier type.</param>
     /// <param name="args">Arguments.</param>
-    /// <returns>An instance of the modifier.</returns>
+    /// <returns>An instance of the <see cref="BaseModifier"/>.</returns>
     public static BaseModifier CreateInstance(Type type, params object[] args)
     {
         var argTypes = args.Select(arg => arg.GetType()).ToArray();
@@ -60,9 +60,9 @@ public static class ModifierFactory
 }
 
 /// <summary>
-/// Factory for creating instances of a modifier. More efficient than using reflection.
+/// Factory for creating instances of <typeparamref name="T"/>. More efficient than using reflection.
 /// </summary>
-/// <typeparam name="T">The modifier type.</typeparam>
+/// <typeparam name="T">The <see cref="BaseModifier"/> type.</typeparam>
 public static class ModifierFactory<T> where T : BaseModifier
 {
     private static readonly Func<object[], T> Constructor = CreateConstructor();
@@ -92,10 +92,10 @@ public static class ModifierFactory<T> where T : BaseModifier
     }
 
     /// <summary>
-    /// Creates an instance of the modifier.
+    /// Creates an instance of <typeparamref name="T"/>.
     /// </summary>
     /// <param name="args">Parameters for the constructor.</param>
-    /// <returns>An instance of the modifier.</returns>
+    /// <returns>An instance of <typeparamref name="T"/>.</returns>
     [SuppressMessage("Design", "CA1000:Do not declare static members on generic types", Justification = "This is a factory class.")]
     public static T CreateInstance(params object[] args)
     {

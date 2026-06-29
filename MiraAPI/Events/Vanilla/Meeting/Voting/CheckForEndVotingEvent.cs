@@ -18,7 +18,7 @@ public class CheckForEndVotingEvent : MiraCancelableEvent
     /// <summary>
     /// Initializes a new instance of the <see cref="CheckForEndVotingEvent"/> class.
     /// </summary>
-    /// <param name="isVotingComplete">>True if voting is complete, false otherwise.</param>
+    /// <param name="isVotingComplete"><see langword="true"/> if voting is complete, <see langword="false"/> otherwise.</param>
     public CheckForEndVotingEvent(bool isVotingComplete)
     {
         IsVotingComplete = isVotingComplete;

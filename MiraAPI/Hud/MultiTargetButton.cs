@@ -6,7 +6,7 @@ using UnityEngine;
 namespace MiraAPI.Hud;
 
 /// <summary>
-/// Custom action button that has multiple target objects.
+/// <see cref="CustomActionButton"/> that has multiple target objects.
 /// </summary>
 /// <typeparam name="T">The type of the target objects.</typeparam>
 public abstract class MultiTargetButton<T> : CustomActionButton where T : MonoBehaviour
@@ -36,8 +36,11 @@ public abstract class MultiTargetButton<T> : CustomActionButton where T : MonoBe
     /// <returns>The list of target objects.</returns>
     public abstract T[] GetTargets();
 
-    /// <inheritdoc cref="CustomActionButton{T}.SetOutline"/>
-    /// <param name="target">The target object to set the oultine.</param>
+    /// <summary>
+    /// Sets the outline of the target <typeparamref name="T"/>.
+    /// </summary>
+    /// <param name="target">The target <typeparamref name="T"/> to set the oultine.</param>
+    /// <param name="active">Should the outline be active.</param>
     public abstract void SetOutline(T target, bool active);
 
     /// <inheritdoc cref="CustomActionButton{T}.CanUse"/>

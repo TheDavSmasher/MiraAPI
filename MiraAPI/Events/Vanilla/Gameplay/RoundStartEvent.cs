@@ -1,12 +1,13 @@
 ﻿namespace MiraAPI.Events.Vanilla.Gameplay;
 
 /// <summary>
-/// Start Round event, invoked on IntroCutscene.OnDestroy and ExileController.WrapUp if the event isn't cancelled.
+/// Start Round event, invoked on <see cref="IntroCutscene.OnDestroy"/> and <see cref="ExileController.WrapUp"/>
+/// if the <see cref="BeforeRoundStartEvent"/> isn't cancelled.
 /// </summary>
 public class RoundStartEvent : MiraEvent
 {
     /// <summary>
-    /// Gets a value indicating whether the event was triggered by the IntroCutscene or ExileController.
+    /// Gets a value indicating whether the event was triggered by the <see cref="IntroCutscene"/> or <see cref="ExileController"/>.
     /// </summary>
     public bool TriggeredByIntro { get; }
 

@@ -6,14 +6,14 @@
 public class EjectionEvent : MiraEvent
 {
     /// <summary>
-    /// Gets the instance of the ExileController.
+    /// Gets the <see cref="global::ExileController"/> instance.
     /// </summary>
     public ExileController ExileController { get; }
 
     /// <summary>
     /// Initializes a new instance of the <see cref="EjectionEvent"/> class.
     /// </summary>
-    /// <param name="controller">The exile controller.</param>
+    /// <param name="controller">The <see cref="global::ExileController"/> instance.</param>
     public EjectionEvent(ExileController controller)
     {
         ExileController = controller;

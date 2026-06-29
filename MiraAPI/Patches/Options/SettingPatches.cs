@@ -17,10 +17,10 @@ public static class SettingPatches
     /// <summary>
     /// Prefix for the <see cref="FloatGameSetting.GetValueString"/> method. Adds support for custom number suffixes.
     /// </summary>
-    /// <param name="__instance">The FloatGameSetting instance.</param>
-    /// <param name="__result">The result of the GetValueString method.</param>
-    /// <param name="value">The float value.</param>
-    /// <returns>False to skip original method.</returns>
+    /// <param name="__instance">The <see cref="FloatGameSetting"/> instance.</param>
+    /// <param name="__result">The result of the <see cref="FloatGameSetting.GetValueString"/> method.</param>
+    /// <param name="value">The <see langword="float"/> value.</param>
+    /// <returns><see langword="false"/> to skip original method.</returns>
     [HarmonyPrefix]
     [HarmonyPatch(typeof(FloatGameSetting), nameof(FloatGameSetting.GetValueString))]
     public static bool ValueStringPatch(

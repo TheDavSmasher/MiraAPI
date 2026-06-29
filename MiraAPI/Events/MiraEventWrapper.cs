@@ -3,7 +3,7 @@
 namespace MiraAPI.Events;
 
 /// <summary>
-/// Wrapper for event handlers.
+/// Wrapper for <see cref="MiraEvent"/> handlers.
 /// </summary>
 public class MiraEventWrapper
 {

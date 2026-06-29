@@ -15,9 +15,9 @@ using UnityEngine.Events;
 namespace MiraAPI.Hud;
 
 /// <summary>
-/// Custom Player Menu using the ShapeshifterPanel as a base.
+/// Custom Player Menu using the <see cref="ShapeshifterPanel"/> as a base.
 /// </summary>
-/// <param name="il2CppPtr">Used by Il2Cpp. Do not use constructor, this is a MonoBehaviour.</param>
+/// <param name="il2CppPtr">Used by Il2Cpp. Do not use constructor, this is a <see cref="MonoBehaviour"/>.</param>
 [RegisterInIl2Cpp]
 [SuppressMessage("Design", "CA1051:Do not declare visible instance fields", Justification = "Unity Convention")]
 [SuppressMessage("StyleCop.CSharp.NamingRules", "SA1307:Accessible fields should begin with upper-case letter", Justification = "Unity Convention")]
@@ -34,9 +34,9 @@ public class CustomPlayerMenu(IntPtr il2CppPtr) : Minigame(il2CppPtr)
     public List<ShapeshifterPanel> potentialVictims;
 
     /// <summary>
-    /// Creates a CustomPlayerMenu.
+    /// Creates a <see cref="CustomPlayerMenu"/>.
     /// </summary>
-    /// <returns>New CustomPlayerMenu object.</returns>
+    /// <returns>New <see cref="CustomPlayerMenu"/> object.</returns>
     public static CustomPlayerMenu Create()
     {
         var shapeShifterRole = RoleManager.Instance.GetRole(RoleTypes.Shapeshifter);
@@ -84,7 +84,7 @@ public class CustomPlayerMenu(IntPtr il2CppPtr) : Minigame(il2CppPtr)
     /// Begins/opens the custom player menu.
     /// </summary>
     /// <param name="playerMatch">Function to determine if player should show in the custom menu.</param>
-    /// <param name="onClick">Onclick action for player.</param>
+    /// <param name="onClick"><see cref="PassiveButton.OnClick"/> action for player.</param>
     [HideFromIl2Cpp]
     public void Begin(Func<PlayerControl, bool> playerMatch, Action<PlayerControl?> onClick)
     {
@@ -96,7 +96,7 @@ public class CustomPlayerMenu(IntPtr il2CppPtr) : Minigame(il2CppPtr)
             onClick(null);
         }));
 
-        DestroyableSingleton<DebugAnalytics>.Instance.Analytics.MinigameOpened(PlayerControl.LocalPlayer.Data, TaskType);
+        DebugAnalytics.Instance.Analytics.MinigameOpened(PlayerControl.LocalPlayer.Data, TaskType);
         var list = PlayerControl.AllPlayerControls.ToArray().Where(playerMatch).ToList();
         potentialVictims = [];
         var list2 = new Il2CppSystem.Collections.Generic.List<UiElement>();

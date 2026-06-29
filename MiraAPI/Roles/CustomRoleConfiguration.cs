@@ -24,7 +24,7 @@ public record struct CustomRoleConfiguration
     /// <summary>
     /// Initializes a new instance of the <see cref="CustomRoleConfiguration"/> struct.
     /// </summary>
-    /// <param name="role">The role in which you are configuring.</param>
+    /// <param name="role">The <see cref="ICustomRole"/> in which you are configuring.</param>
     public CustomRoleConfiguration(ICustomRole role)
     {
         var roleBehaviour = role as RoleBehaviour;
@@ -76,13 +76,13 @@ public record struct CustomRoleConfiguration
     public bool CanModifyChance { get; set; } = true;
 
     /// <summary>
-    /// Gets or sets the Sprite used for the Role Options menu screenshot.
+    /// Gets or sets the <see cref="Sprite"/> used for the Role Options menu screenshot.
     /// </summary>
     [HideFromIl2Cpp]
     public LoadableAsset<Sprite>? OptionsScreenshot { get; set; } = null;
 
     /// <summary>
-    /// Gets or sets the Sprite used for the Role Icon.
+    /// Gets or sets the <see cref="Sprite"/> used for the Role Icon.
     /// </summary>
     [HideFromIl2Cpp]
     public LoadableAsset<Sprite>? Icon { get; set; } = null;
@@ -109,9 +109,14 @@ public record struct CustomRoleConfiguration
     public bool UseVanillaKillButton { get; set; }
 
     /// <summary>
-    /// Gets or sets a value indicating whether the role can use vents.
+    /// Gets or sets a value indicating whether the role can use <see cref="Vent"/>s. Also sends vanilla <see cref="Vent"/> data.
     /// </summary>
     public bool CanUseVent { get; set; }
+
+    /// <summary>
+    /// Gets or sets a value indicating whether the role can receive vanilla <see cref="Vent"/> data.
+    /// </summary>
+    public bool GetsVentData { get; set; }
 
     /// <summary>
     /// Gets or sets a value indicating whether the role can use the sabotage button.
@@ -139,12 +144,12 @@ public record struct CustomRoleConfiguration
     public string FreeplayFolder { get; set; }
 
     /// <summary>
-    /// Gets or sets the outline color for the KillButton if <see cref="UseVanillaKillButton"/> is true.
+    /// Gets or sets the outline <see cref="Color"/> for the <see cref="KillButton"/> if <see cref="UseVanillaKillButton"/> is <see langword="true"/>.
     /// </summary>
     public Color KillButtonOutlineColor { get; set; }
 
     /// <summary>
-    /// Gets or sets the role hint style. See <see cref="RoleHintType"/> enum for all options.
+    /// Gets or sets the role hint style. See <see cref="RoleHintType"/> <see langword="enum"/> for all options.
     /// </summary>
     public RoleHintType RoleHintType { get; set; } = RoleHintType.RoleTab;
 

@@ -1,12 +1,14 @@
 ﻿using HarmonyLib;
 using InnerNet;
 using MiraAPI.Roles;
+using MiraAPI.Utilities;
 using Reactor.Utilities.Extensions;
+using UnityEngine;
 
 namespace MiraAPI.Patches.Roles;
 
 /// <summary>
-/// HudManager patches for roles.
+/// <see cref="HudManager"/> patches for roles.
 /// </summary>
 [HarmonyPatch(typeof(HudManager))]
 public static class HudManagerPatches
@@ -15,11 +17,11 @@ public static class HudManagerPatches
     public static TaskPanelBehaviour? RoleTab;
 
     /// <summary>
-    /// Fixes Kill Button not showing for Neutral killing role.
+    /// Fixes <see cref="HudManager.KillButton"/> not showing for Neutral killing role.
     /// </summary>
-    /// <param name="__instance">HudManager instance.</param>
-    /// <param name="localPlayer">The local PlayerControl.</param>
-    /// <param name="role">The player's RoleBehaviour.</param>
+    /// <param name="__instance"><see cref="HudManager"/> instance.</param>
+    /// <param name="localPlayer">The local <see cref="PlayerControl"/>.</param>
+    /// <param name="role">The player's <see cref="RoleBehaviour"/>.</param>
     /// <param name="isActive">Whether the Hud should be set active or not.</param>
     [HarmonyPostfix]
     [HarmonyPatch(nameof(HudManager.SetHudActive), typeof(PlayerControl), typeof(RoleBehaviour), typeof(bool))]
@@ -69,9 +71,10 @@ public static class HudManagerPatches
 
             CustomRoleManager.UpdateRoleTab(RoleTab, customRole);
         }
-        else if (RoleTab)
+        else if (RoleTab != null)
         {
-            RoleTab?.gameObject.Destroy();
+            RoleTab.gameObject.DeepDestroy();
+            RoleTab = null;
         }
     }
 }

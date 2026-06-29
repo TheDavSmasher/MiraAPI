@@ -4,6 +4,7 @@ using System.Linq;
 using HarmonyLib;
 using Il2CppInterop.Runtime.Attributes;
 using MiraAPI.LocalSettings;
+using MiraAPI.Utilities;
 using MiraAPI.Utilities.Assets;
 using Reactor.Utilities.Attributes;
 using Reactor.Utilities.Extensions;
@@ -15,13 +16,13 @@ using UnityEngine.UI;
 namespace MiraAPI.Modifiers.ModifierDisplay;
 
 /// <summary>
-/// The code used to display Mira modifiers.
+/// The code used to display <see cref="BaseModifier"/>s.
 /// </summary>
 [RegisterInIl2Cpp]
 public class ModifierDisplayComponent(nint cppPtr) : MonoBehaviour(cppPtr)
 {
     /// <summary>
-    /// Gets the instance of the Modifier Display.
+    /// Gets the instance of the <see cref="ModifierDisplayComponent"/>.
     /// </summary>
     public static ModifierDisplayComponent? Instance { get; private set; }
 
@@ -41,7 +42,7 @@ public class ModifierDisplayComponent(nint cppPtr) : MonoBehaviour(cppPtr)
     private readonly Dictionary<BaseModifier, ModifierUiComponent> _modifiers = [];
 
     /// <summary>
-    /// Gets a read only dictionary of the created modifier UI components.
+    /// Gets a <see cref="ReadOnlyDictionary{TKey, TValue}"/> of the created <see cref="ModifierUiComponent"/>s.
     /// </summary>
     [HideFromIl2Cpp]
     public ReadOnlyDictionary<BaseModifier, ModifierUiComponent> Modifiers => new(_modifiers);
@@ -108,7 +109,7 @@ public class ModifierDisplayComponent(nint cppPtr) : MonoBehaviour(cppPtr)
     }
 
     /// <summary>
-    /// Use this to refresh the modifiers UI. Useful if you hide modifiers uis based on options.
+    /// Use this to refresh the modifiers UI. Useful if you hide modifiers UIs based on options.
     /// </summary>
     public void RefreshModifiers()
     {
@@ -137,7 +138,7 @@ public class ModifierDisplayComponent(nint cppPtr) : MonoBehaviour(cppPtr)
     internal void DestroyComponent(ModifierUiComponent component)
     {
         _modifiers.Remove(component.Modifier!);
-        component.gameObject.DestroyImmediate();
+        component.gameObject.DeepDestroy();
         RefreshModifiers();
     }
 
@@ -207,7 +208,7 @@ public class ModifierDisplayComponent(nint cppPtr) : MonoBehaviour(cppPtr)
                 continue;
             }
 
-            mod.Value.gameObject.Destroy();
+            mod.Value.gameObject.DeepDestroy();
             _modifiers.Remove(mod.Key);
         }
 

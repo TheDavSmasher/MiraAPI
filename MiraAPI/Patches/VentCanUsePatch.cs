@@ -8,7 +8,7 @@ using UnityEngine;
 namespace MiraAPI.Patches;
 
 /// <summary>
-/// Used to change vent behaviour for the event system, custom roles, and modifiers.
+/// Used to change <see cref="Vent"/> behaviour for the <see cref="MiraEvent"/> system, <see cref="ICustomRole"/>s, and <see cref="BaseModifier"/>s.
 /// </summary>
 [HarmonyPatch(typeof(Vent), nameof(Vent.CanUse))]
 internal static class VentCanUsePatch
@@ -28,7 +28,7 @@ internal static class VentCanUsePatch
         var @object = pc.Object;
         var role = @object.Data.Role;
 
-        var canVent = role is ICustomRole customRole ? customRole.Configuration.CanUseVent : role.CanVent;
+        var canVent = role is ICustomRole customRole ? customRole.Configuration.CanUseVent || customRole.Configuration.GetsVentData : role.CanVent;
         couldUse = canVent;
 
         var modifiers = @object.GetModifierComponent().ActiveModifiers;

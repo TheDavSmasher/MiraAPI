@@ -9,7 +9,7 @@ using UnityEngine;
 namespace MiraAPI;
 
 /// <summary>
-/// Mira API Config File Handler.
+/// Mira API <see cref="ConfigFile"/> Handler.
 /// </summary>
 public class MiraApiSettings(ConfigFile config) : LocalSettingsTab(config)
 {

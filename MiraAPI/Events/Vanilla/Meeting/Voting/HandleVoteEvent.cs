@@ -5,12 +5,12 @@ namespace MiraAPI.Events.Vanilla.Meeting.Voting;
 /// <summary>
 /// The event that is invoked when Mira handles a vote. This is invoked before Mira's behaviour, so be cautious.
 /// If you intend on adding custom vote behaviour, cancel the event and do so.
-/// If you are NOT canceling the event, keep in mind that Mira automatically removes a vote and adds the suspect to the VotedPlayers list after this event is invoked.
+/// If you are NOT canceling the event, keep in mind that Mira automatically removes a vote and adds the suspect to the <see cref="PlayerVoteData.Votes"/> list after this event is invoked.
 /// </summary>
 public class HandleVoteEvent : MiraCancelableEvent
 {
     /// <summary>
-    /// Gets the instance of the voter's vote data.
+    /// Gets the instance of the voter's <see cref="PlayerVoteData"/>.
     /// </summary>
     public PlayerVoteData VoteData { get; }
 
@@ -30,14 +30,14 @@ public class HandleVoteEvent : MiraCancelableEvent
     public bool PreventVote { get; }
 
     /// <summary>
-    /// Gets the player info of the target.
+    /// Gets the <see cref="NetworkedPlayerInfo"/> of the target.
     /// </summary>
     public NetworkedPlayerInfo TargetPlayerInfo { get; }
 
     /// <summary>
     /// Initializes a new instance of the <see cref="HandleVoteEvent"/> class.
     /// </summary>
-    /// <param name="playerVoteData">The voter's data.</param>
+    /// <param name="playerVoteData">The voter's <see cref="PlayerVoteData"/>.</param>
     /// <param name="targetId">The target's playerId.</param>
     public HandleVoteEvent(PlayerVoteData playerVoteData, byte targetId)
     {

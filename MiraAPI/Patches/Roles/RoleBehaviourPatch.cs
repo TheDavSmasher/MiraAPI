@@ -8,7 +8,7 @@ namespace MiraAPI.Patches.Roles;
 public static class RoleBehaviourPatch
 {
     /// <summary>
-    /// Update TeamColor text for Mira roles.
+    /// Update <see cref="RoleBehaviour.TeamColor"/> text for <see cref="ICustomRole"/>s.
     /// </summary>
     [HarmonyPrefix]
     [HarmonyPatch(nameof(RoleBehaviour.TeamColor), MethodType.Getter)]

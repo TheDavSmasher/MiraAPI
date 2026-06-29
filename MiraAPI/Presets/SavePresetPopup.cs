@@ -26,7 +26,7 @@ public class SavePresetPopup(nint cppPtr) : Minigame(cppPtr)
     // Cleanup holder object
     public void OnDestroy()
     {
-        transform.parent.gameObject.Destroy();
+        transform.parent.gameObject.DeepDestroy();
     }
 
     public override void Close()

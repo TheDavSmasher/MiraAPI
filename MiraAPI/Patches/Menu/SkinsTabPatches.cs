@@ -1,6 +1,7 @@
 ﻿using AmongUs.Data;
 using HarmonyLib;
 using MiraAPI.Utilities;
+using MiraAPI.Utilities.Assets;
 using Reactor.Utilities.Extensions;
 using System;
 using System.Collections.Generic;
@@ -36,6 +37,10 @@ public static class SkinsTabPatches
     [HarmonyPrefix]
     public static bool OnEnablePrefix(SkinsTab __instance)
     {
+        if (!AddressablesLoader.AddressableSkinsExist)
+        {
+            return true;
+        }
         __instance.skinId = HatManager.Instance.GetSkinById(DataManager.Player.Customization.Skin).ProdId;
         var allSkins = HatManager.Instance.GetUnlockedSkins().ToImmutableList();
 
@@ -62,6 +67,10 @@ public static class SkinsTabPatches
 
     public static void UpdatePrefix(SkinsTab __instance)
     {
+        if (!AddressablesLoader.AddressableSkinsExist)
+        {
+            return;
+        }
         if (Input.GetKeyDown(KeyCode.LeftControl) || Input.GetKeyDown(KeyCode.RightControl) || Input.GetKeyDown(KeyCode.LeftArrow))
         {
             PreviousPage(__instance);
@@ -74,9 +83,10 @@ public static class SkinsTabPatches
 
     private static void GenerateHats(SkinsTab __instance, int page)
     {
-        foreach (ColorChip instanceColorChip in __instance.ColorChips) instanceColorChip.gameObject.Destroy();
+        foreach (var instanceColorChip in __instance.ColorChips) instanceColorChip.gameObject.DeepDestroy(false);
         __instance.ColorChips.Clear();
-        __instance.scroller.Inner.GetComponentsInChildren<TextMeshPro>().Do(x => x.gameObject.Destroy());
+        __instance.scroller.Inner.GetComponentsInChildren<TextMeshPro>().Do(x => x.gameObject.DeepDestroy(false));
+        Utilities.Extensions.ClearGarbageCollector();
 
         var groupNameText = __instance.GetComponentInChildren<TextMeshPro>(false);
 

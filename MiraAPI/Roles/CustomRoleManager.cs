@@ -37,17 +37,17 @@ public static class CustomRoleManager
         CustomRoleUtils.GetIntroSound(RoleTypes.Impostor)!;
 
     /// <summary>
-    /// Gets the list of all roles from vanilla RoleManager.
+    /// Gets the array of all roles from vanilla <see cref="RoleManager"/>.
     /// </summary>
     public static RoleBehaviour[] AllRoles => RoleManager.Instance.AllRoles.ToArray();
 
     /// <summary>
-    /// Gets the list of custom roles as RoleBehaviour objects.
+    /// Gets the <see cref="IReadOnlyList{T}"/> of custom roles as <see cref="RoleBehaviour"/> objects.
     /// </summary>
     public static IReadOnlyList<RoleBehaviour> CustomRoleBehaviours { get; private set; } = [];
 
     /// <summary>
-    /// Gets the list of custom roles as ICustomRole objects.
+    /// Gets the <see cref="IReadOnlyList{T}"/> of custom roles as <see cref="ICustomRole"/> objects.
     /// </summary>
     public static IReadOnlyList<ICustomRole> CustomMiraRoles { get; private set; } = [];
 
@@ -139,7 +139,7 @@ public static class CustomRoleManager
         roleBehaviour.CanBeKilled = customRole.Configuration.CanGetKilled;
         roleBehaviour.CanUseKillButton = customRole.Configuration.UseVanillaKillButton;
         roleBehaviour.TasksCountTowardProgress = customRole.Configuration.TasksCountForProgress;
-        roleBehaviour.CanVent = customRole.Configuration.CanUseVent;
+        roleBehaviour.CanVent = customRole.Configuration.CanUseVent || customRole.Configuration.GetsVentData;
         roleBehaviour.DefaultGhostRole = customRole.Configuration.GhostRole;
         roleBehaviour.MaxCount = customRole.Configuration.MaxRoleCount;
         roleBehaviour.RoleScreenshot = customRole.Configuration.OptionsScreenshot?.LoadAsset();
@@ -195,19 +195,19 @@ public static class CustomRoleManager
     /// <summary>
     /// Finds the parent mod of a custom role.
     /// </summary>
-    /// <param name="role">The ICustomRole object.</param>
-    /// <returns>A MiraPluginInfo object representing the parent mod of the role.</returns>
+    /// <param name="role">The <see cref="ICustomRole"/> object.</param>
+    /// <returns>A <see cref="MiraPluginInfo"/> object representing the parent mod of the role.</returns>
     public static MiraPluginInfo FindParentMod(ICustomRole role)
     {
         return MiraPluginManager.Instance.RegisteredPlugins.First(plugin => plugin.InternalRoles.ContainsValue(role as RoleBehaviour ?? throw new InvalidOperationException()));
     }
 
     /// <summary>
-    /// Gets a custom role behaviour by role type.
+    /// Gets a custom role behaviour by <see cref="RoleTypes"/>.
     /// </summary>
-    /// <param name="roleType">The role type enum.</param>
-    /// <param name="result">The ICustomRole result.</param>
-    /// <returns>True if the role was found.</returns>
+    /// <param name="roleType">The <see cref="RoleTypes"/> <see langword="enum"/>.</param>
+    /// <param name="result">The <see cref="ICustomRole"/> result.</param>
+    /// <returns><see langword="true"/> if the role was found.</returns>
     public static bool GetCustomRoleBehaviour(RoleTypes roleType, out ICustomRole? result)
     {
         CustomRoles.TryGetValue((ushort)roleType, out var temp);

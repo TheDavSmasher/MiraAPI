@@ -5,7 +5,7 @@ using MiraAPI.Events.Vanilla.Map;
 namespace MiraAPI.Patches.Events;
 
 /// <summary>
-/// Patch for map related MiraEvents.
+/// Patch for <see cref="MapBehaviour"/> related <see cref="MiraEvent"/>s.
 /// </summary>
 [HarmonyPatch]
 public static class MapBehaviourPatches

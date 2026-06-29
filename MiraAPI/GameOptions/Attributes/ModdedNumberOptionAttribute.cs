@@ -6,7 +6,7 @@ using MiraAPI.Utilities;
 namespace MiraAPI.GameOptions.Attributes;
 
 /// <summary>
-/// A number option attribute for the modded options system.
+/// Attribute for a <see cref="ModdedNumberOption"/>.
 /// </summary>
 [AttributeUsage(AttributeTargets.Property)]
 public class ModdedNumberOptionAttribute(
