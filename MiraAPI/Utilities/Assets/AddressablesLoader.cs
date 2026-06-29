@@ -166,9 +166,13 @@ public static class AddressablesLoader
         while (!AmongUsClient.Instance || CatalogLocations.Select(x=>x.Location).Any(x=>!LoadedLocations.Contains(x))) yield return null;
 
         var hatBehaviours = DiscoverData<HatData>(RegisteredHatKeys);
+        hatBehaviours = hatBehaviours.OrderBy(x => x.StoreName).ToList();
         var skinBehaviours = DiscoverData<SkinData>(RegisteredSkinKeys);
+        skinBehaviours = skinBehaviours.OrderBy(x => x.StoreName).ToList();
         var namePlateBehaviours = DiscoverAndReportData<NamePlateData>(RegisteredNameplateKeys);
+        namePlateBehaviours = namePlateBehaviours.OrderBy(x => x.Category).ToList();
         var visorBehaviours = DiscoverAndReportData<VisorData>(RegisteredVisorKeys);
+        visorBehaviours = visorBehaviours.OrderBy(x => x.Category).ToList();
 
         var hatData = new List<HatData>();
         hatData.AddRange(HatManager.Instance.allHats);
