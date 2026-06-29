@@ -6,13 +6,13 @@ using UnityEngine;
 namespace MiraAPI.Patches.Roles;
 
 /// <summary>
-/// Vent patches for Roles.
+/// <see cref="Vent"/> patches for <see cref="ICustomRole"/>s.
 /// </summary>
 [HarmonyPatch(typeof(Vent))]
 public static class VentPatches
 {
     /// <summary>
-    /// Set outline to player's custom role color.
+    /// Set outline to player's <see cref="ICustomRole.RoleColor"/>.
     /// </summary>
     [HarmonyPostfix]
     [HarmonyPatch(nameof(Vent.SetOutline))]

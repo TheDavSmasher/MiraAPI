@@ -9,12 +9,12 @@ using Rewired;
 namespace MiraAPI.Keybinds;
 
 /// <summary>
-/// Lets you register and manage mod keybinds with conflict checks and rebinding support.
+/// Lets you register and manage mod <see cref="MiraKeybind"/>s with conflict checks and rebinding support.
 /// </summary>
 public static class KeybindManager
 {
     /// <summary>
-    /// Gets a list of all registered keybinds.
+    /// Gets a list of all registered <see cref="MiraKeybind"/>s.
     /// </summary>
     public static List<MiraKeybind> Keybinds { get; } = new();
 
@@ -49,7 +49,7 @@ public static class KeybindManager
     }
 
     /// <summary>
-    /// Returns all conflicts where keybinds use the same key.
+    /// Returns all conflicts where <see cref="MiraKeybind"/>s use the same key.
     /// </summary>
     /// <returns>A list of pairs of keybinds that conflict.</returns>
     public static Dictionary<KeyboardKeyCode, List<MiraKeybind>> GetConflicts()
@@ -77,11 +77,11 @@ public static class KeybindManager
     }
 
     /// <summary>
-    /// Returns all keybinds for a specified keycode.
+    /// Returns all <see cref="MiraKeybind"/>s for a specified keycode.
     /// </summary>
     /// <param name="keyCode">The key to look for.</param>
     /// /// <param name="exclusiveCheck">Should only exlusive keybinds be present.</param>
-    /// <returns>The list of keybinds.</returns>
+    /// <returns>The list of <see cref="MiraKeybind"/>s.</returns>
     public static MiraKeybind[] GetKeybindsForKey(KeyboardKeyCode keyCode, bool exclusiveCheck = false)
     {
         var all = new List<MiraKeybind>();

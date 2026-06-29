@@ -4,7 +4,7 @@ using System.Reflection;
 namespace MiraAPI.GameOptions.Attributes;
 
 /// <summary>
-/// Represents an attribute that is used to define a modded option.
+/// Represents an attribute that is used to define an <see cref="IModdedOption"/>.
 /// </summary>
 /// <param name="title">The option title.</param>
 /// <param name="roleType">Optional parameter to specify a role Type.</param>

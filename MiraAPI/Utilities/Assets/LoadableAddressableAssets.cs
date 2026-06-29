@@ -22,7 +22,7 @@ public class LoadableAddressableAssets<T>(string key) where T : UnityEngine.Obje
 
     /// <summary>
     /// Initializes a new instance of the <see cref="LoadableAddressableAssets{T}"/> class, with added garbageCollector logic,
-    /// to help with https://github.com/BepInEx/Il2CppInterop/issues/40.
+    /// to help with <see href="https://github.com/BepInEx/Il2CppInterop/issues/40"/>.
     /// </summary>
     /// <param name="key">The key of the assets.</param>
     /// <param name="garbageCollection">A lambda that allows GCHandle.Alloc calls without garbage collection interferences.</param>

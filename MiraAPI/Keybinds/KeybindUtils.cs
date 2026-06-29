@@ -14,9 +14,9 @@ public static class KeybindUtils
     public static InputManager_Base? RewiredInputManager { get; internal set; }
 
     /// <summary>
-    /// Returns the currently assigned keycode of a keybind.
+    /// Returns the currently assigned keycode of a <see cref="BaseKeybind"/>.
     /// </summary>
-    /// <param name="keybind">The keybind to get the keycode from.</param>
+    /// <param name="keybind">The <see cref="BaseKeybind"/> to get the keycode from.</param>
     /// <returns>The currently assigned keycode.</returns>
     public static KeyboardKeyCode GetKeycodeByKeybind(BaseKeybind keybind)
     {
@@ -29,7 +29,7 @@ public static class KeybindUtils
     }
 
     /// <summary>
-    /// Gets the keycode for an action with ReInput.
+    /// Gets the keycode for an action with <see cref="ReInput"/>.
     /// </summary>
     /// <param name="actionId">The action ID.</param>
     /// <returns>The keyboard keycode.</returns>
@@ -39,7 +39,7 @@ public static class KeybindUtils
     }
 
     /// <summary>
-    /// Gets a <see cref="ActionElementMap"/> by id with ReInput.
+    /// Gets a <see cref="ActionElementMap"/> by id with <see cref="ReInput"/>.
     /// </summary>
     /// <param name="actionId">The action ID.</param>
     /// <returns>The keyboard keycode.</returns>
@@ -65,7 +65,7 @@ public static class KeybindUtils
     /// <param name="exclude">The KeyCode to skip during the search.</param>
     /// <returns>
     /// The first available KeyCode not currently used by any registered keybind,
-    /// or KeyCode.None if none are available.
+    /// or <see cref="KeyboardKeyCode.None"/> if none are available.
     /// </returns>
     public static KeyboardKeyCode FindAvailableKey(KeyboardKeyCode exclude)
     {

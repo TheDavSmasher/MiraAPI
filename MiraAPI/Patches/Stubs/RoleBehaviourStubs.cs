@@ -6,16 +6,16 @@ using Il2CppSystem.Text;
 namespace MiraAPI.Patches.Stubs;
 
 /// <summary>
-/// Stub methods for the RoleBehaviour class. Needed because of Il2Cpp limitations on injected classes.
+/// Stub methods for the <see cref="RoleBehaviour"/> class. Needed because of Il2Cpp limitations on injected classes.
 /// </summary>
 [HarmonyPatch]
 public static class RoleBehaviourStubs
 {
     /// <summary>
-    /// Stub method for RoleBehaviour.Initialize.
+    /// Stub method for <see cref="RoleBehaviour.Initialize"/>.
     /// </summary>
-    /// <param name="instance">The RoleBehaviour object.</param>
-    /// <param name="player">The PlayerControl to initialize.</param>
+    /// <param name="instance">The <see cref="RoleBehaviour"/> object.</param>
+    /// <param name="player">The <see cref="PlayerControl"/> to initialize.</param>
     [HarmonyReversePatch]
     [HarmonyPatch(typeof(RoleBehaviour), nameof(RoleBehaviour.Initialize))]
     [MethodImpl(MethodImplOptions.NoInlining)]
@@ -25,10 +25,10 @@ public static class RoleBehaviourStubs
     }
 
     /// <summary>
-    /// Stub method for RoleBehaviour.AdjustTasks.
+    /// Stub method for <see cref="RoleBehaviour.AdjustTasks"/>.
     /// </summary>
-    /// <param name="instance">The RoleBehaviour object.</param>
-    /// <param name="player">The PlayerControl to adjust tasks for.</param>
+    /// <param name="instance">The <see cref="RoleBehaviour"/> object.</param>
+    /// <param name="player">The <see cref="PlayerControl"/> to adjust tasks for.</param>
     [HarmonyReversePatch]
     [HarmonyPatch(typeof(RoleBehaviour), nameof(RoleBehaviour.AdjustTasks))]
     [MethodImpl(MethodImplOptions.NoInlining)]
@@ -38,10 +38,10 @@ public static class RoleBehaviourStubs
     }
 
     /// <summary>
-    /// Stub method for RoleBehaviour.AppendTaskHint.
+    /// Stub method for <see cref="RoleBehaviour.AppendTaskHint(StringBuilder)"/>.
     /// </summary>
-    /// <param name="instance">The RoleBehaviour object.</param>
-    /// <param name="taskStringBuilder">The StringBuilder to append the task hint to.</param>
+    /// <param name="instance">The <see cref="RoleBehaviour"/> object.</param>
+    /// <param name="taskStringBuilder">The <see cref="StringBuilder"/> to append the task hint to.</param>
     [HarmonyReversePatch]
     [HarmonyPatch(typeof(RoleBehaviour), nameof(RoleBehaviour.AppendTaskHint), typeof(StringBuilder))]
     [MethodImpl(MethodImplOptions.NoInlining)]
@@ -51,10 +51,10 @@ public static class RoleBehaviourStubs
     }
 
     /// <summary>
-    /// Stub method for RoleBehaviour.CanUse.
+    /// Stub method for <see cref="RoleBehaviour.CanUse"/>.
     /// </summary>
-    /// <param name="instance">The RoleBehaviour object.</param>
-    /// <param name="console">The IUsable console to check.</param>
+    /// <param name="instance">The <see cref="RoleBehaviour"/> object.</param>
+    /// <param name="console">The <see cref="IUsable"/> console to check.</param>
     /// <returns>Whether the console can be used.</returns>
     [HarmonyReversePatch]
     [HarmonyPatch(typeof(RoleBehaviour), nameof(RoleBehaviour.CanUse))]
@@ -65,10 +65,10 @@ public static class RoleBehaviourStubs
     }
 
     /// <summary>
-    /// Stub method for RoleBehaviour.Deinitialize.
+    /// Stub method for <see cref="RoleBehaviour.Deinitialize"/>.
     /// </summary>
-    /// <param name="instance">The RoleBehaviour object.</param>
-    /// <param name="targetPlayer">The PlayerControl to deinitialize for.</param>
+    /// <param name="instance">The <see cref="RoleBehaviour"/> object.</param>
+    /// <param name="targetPlayer">The <see cref="PlayerControl"/> to deinitialize for.</param>
     [HarmonyReversePatch]
     [HarmonyPatch(typeof(RoleBehaviour), nameof(RoleBehaviour.Deinitialize))]
     [MethodImpl(MethodImplOptions.NoInlining)]
@@ -78,9 +78,9 @@ public static class RoleBehaviourStubs
     }
 
     /// <summary>
-    /// Stub method for RoleBehaviour.DidWin.
+    /// Stub method for <see cref="RoleBehaviour.DidWin"/>.
     /// </summary>
-    /// <param name="instance">The RoleBehaviour object.</param>
+    /// <param name="instance">The <see cref="RoleBehaviour"/> object.</param>
     /// <param name="gameOverReason">The reason for game over.</param>
     /// <returns>Whether the role won.</returns>
     [HarmonyReversePatch]
@@ -92,10 +92,10 @@ public static class RoleBehaviourStubs
     }
 
     /// <summary>
-    /// Stub method for RoleBehaviour.FindClosestTarget.
+    /// Stub method for <see cref="RoleBehaviour.FindClosestTarget"/>.
     /// </summary>
-    /// <param name="instance">The RoleBehaviour object.</param>
-    /// <returns>The closest target PlayerControl.</returns>
+    /// <param name="instance">The <see cref="RoleBehaviour"/> object.</param>
+    /// <returns>The closest target <see cref="PlayerControl"/>.</returns>
     [HarmonyReversePatch]
     [HarmonyPatch(typeof(RoleBehaviour), nameof(RoleBehaviour.FindClosestTarget))]
     [MethodImpl(MethodImplOptions.NoInlining)]
@@ -105,9 +105,9 @@ public static class RoleBehaviourStubs
     }
 
     /// <summary>
-    /// Stub method for RoleBehaviour.GetAbilityDistance.
+    /// Stub method for <see cref="RoleBehaviour.GetAbilityDistance"/>.
     /// </summary>
-    /// <param name="instance">The RoleBehaviour object.</param>
+    /// <param name="instance">The <see cref="RoleBehaviour"/> object.</param>
     /// <returns>The ability distance.</returns>
     [HarmonyReversePatch]
     [HarmonyPatch(typeof(RoleBehaviour), nameof(RoleBehaviour.GetAbilityDistance))]
@@ -118,10 +118,10 @@ public static class RoleBehaviourStubs
     }
 
     /// <summary>
-    /// Stub method for RoleBehaviour.IsValidTarget.
+    /// Stub method for <see cref="RoleBehaviour.IsValidTarget"/>.
     /// </summary>
-    /// <param name="instance">The RoleBehaviour object.</param>
-    /// <param name="target">The NetworkedPlayerInfo to validate.</param>
+    /// <param name="instance">The <see cref="RoleBehaviour"/> object.</param>
+    /// <param name="target">The <see cref="NetworkedPlayerInfo"/> to validate.</param>
     /// <returns>Whether the target is valid.</returns>
     [HarmonyReversePatch]
     [HarmonyPatch(typeof(RoleBehaviour), nameof(RoleBehaviour.IsValidTarget))]
@@ -132,9 +132,9 @@ public static class RoleBehaviourStubs
     }
 
     /// <summary>
-    /// Stub method for RoleBehaviour.OnDeath.
+    /// Stub method for <see cref="RoleBehaviour.OnDeath"/>.
     /// </summary>
-    /// <param name="instance">The RoleBehaviour object.</param>
+    /// <param name="instance">The <see cref="RoleBehaviour"/> object.</param>
     /// <param name="reason">The reason for death.</param>
     [HarmonyReversePatch]
     [HarmonyPatch(typeof(RoleBehaviour), nameof(RoleBehaviour.OnDeath))]
@@ -145,9 +145,9 @@ public static class RoleBehaviourStubs
     }
 
     /// <summary>
-    /// Stub method for RoleBehaviour.OnMeetingStart.
+    /// Stub method for <see cref="RoleBehaviour.OnMeetingStart"/>.
     /// </summary>
-    /// <param name="instance">The RoleBehaviour object.</param>
+    /// <param name="instance">The <see cref="RoleBehaviour"/> object.</param>
     [HarmonyReversePatch]
     [HarmonyPatch(typeof(RoleBehaviour), nameof(RoleBehaviour.OnMeetingStart))]
     [MethodImpl(MethodImplOptions.NoInlining)]
@@ -157,9 +157,9 @@ public static class RoleBehaviourStubs
     }
 
     /// <summary>
-    /// Stub method for RoleBehaviour.OnVotingComplete.
+    /// Stub method for <see cref="RoleBehaviour.OnVotingComplete"/>.
     /// </summary>
-    /// <param name="instance">The RoleBehaviour object.</param>
+    /// <param name="instance">The <see cref="RoleBehaviour"/> object.</param>
     [HarmonyReversePatch]
     [HarmonyPatch(typeof(RoleBehaviour), nameof(RoleBehaviour.OnVotingComplete))]
     [MethodImpl(MethodImplOptions.NoInlining)]
@@ -169,9 +169,9 @@ public static class RoleBehaviourStubs
     }
 
     /// <summary>
-    /// Stub method for RoleBehaviour.SetCooldown.
+    /// Stub method for <see cref="RoleBehaviour.SetCooldown"/>.
     /// </summary>
-    /// <param name="instance">The RoleBehaviour object.</param>
+    /// <param name="instance">The <see cref="RoleBehaviour"/> object.</param>
     [HarmonyReversePatch]
     [HarmonyPatch(typeof(RoleBehaviour), nameof(RoleBehaviour.SetCooldown))]
     [MethodImpl(MethodImplOptions.NoInlining)]
@@ -181,10 +181,10 @@ public static class RoleBehaviourStubs
     }
 
     /// <summary>
-    /// Stub method for RoleBehaviour.SetPlayerTarget.
+    /// Stub method for <see cref="RoleBehaviour.SetPlayerTarget"/>.
     /// </summary>
-    /// <param name="instance">The RoleBehaviour object.</param>
-    /// <param name="target">The PlayerControl target to set.</param>
+    /// <param name="instance">The <see cref="RoleBehaviour"/> object.</param>
+    /// <param name="target">The <see cref="PlayerControl"/> target to set.</param>
     [HarmonyReversePatch]
     [HarmonyPatch(typeof(RoleBehaviour), nameof(RoleBehaviour.SetPlayerTarget))]
     [MethodImpl(MethodImplOptions.NoInlining)]
@@ -194,10 +194,10 @@ public static class RoleBehaviourStubs
     }
 
     /// <summary>
-    /// Stub method for RoleBehaviour.SetUsableTarget.
+    /// Stub method for <see cref="RoleBehaviour.SetUsableTarget"/>.
     /// </summary>
-    /// <param name="instance">The RoleBehaviour object.</param>
-    /// <param name="target">The IUsable target to set.</param>
+    /// <param name="instance">The <see cref="RoleBehaviour"/> object.</param>
+    /// <param name="target">The <see cref="IUsable"/> target to set.</param>
     [HarmonyReversePatch]
     [HarmonyPatch(typeof(RoleBehaviour), nameof(RoleBehaviour.SetUsableTarget))]
     [MethodImpl(MethodImplOptions.NoInlining)]
@@ -207,10 +207,10 @@ public static class RoleBehaviourStubs
     }
 
     /// <summary>
-    /// Stub method for RoleBehaviour.SpawnTaskHeader.
+    /// Stub method for <see cref="RoleBehaviour.SpawnTaskHeader"/>.
     /// </summary>
-    /// <param name="instance">The RoleBehaviour object.</param>
-    /// <param name="playerControl">The PlayerControl to spawn the task header for.</param>
+    /// <param name="instance">The <see cref="RoleBehaviour"/> object.</param>
+    /// <param name="playerControl">The <see cref="PlayerControl"/> to spawn the task header for.</param>
     [HarmonyReversePatch]
     [HarmonyPatch(typeof(RoleBehaviour), nameof(RoleBehaviour.SpawnTaskHeader))]
     [MethodImpl(MethodImplOptions.NoInlining)]
@@ -220,9 +220,9 @@ public static class RoleBehaviourStubs
     }
 
     /// <summary>
-    /// Stub method for RoleBehaviour.UseAbility.
+    /// Stub method for <see cref="RoleBehaviour.UseAbility"/>.
     /// </summary>
-    /// <param name="instance">The RoleBehaviour object.</param>
+    /// <param name="instance">The <see cref="RoleBehaviour"/> object.</param>
     [HarmonyReversePatch]
     [HarmonyPatch(typeof(RoleBehaviour), nameof(RoleBehaviour.UseAbility))]
     [MethodImpl(MethodImplOptions.NoInlining)]
@@ -232,9 +232,9 @@ public static class RoleBehaviourStubs
     }
 
     /// <summary>
-    /// Stub method for RoleBehaviour.UseSecondaryAbility.
+    /// Stub method for <see cref="RoleBehaviour.UseSecondaryAbility"/>.
     /// </summary>
-    /// <param name="instance">The RoleBehaviour object.</param>
+    /// <param name="instance">The <see cref="RoleBehaviour"/> object.</param>
     [HarmonyReversePatch]
     [HarmonyPatch(typeof(RoleBehaviour), nameof(RoleBehaviour.UseSecondaryAbility))]
     [MethodImpl(MethodImplOptions.NoInlining)]
@@ -244,9 +244,9 @@ public static class RoleBehaviourStubs
     }
 
     /// <summary>
-    /// Stub method for RoleBehaviour.OnRoleSet.
+    /// Stub method for <see cref="RoleBehaviour.OnRoleSet"/>.
     /// </summary>
-    /// <param name="instance">The RoleBehaviour object.</param>
+    /// <param name="instance">The <see cref="RoleBehaviour"/> object.</param>
     [HarmonyReversePatch]
     [HarmonyPatch(typeof(RoleBehaviour), nameof(RoleBehaviour.OnRoleSet))]
     [MethodImpl(MethodImplOptions.NoInlining)]
@@ -256,9 +256,9 @@ public static class RoleBehaviourStubs
     }
 
     /// <summary>
-    /// Stub method for RoleBehaviour.InitializeMeetingAbilityButton.
+    /// Stub method for <see cref="RoleBehaviour.InitializeMeetingAbilityButton"/>.
     /// </summary>
-    /// <param name="instance">The RoleBehaviour object.</param>
+    /// <param name="instance">The <see cref="RoleBehaviour"/> object.</param>
     [HarmonyReversePatch]
     [HarmonyPatch(typeof(RoleBehaviour), nameof(RoleBehaviour.InitializeMeetingAbilityButton))]
     [MethodImpl(MethodImplOptions.NoInlining)]
@@ -268,9 +268,9 @@ public static class RoleBehaviourStubs
     }
 
     /// <summary>
-    /// Stub method for RoleBehaviour.FindClosestBody.
+    /// Stub method for <see cref="RoleBehaviour.FindClosestBody"/>.
     /// </summary>
-    /// <param name="instance">The RoleBehaviour object.</param>
+    /// <param name="instance">The <see cref="RoleBehaviour"/> object.</param>
     [HarmonyReversePatch]
     [HarmonyPatch(typeof(RoleBehaviour), nameof(RoleBehaviour.FindClosestBody))]
     [MethodImpl(MethodImplOptions.NoInlining)]
@@ -280,9 +280,9 @@ public static class RoleBehaviourStubs
     }
 
     /// <summary>
-    /// Stub method for RoleBehaviour.HandleRoleRpc.
+    /// Stub method for <see cref="RoleBehaviour.HandleRoleRpc"/>.
     /// </summary>
-    /// <param name="instance">The RoleBehaviour object.</param>
+    /// <param name="instance">The <see cref="RoleBehaviour"/> object.</param>
     [HarmonyReversePatch]
     [HarmonyPatch(typeof(RoleBehaviour), nameof(RoleBehaviour.HandleRoleRpc))]
     [MethodImpl(MethodImplOptions.NoInlining)]
@@ -292,9 +292,9 @@ public static class RoleBehaviourStubs
     }
 
     /// <summary>
-    /// Stub method for RoleBehaviour.KillAnimSpecialSetup.
+    /// Stub method for <see cref="RoleBehaviour.KillAnimSpecialSetup"/>.
     /// </summary>
-    /// <param name="instance">The RoleBehaviour object.</param>
+    /// <param name="instance">The <see cref="RoleBehaviour"/> object.</param>
     [HarmonyReversePatch]
     [HarmonyPatch(typeof(RoleBehaviour), nameof(RoleBehaviour.KillAnimSpecialSetup))]
     [MethodImpl(MethodImplOptions.NoInlining)]

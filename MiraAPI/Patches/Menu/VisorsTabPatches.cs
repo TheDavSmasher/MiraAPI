@@ -1,11 +1,11 @@
 ﻿using AmongUs.Data;
 using HarmonyLib;
 using MiraAPI.Utilities;
+using MiraAPI.Utilities.Assets;
 using Reactor.Utilities.Extensions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using MiraAPI.Utilities.Assets;
 using TMPro;
 using UnityEngine;
 using Object = UnityEngine.Object;
@@ -39,7 +39,6 @@ public static class VisorsTabPatches
         currentPage = currentPage > SortedVisors.Count - 1 ? 0 : currentPage;
         GenerateHats(tab, currentPage);
     }
-
 
     [HarmonyPatch(nameof(VisorsTab.OnEnable))]
     [HarmonyPrefix]

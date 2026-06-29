@@ -23,12 +23,12 @@ public class OptionPreset
     public MiraPluginInfo Plugin { get; }
 
     /// <summary>
-    /// Gets the configuration file of the plugin associated with the preset.
+    /// Gets the <see cref="ConfigFile"/> of the plugin associated with the preset.
     /// </summary>
     public ConfigFile PluginConfig { get; }
 
     /// <summary>
-    /// Gets the configuration file for the preset.
+    /// Gets the <see cref="ConfigFile"/> for the preset.
     /// </summary>
     public ConfigFile PresetConfig { get; }
 
@@ -40,9 +40,9 @@ public class OptionPreset
     /// <summary>
     /// Initializes a new instance of the <see cref="OptionPreset"/> class with the specified name and configuration file.
     /// </summary>
-    /// <param name="name">>The name of the preset.</param>
+    /// <param name="name">The name of the preset.</param>
     /// <param name="plugin">The plugin associated with the preset.</param>
-    /// <param name="presetConfig">>The configuration file for the preset.</param>
+    /// <param name="presetConfig">The configuration file for the preset.</param>
     public OptionPreset(string name, MiraPluginInfo plugin, ConfigFile presetConfig)
     {
         Name = name;
@@ -75,6 +75,7 @@ public class OptionPreset
     /// <summary>
     /// Resets the specified option with the preset provided.
     /// </summary>
+    /// <param name="baseOption">The option to reset.</param>
     public void ResetOption(OptionBehaviour baseOption)
     {
         var selectedOpt = Plugin.InternalOptions.First(x => x.OptionBehaviour == baseOption);
@@ -87,7 +88,8 @@ public class OptionPreset
     /// <summary>
     /// Gets whether the specified option is included in the preset.
     /// </summary>
-    /// <returns>>The value of whether the option is in the preset.</returns>
+    /// <param name="baseOption">The option to check.</param>
+    /// <returns>The value of whether the option is in the preset.</returns>
     public bool IsOptionInPreset(OptionBehaviour baseOption)
     {
         var selectedOpt = Plugin.InternalOptions.First(x => x.OptionBehaviour == baseOption);

@@ -168,7 +168,7 @@ public static class CustomMurderRpc
     }
 
     /// <summary>
-    /// Custom Murder method without networking. If you need a networked version, use <see cref="RpcCustomMurder"/>.
+    /// Custom Murder method without networking. If you need a networked version, use <see cref="RpcCustomMurder(PlayerControl, PlayerControl, bool, bool, bool, bool, bool, bool)"/>.
     /// </summary>
     /// <param name="source">The killer.</param>
     /// <param name="target">The player to murder.</param>

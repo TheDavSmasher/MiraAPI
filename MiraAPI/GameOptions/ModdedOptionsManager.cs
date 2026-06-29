@@ -17,7 +17,7 @@ using Reactor.Utilities;
 namespace MiraAPI.GameOptions;
 
 /// <summary>
-/// Handles modded options.
+/// Handles <see cref="IModdedOption"/>s.
 /// </summary>
 public static class ModdedOptionsManager
 {
@@ -281,7 +281,7 @@ public static class ModdedOptionsManager
     /// </summary>
     /// <param name="__originalMethod">The original getter method.</param>
     /// <param name="__result">The result of the property getter.</param>
-    /// <returns>False so the original getter gets skipped.</returns>
+    /// <returns><see langword="false"/> so the original getter gets skipped.</returns>
 #pragma warning disable CA1707
     [SuppressMessage("ReSharper", "InconsistentNaming", Justification = "Harmony naming convention")]
     public static bool PropertyGetterPatch(MethodBase __originalMethod, ref object __result)

@@ -13,11 +13,11 @@ public static class MiraEventManager
     private static readonly Dictionary<Type, List<MiraEventWrapper>> EventWrappers = [];
 
     /// <summary>
-    /// Invoke an event.
+    /// Invoke a <see cref="MiraEvent"/>.
     /// </summary>
-    /// <param name="eventInstance">The event instance.</param>
+    /// <param name="eventInstance">The <typeparamref name="T"/> instance.</param>
     /// <typeparam name="T">Type of Event.</typeparam>
-    /// <returns>If there was an event handler invoked for this event, return true. Otherwise, return false.</returns>
+    /// <returns>If there was an event handler invoked for this event, return <see langword="true"/>. Otherwise, return <see langword="false"/>.</returns>
     public static bool InvokeEvent<T>(T eventInstance) where T : MiraEvent
     {
         EventWrappers.TryGetValue(typeof(T), out var handlers);
@@ -42,11 +42,11 @@ public static class MiraEventManager
     }
 
     /// <summary>
-    /// Invoke an event and use a specific type to find the handlers.
+    /// Invoke a <see cref="MiraEvent"/> and use a specific type to find the handlers.
     /// </summary>
-    /// <param name="eventInstance">The event instance.</param>
+    /// <param name="eventInstance">The <see cref="MiraEvent"/> instance.</param>
     /// <param name="type">The type to use for handler lookup.</param>
-    /// <returns>If there was an event handler invoked for this event, return true. Otherwise, return false.</returns>
+    /// <returns>If there was an event handler invoked for this event, return <see langword="true"/>. Otherwise, return <see langword="false"/>.</returns>
     public static bool InvokeEvent(MiraEvent eventInstance, Type type)
     {
         EventWrappers.TryGetValue(type, out var handlers);
@@ -71,12 +71,12 @@ public static class MiraEventManager
     }
 
     /// <summary>
-    /// Register an event.
+    /// Register a <see cref="MiraEvent"/> handler.
     /// </summary>
-    /// <param name="type">The type of event.</param>
-    /// <param name="methodInfo">The MethodInfo of the event handler.</param>
+    /// <param name="type">The type of <see cref="MiraEvent"/> event.</param>
+    /// <param name="methodInfo">The <see cref="MethodInfo"/> of the event handler.</param>
     /// <param name="priority">The priority of the event handler. Lower values are called first.</param>
-    /// <returns>An event handle to use when unregistering the event.</returns>
+    /// <returns>A <see cref="MiraEventHandle"/> to use when unregistering the event.</returns>
     public static MiraEventHandle RegisterEventHandler(Type type, MethodInfo methodInfo, int priority = 0)
     {
         if (!type.IsSubclassOf(typeof(MiraEvent)))
@@ -102,12 +102,12 @@ public static class MiraEventManager
     }
 
     /// <summary>
-    /// Register an event.
+    /// Register a <typeparamref name="T"/> handler.
     /// </summary>
     /// <param name="handler">The callback method/handler for the event.</param>
     /// <param name="priority">The priority of the event handler. Lower values are called first.</param>
-    /// <typeparam name="T">Type of event.</typeparam>
-    /// <returns>An event handle to use when unregistering the event.</returns>
+    /// <typeparam name="T">Type of <see cref="MiraEvent"/> event.</typeparam>
+    /// <returns>A <see cref="MiraEventHandle"/> to use when unregistering the event.</returns>
     public static MiraEventHandle RegisterEventHandler<T>(Action<T> handler, int priority = 0) where T : MiraEvent
     {
         EventWrappers.TryAdd(typeof(T), []);
@@ -127,10 +127,10 @@ public static class MiraEventManager
     }
 
     /// <summary>
-    /// Unregister an event using the event handle.
+    /// Unregister a <see cref="MiraEvent"/> handler using the <see cref="MiraEventHandle"/>.
     /// </summary>
     /// <param name="eventHandle">A handle to the event.</param>
-    /// <returns>True if the event was unregistered successfully, false otherwise.</returns>
+    /// <returns><see langword="true"/> if the event was unregistered successfully, <see langword="false"/> otherwise.</returns>
     public static bool UnregisterEventHandler(MiraEventHandle eventHandle)
     {
         if (!EventWrappers.TryGetValue(eventHandle.EventType, out var handlers))

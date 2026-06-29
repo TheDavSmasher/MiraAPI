@@ -153,7 +153,7 @@ public sealed class MiraPluginManager
     /// Get a mira plugin by its GUID.
     /// </summary>
     /// <param name="pluginId">The plugin GUID.</param>
-    /// <returns>A MiraPluginInfo.</returns>
+    /// <returns>A <see cref="MiraPluginInfo"/>.</returns>
     public static MiraPluginInfo? GetPluginByGuid(string pluginId)
     {
         return Instance._registeredPlugins.Values.FirstOrDefault(plugin => plugin.PluginId == pluginId);

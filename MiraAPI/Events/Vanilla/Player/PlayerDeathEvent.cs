@@ -16,7 +16,7 @@ public class PlayerDeathEvent : MiraEvent
     public DeathReason DeathReason { get; }
 
     /// <summary>
-    /// Gets the dead body associated with the player, if any.
+    /// Gets the <see cref="global::DeadBody"/> associated with the player, if any.
     /// </summary>
     public DeadBody? DeadBody { get; }
 
@@ -25,7 +25,7 @@ public class PlayerDeathEvent : MiraEvent
     /// </summary>
     /// <param name="player">The player who died.</param>
     /// <param name="reason">The reason the player died.</param>
-    /// <param name="deadBody">The player's body, if it exists.</param>
+    /// <param name="deadBody">The player's <see cref="global::DeadBody"/>, if it exists.</param>
     public PlayerDeathEvent(PlayerControl player, DeathReason reason, DeadBody? deadBody)
     {
         Player = player;

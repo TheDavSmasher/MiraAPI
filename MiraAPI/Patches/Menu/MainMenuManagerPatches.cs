@@ -9,7 +9,7 @@ using UnityEngine;
 namespace MiraAPI.Patches.Menu;
 
 /// <summary>
-/// General MainMenuManage patches.
+/// General <see cref="MainMenuManager"/> patches.
 /// </summary>
 [HarmonyPatch(typeof(MainMenuManager))]
 public static class MainMenuManagerPatches
@@ -17,7 +17,7 @@ public static class MainMenuManagerPatches
     internal static bool NeedsDeepDestroy { get; private set; }
 
     /// <summary>
-    /// A postifix on Awake to load all the addressables registered.
+    /// A postifix on <see cref="MainMenuManager.Awake"/> to load all the addressables registered.
     /// </summary>
     [HarmonyPatch(nameof(MainMenuManager.Awake))]
     [HarmonyPostfix]

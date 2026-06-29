@@ -8,7 +8,7 @@ public class PlayerCanUseEvent : PlayerUseEvent
     /// <summary>
     /// Initializes a new instance of the <see cref="PlayerCanUseEvent"/> class.
     /// </summary>
-    /// <param name="usable">The IUsable.</param>
+    /// <param name="usable">The <see cref="IUsable"/>.</param>
     public PlayerCanUseEvent(IUsable usable) : base(usable)
     {
     }

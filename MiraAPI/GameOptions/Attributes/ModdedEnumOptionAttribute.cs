@@ -5,7 +5,7 @@ using MiraAPI.GameOptions.OptionTypes;
 namespace MiraAPI.GameOptions.Attributes;
 
 /// <summary>
-/// Attribute for creating an enum option.
+/// Attribute for creating a <see cref="ModdedEnumOption"/>.
 /// </summary>
 [AttributeUsage(AttributeTargets.Property)]
 public class ModdedEnumOptionAttribute(string title, Type enumType, string[]? values = null)

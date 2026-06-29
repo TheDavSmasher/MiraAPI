@@ -8,7 +8,7 @@ namespace MiraAPI.Events.Vanilla.Meeting.Voting;
 public class MeetingSelectEvent : MiraEvent
 {
     /// <summary>
-    /// Gets the instance of the voter's vote data.
+    /// Gets the instance of the voter's <see cref="PlayerVoteData"/>.
     /// </summary>
     public PlayerVoteData VoteData { get; }
 
@@ -18,7 +18,7 @@ public class MeetingSelectEvent : MiraEvent
     public int TargetId { get; }
 
     /// <summary>
-    /// Gets the player info of the target.
+    /// Gets the <see cref="NetworkedPlayerInfo"/> of the target.
     /// </summary>
     public NetworkedPlayerInfo TargetPlayerInfo { get; }
 
@@ -30,9 +30,9 @@ public class MeetingSelectEvent : MiraEvent
     /// <summary>
     /// Initializes a new instance of the <see cref="MeetingSelectEvent"/> class.
     /// </summary>
-    /// <param name="playerVoteData">The voter's data.</param>
+    /// <param name="playerVoteData">The voter's <see cref="PlayerVoteData"/>.</param>
     /// <param name="targetId">The target's playerId.</param>
-    /// <param name="allowSelect">>Whether the player is allowed to select the target.</param>
+    /// <param name="allowSelect">Whether the player is allowed to select the target.</param>
     public MeetingSelectEvent(PlayerVoteData playerVoteData, int targetId, bool allowSelect)
     {
         VoteData = playerVoteData;

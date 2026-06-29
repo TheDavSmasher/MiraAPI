@@ -8,25 +8,25 @@ namespace MiraAPI.Events.Vanilla.Gameplay;
 public sealed class BeforeMurderEvent : MiraCancelableEvent
 {
     /// <summary>
-    /// Gets the player that is killing the target.
+    /// Gets the <see cref="PlayerControl"/> that is killing the <see cref="Target"/>.
     /// </summary>
     public PlayerControl Source { get; }
 
     /// <summary>
-    /// Gets the player that is being killed.
+    /// Gets the <see cref="PlayerControl"/> that is being killed.
     /// </summary>
     public PlayerControl Target { get; }
 
     /// <summary>
-    /// Gets whether the murder was meant to be done in a meeting via an enum.
+    /// Gets whether the murder was meant to be done in a meeting, via an enum.
     /// </summary>
     public MeetingCheck InMeeting { get; }
 
     /// <summary>
     /// Initializes a new instance of the <see cref="BeforeMurderEvent"/> class.
     /// </summary>
-    /// <param name="source">The player that is killing the target.</param>
-    /// <param name="target">The player that is being killed.</param>
+    /// <param name="source">The <see cref="PlayerControl"/> that is killing the <paramref name="target"/>.</param>
+    /// <param name="target">The <see cref="PlayerControl"/> that is being killed.</param>
     /// <param name="inMeeting">Whether the murder is intended to be triggered in a meeting.</param>
     public BeforeMurderEvent(PlayerControl source, PlayerControl target, MeetingCheck inMeeting)
     {
@@ -38,8 +38,8 @@ public sealed class BeforeMurderEvent : MiraCancelableEvent
     /// <summary>
     /// Initializes a new instance of the <see cref="BeforeMurderEvent"/> class.
     /// </summary>
-    /// <param name="source">The player that is killing the target.</param>
-    /// <param name="target">The player that is being killed.</param>
+    /// <param name="source">The <see cref="PlayerControl"/> that is killing the <paramref name="target"/>.</param>
+    /// <param name="target">The <see cref="PlayerControl"/> that is being killed.</param>
     public BeforeMurderEvent(PlayerControl source, PlayerControl target)
     {
         Source = source;

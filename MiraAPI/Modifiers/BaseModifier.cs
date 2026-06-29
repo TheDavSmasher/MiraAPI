@@ -12,12 +12,12 @@ namespace MiraAPI.Modifiers;
 public abstract class BaseModifier : IOptionable
 {
     /// <summary>
-    /// Gets the player that the modifier is attached to.
+    /// Gets the <see cref="PlayerControl"/> that the modifier is attached to.
     /// </summary>
     public PlayerControl Player { get; internal set; } = null!;
 
     /// <summary>
-    /// Gets the modifier component that the modifier is attached to.
+    /// Gets the <see cref="Modifiers.ModifierComponent"/> that the modifier is attached to.
     /// </summary>
     public ModifierComponent? ModifierComponent { get; internal set; }
 
@@ -50,7 +50,7 @@ public abstract class BaseModifier : IOptionable
     public abstract string ModifierName { get; }
 
     /// <summary>
-    /// Gets the modifier icon. Useless if HideOnUi is true.
+    /// Gets the modifier icon. Useless if <see cref="HideOnUi"/> is <see langword="true"/>.
     /// </summary>
     public virtual LoadableAsset<Sprite>? ModifierIcon => null;
 
@@ -65,17 +65,17 @@ public abstract class BaseModifier : IOptionable
     public virtual bool ShowInFreeplay => false;
 
     /// <summary>
-    /// Gets a value indicating the color that should be used for the modifier within freeplay.
+    /// Gets a value indicating the <see cref="Color"/> that should be used for the modifier within freeplay.
     /// </summary>
     public virtual Color FreeplayFileColor => Color.gray;
 
     /// <summary>
-    /// Gets a value indicating whether the modifier is unique. If true, the player can only have one instance of this modifier.
+    /// Gets a value indicating whether the modifier is unique. If <see langword="true"/>, the player can only have one instance of this modifier.
     /// </summary>
     public virtual bool Unique => true;
 
     /// <summary>
-    /// Gets the HUD description for this modifier. Does nothing if <see cref="HideOnUi"/> is true. Required to be visible on UI.
+    /// Gets the HUD description for this modifier. Does nothing if <see cref="HideOnUi"/> is <see langword="true"/>. Required to be visible on UI.
     /// </summary>
     /// <returns>The description string for the HUD.</returns>
     public virtual string GetDescription() => string.Empty;
@@ -95,14 +95,14 @@ public abstract class BaseModifier : IOptionable
     }
 
     /// <summary>
-    /// Called when the modifier is updated. Attached to the ModifierComponent's Update method.
+    /// Called when the modifier is updated. Attached to <see cref="ModifierComponent"/>'s <see cref="ModifierComponent.Update"/> method.
     /// </summary>
     public virtual void Update()
     {
     }
 
     /// <summary>
-    /// Called when the modifier is updated. Attached to the ModifierComponent's FixedUpdate method.
+    /// Called when the modifier is updated. Attached to <see cref="ModifierComponent"/>'s <see cref="ModifierComponent.FixedUpdate"/> method.
     /// </summary>
     public virtual void FixedUpdate()
     {
@@ -126,7 +126,7 @@ public abstract class BaseModifier : IOptionable
     /// <summary>
     /// Determines whether the player can vent.
     /// </summary>
-    /// <returns>True if the player can vent, false otherwise. Null for no effect.</returns>
+    /// <returns><see langword="true"/> if the player can vent, <see langword="false"/> otherwise. <see langword="null"/> for no effect.</returns>
     public virtual bool? CanVent() => null;
 
     /// <summary>

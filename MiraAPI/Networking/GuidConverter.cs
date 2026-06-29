@@ -24,7 +24,7 @@ public class GuidConverter : MessageConverter<Guid>
     /// Reads a <see cref="Guid"/> from the reader.
     /// </summary>
     /// <inheritdoc />
-    /// <returns>A GUID object.</returns>
+    /// <returns>A <see cref="Guid"/> object.</returns>
     public override Guid Read(MessageReader reader, Type objectType)
     {
         return new Guid(reader.ReadBytesAndSize());
