@@ -121,5 +121,5 @@ public enum MenuCategory
     /// <summary>
     /// Determines the option group is in the second custom settings tab.
     /// </summary>
-    CustomTwo
+    CustomTwo,
 }

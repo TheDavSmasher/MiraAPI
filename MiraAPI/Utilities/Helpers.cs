@@ -40,6 +40,11 @@ public static class Helpers
         return keybindIcon;
     }
 
+    /// <summary>
+    /// Gets the move next of an <see cref="IEnumerator"/> on <typeparamref name="T"/>.
+    /// </summary>
+    /// <typeparam name="T">Where the <see cref="Scroller"/> should be parented to.</typeparam>
+    /// <returns>THe corresponding method to patch.</returns>
     public static MethodBase? GetStateMachineMoveNext<T>(string methodName)
     {
         var typeName = typeof(T).FullName;
