@@ -47,7 +47,12 @@ public static class HudManagerPatches
         {
             foreach (var aspect in baseButtons.GetComponentsInChildren<AspectPosition>(true))
             {
-                if (aspect.gameObject == null)
+                if (!aspect.gameObject)
+                {
+                    continue;
+                }
+
+                if (aspect.gameObject.transform.parent.name == "TopRight")
                 {
                     continue;
                 }
@@ -65,7 +70,7 @@ public static class HudManagerPatches
 
         foreach (var button in HudManager.Instance.GetComponentsInChildren<ActionButton>(true))
         {
-            if (button.gameObject == null)
+            if (!button.gameObject)
             {
                 continue;
             }
