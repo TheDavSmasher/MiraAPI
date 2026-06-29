@@ -93,11 +93,33 @@ public abstract class AbstractOptionGroup<T> : AbstractOptionGroup where T : IOp
     }
 }
 
+/// <summary>
+/// Menu categories for option groups.
+/// </summary>
 public enum MenuCategory
 {
+    /// <summary>
+    /// Determines the option group is in the game settings tab.
+    /// </summary>
     Game,
+
+    /// <summary>
+    /// Determines the option group is in the role settings tab.
+    /// </summary>
     Roles,
+
+    /// <summary>
+    /// Determines the option group is in the modifier settings tab.
+    /// </summary>
     Modifiers,
+
+    /// <summary>
+    /// Determines the option group is in the first custom settings tab.
+    /// </summary>
     CustomOne,
+
+    /// <summary>
+    /// Determines the option group is in the second custom settings tab.
+    /// </summary>
     CustomTwo
 }
