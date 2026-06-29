@@ -7,7 +7,7 @@ namespace MiraAPI.Patches.LocalSettings;
 public static class ToggleBehaviourPatch
 {
     /// <summary>
-    /// ResetText was inlined ofc.
+    /// <see cref="ToggleButtonBehaviour.ResetText"/> was inlined ofc.
     /// Skill issue.
     /// </summary>
     [HarmonyPrefix]

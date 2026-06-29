@@ -18,7 +18,7 @@ public class PlayerVoteData(nint cppPtr) : MonoBehaviour(cppPtr)
     public PlayerControl Owner { get; private set; } = null!;
 
     /// <summary>
-    /// Gets the list of votes the owner has.
+    /// Gets the list of <see cref="CustomVote"/>s the owner has.
     /// </summary>
     [HideFromIl2Cpp]
     public List<CustomVote> Votes { get; private set; } = [];
@@ -48,7 +48,7 @@ public class PlayerVoteData(nint cppPtr) : MonoBehaviour(cppPtr)
     /// Returns whether the owner has voted for the specified player.
     /// </summary>
     /// <param name="playerId">The target's playerId.</param>
-    /// <returns>True if the owner voted for the specified player, false otherwise.</returns>
+    /// <returns><see langword="true"/> if the owner voted for the specified player, <see langword="false"/> otherwise.</returns>
     public bool VotedFor(byte playerId)
     {
         return Votes.Exists(x => x.Suspect == playerId);
@@ -64,9 +64,9 @@ public class PlayerVoteData(nint cppPtr) : MonoBehaviour(cppPtr)
     }
 
     /// <summary>
-    /// Removes the specified vote.
+    /// Removes the specified <see cref="CustomVote"/>.
     /// </summary>
-    /// <param name="vote">The vote you would like to remove.</param>
+    /// <param name="vote">The <see cref="CustomVote"/> you would like to remove.</param>
     public void RemovePlayerVote(CustomVote vote)
     {
         Votes.Remove(vote);

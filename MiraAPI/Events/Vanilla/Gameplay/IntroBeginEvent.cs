@@ -6,7 +6,7 @@
 public class IntroBeginEvent : MiraEvent
 {
     /// <summary>
-    /// Gets the instance of the IntroCutscene.
+    /// Gets the <see cref="global::IntroCutscene"/> instance.
     /// </summary>
     public IntroCutscene IntroCutscene { get; }
 

@@ -123,7 +123,6 @@ public static class IntroCutscenePatches
                 introCutscene = __instance.Cast<IntroCutscene>();
             }
 
-
             Info("IntroCutscene ended");
 
             MiraEventManager.InvokeEvent(new IntroEndEvent(introCutscene));

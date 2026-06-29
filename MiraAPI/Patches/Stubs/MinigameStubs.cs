@@ -4,13 +4,13 @@ using HarmonyLib;
 namespace MiraAPI.Patches.Stubs;
 
 /// <summary>
-/// Reverse patches for Minigames.
+/// Reverse patches for <see cref="Minigame"/>s.
 /// </summary>
 [HarmonyPatch]
 public static class MinigameStubs
 {
     /// <summary>
-    /// Reverse patch for Minigame.Begin.
+    /// Reverse patch for <see cref="Minigame.Begin"/>.
     /// </summary>
     /// <param name="instance">The Minigame instance.</param>
     /// <param name="task">Associated PlayerTask.</param>
@@ -23,7 +23,7 @@ public static class MinigameStubs
     }
 
     /// <summary>
-    /// Reverse patch for Minigame.Close.
+    /// Reverse patch for <see cref="Minigame.Close()"/>.
     /// </summary>
     /// <param name="instance">The Minigame instance.</param>
     [HarmonyReversePatch]

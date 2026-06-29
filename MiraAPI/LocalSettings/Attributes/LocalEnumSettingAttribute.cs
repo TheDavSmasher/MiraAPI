@@ -5,9 +5,9 @@ using MiraAPI.LocalSettings.SettingTypes;
 namespace MiraAPI.LocalSettings.Attributes;
 
 /// <summary>
-/// Creates an enum setting for the <see cref="ConfigEntry{T}"/>.
+/// Creates a <see cref="LocalEnumSetting"/> for the <see cref="ConfigEntry{T}"/>.
 /// </summary>
-/// <param name="names">Optional custom enum names.</param>
+/// <param name="names">Optional custom <see langword="enum"/> names.</param>
 /// <inheritdoc/>
 [AttributeUsage(AttributeTargets.Property)]
 public class LocalEnumSettingAttribute(

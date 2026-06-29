@@ -1,7 +1,7 @@
 ﻿namespace MiraAPI.Hud;
 
 /// <summary>
-/// The location of the custom button on the screen.
+/// The location of the <see cref="CustomActionButton"/> on the screen.
 /// </summary>
 public enum ButtonLocation
 {

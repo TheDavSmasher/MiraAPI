@@ -48,9 +48,9 @@ public static class Extensions
     }
 
     /// <summary>
-    /// Used if you override Minigame.Close.
+    /// Used if you override <see cref="Minigame.Close()"/>.
     /// </summary>
-    /// <param name="self">The minigame.</param>
+    /// <param name="self">The <see cref="Minigame"/>.</param>
     public static void BaseClose(this Minigame self)
     {
         bool isComplete;
@@ -91,16 +91,16 @@ public static class Extensions
     }
 
     /// <summary>
-    /// Sets the cooldown of a button with a formatted string.
+    /// Sets the cooldown of an <see cref="ActionButton"/> with a formatted string.
     /// </summary>
-    /// <param name="button">The ActionButton to set the cooldown for.</param>
+    /// <param name="button">The <see cref="ActionButton"/> to set the cooldown for.</param>
     /// <param name="timer">The current timer value.</param>
     /// <param name="maxTimer">The maximum timer value.</param>
     /// <param name="format">The format string to use for the timer text.</param>
     public static void SetCooldownFormat(this ActionButton? button, float timer, float maxTimer, string format = "0")
     {
         var num = Mathf.Clamp(timer / maxTimer, 0f, 1f);
-        button.isCoolingDown = num > 0f;
+        button!.isCoolingDown = num > 0f;
         button.SetCooldownFill(num);
         if (button.isCoolingDown)
         {
@@ -112,9 +112,9 @@ public static class Extensions
     }
 
     /// <summary>
-    /// Sets the fill-up variant of a cooldown button with a formatted string.
+    /// Sets the fill-up variant of a cooldown <see cref="ActionButton"/> with a formatted string.
     /// </summary>
-    /// <param name="button">The ActionButton to set the cooldown for.</param>
+    /// <param name="button">The <see cref="ActionButton"/> to set the cooldown for.</param>
     /// <param name="timer">The current timer value.</param>
     /// <param name="maxTimer">The maximum timer value.</param>
     /// <param name="format">The format string to use for the timer text.</param>
@@ -161,43 +161,43 @@ public static class Extensions
     }
 
     /// <summary>
-    /// Gets a PlayerControl from their PlayerVoteArea in a meeting.
+    /// Gets a <see cref="PlayerControl"/> from their <see cref="PlayerVoteArea"/> in a meeting.
     /// </summary>
-    /// <param name="state">The vote area.</param>
-    /// <returns>The player's PlayerControl.</returns>
+    /// <param name="state">The <see cref="PlayerVoteArea"/>.</param>
+    /// <returns>The player's <see cref="PlayerControl"/>.</returns>
     public static PlayerControl? GetPlayer(this PlayerVoteArea state) => GameData.Instance.GetPlayerById(state.TargetPlayerId)?.Object;
 
     /// <summary>
-    /// Gets an int representing the amount of tasks a player has left.
+    /// Gets an <see langword="int"/> representing the amount of tasks a player has left.
     /// </summary>
     /// <param name="player">The player.</param>
     /// <returns>A count of how many tasks the player has left.</returns>
     public static int GetTasksLeft(this PlayerControl player) => player.Data.Tasks.ToArray().Count(x => !x.Complete);
 
     /// <summary>
-    /// Checks if a PlayerControl is the game's host.
+    /// Checks if a <see cref="PlayerControl"/> is the game's host.
     /// </summary>
-    /// <param name="playerControl">The player you're checking for.</param>
-    /// <returns>If the player is the host, true, else false.</returns>
+    /// <param name="playerControl">The <see cref="PlayerControl"/> you're checking for.</param>
+    /// <returns>If the player is the host, <see langword="true"/>, else <see langword="false"/>.</returns>
     public static bool IsHost(this PlayerControl playerControl)
     {
         return TutorialManager.InstanceExists || AmongUsClient.Instance.HostId == playerControl.OwnerId;
     }
 
     /// <summary>
-    /// Checks if a PlayerControl is protected by a Guardian Angel.
+    /// Checks if a <see cref="PlayerControl"/> is protected by a Guardian Angel.
     /// </summary>
-    /// <param name="playerControl">The player you're checking for.</param>
-    /// <returns>If the player is protected, true, else false.</returns>
+    /// <param name="playerControl">The <see cref="PlayerControl"/> you're checking for.</param>
+    /// <returns>If the player is protected, <see langword="true"/>, else <see langword="false"/>.</returns>
     public static bool ProtectedByGa(this PlayerControl playerControl)
     {
         return playerControl.protectedByGuardianId > -1;
     }
 
     /// <summary>
-    /// Used to convert a System.Collections.Generic.List to Il2cppSystem.
+    /// Used to convert a <see cref="List{T}"/> to <see cref="Il2CppSystem.Collections.Generic.List{T}"/>.
     /// </summary>
-    /// <param name="systemList">The list.</param>
+    /// <param name="systemList">The <see cref="List{T}"/>.</param>
     /// <typeparam name="T">The type in the list.</typeparam>
     /// <returns>The converted list.</returns>
     public static Il2CppSystem.Collections.Generic.List<T> ToIl2CppList<T>(this List<T> systemList)
@@ -213,19 +213,19 @@ public static class Extensions
     }
 
     /// <summary>
-    /// Determines if a float is an integer.
+    /// Determines if a <see langword="float"/> is an integer.
     /// </summary>
-    /// <param name="number">The float number.</param>
-    /// <returns>True if the float is an integer, false otherwise.</returns>
+    /// <param name="number">The <see langword="float"/> number.</param>
+    /// <returns><see langword="true"/> if the <see langword="float"/> is an integer, <see langword="false"/> otherwise.</returns>
     public static bool IsInteger(this float number)
     {
         return Mathf.Approximately(number, Mathf.Round(number));
     }
 
     /// <summary>
-    /// Destroys the object properly.
+    /// Destroys the <see cref="GameObject"/> properly.
     /// </summary>
-    /// <param name="obj">The object to destroy.</param>
+    /// <param name="obj">The <see cref="GameObject"/> to destroy.</param>
     /// <param name="clearGc">Whether to run the garbage collector immediately.</param>
     public static void DeepDestroy(this GameObject obj, bool clearGc = true)
     {
@@ -348,15 +348,15 @@ public static class Extensions
     }
 
     /// <summary>
-    /// Gets a cache of player's vote data components to improve performance.
+    /// Gets a cache of <see cref="PlayerControl"/>'s <see cref="PlayerVoteData"/> to improve performance.
     /// </summary>
     public static Dictionary<PlayerControl, PlayerVoteData> VoteDataComponents { get; } = [];
 
     /// <summary>
-    /// Gets the PlayerVoteData of a player.
+    /// Gets the <see cref="PlayerVoteData"/> of a <see cref="PlayerControl"/>.
     /// </summary>
-    /// <param name="player">The PlayerControl object.</param>
-    /// <returns>A PlayerVoteData if there is one, null otherwise.</returns>
+    /// <param name="player">The <see cref="PlayerControl"/> object.</param>
+    /// <returns>A <see cref="PlayerVoteData"/> if there is one, <see langword="null"/> otherwise.</returns>
     public static PlayerVoteData GetVoteData(this PlayerControl player)
     {
         if (VoteDataComponents.TryGetValue(player, out var component))
@@ -375,11 +375,11 @@ public static class Extensions
     }
 
     /// <summary>
-    /// Gets the maximum value from a dictionary of integers, returning the key and value.
+    /// Gets the maximum value from a <see cref="Dictionary{TKey, TValue}"/> of integers, returning the key and value.
     /// </summary>
-    /// <param name="self">The dictionary to search.</param>
+    /// <param name="self">The <see cref="Dictionary{TKey, TValue}"/> to search.</param>
     /// <param name="tie">Whether there is a tie for the maximum value.</param>
-    /// <returns>The key-value pair with the maximum value.</returns>
+    /// <returns>The <see cref="KeyValuePair{TKey, TValue}"/> with the maximum value.</returns>
     public static KeyValuePair<byte, int> MaxPair(this Dictionary<byte, int> self, out bool tie)
     {
         tie = true;
@@ -400,11 +400,11 @@ public static class Extensions
     }
 
     /// <summary>
-    /// Gets the maximum value from a dictionary of floats, returning the key and value.
+    /// Gets the maximum value from a <see cref="Dictionary{TKey, TValue}"/> of floats, returning the key and value.
     /// </summary>
-    /// <param name="self">The dictionary to search.</param>
+    /// <param name="self">The <see cref="Dictionary{TKey, TValue}"/> to search.</param>
     /// <param name="tie">Whether there is a tie for the maximum value.</param>
-    /// <returns>The key-value pair with the maximum value.</returns>
+    /// <returns>The <see cref="KeyValuePair{TKey, TValue}"/> with the maximum value.</returns>
     public static KeyValuePair<byte, float> MaxPair(this Dictionary<byte, float> self, out bool tie)
     {
         tie = true;
@@ -441,10 +441,10 @@ public static class Extensions
     }
 
     /// <summary>
-    /// Gets a proper string for an enum. (with spaces).
+    /// Gets a proper string for an <see cref="Enum"/>. (with spaces).
     /// </summary>
-    /// <param name="enum">The enum you would like to change.</param>
-    /// <returns>A proper string for the enum.</returns>
+    /// <param name="enum">The <see cref="Enum"/> you would like to change.</param>
+    /// <returns>A proper string for the <see cref="Enum"/>.</returns>
     public static string ToDisplayString(this Enum @enum)
     {
         var regex = new Regex(@"([^\^])([A-Z][a-z$])");
@@ -494,9 +494,9 @@ public static class Extensions
     }
 
     /// <summary>
-    /// Enables stencil masking on a TMP text object.
+    /// Enables stencil masking on a <see cref="TMP_Text"/> object.
     /// </summary>
-    /// <param name="text">The TMP text.</param>
+    /// <param name="text">The <see cref="TMP_Text"/>.</param>
     public static void EnableStencilMasking(this TMP_Text text)
     {
         text.fontMaterial.SetFloat(ShaderID.Stencil, 1);
@@ -507,18 +507,18 @@ public static class Extensions
     /// Checks if a type is static.
     /// </summary>
     /// <param name="type">The type being checked.</param>
-    /// <returns>True if the type is static, false otherwise.</returns>
+    /// <returns><see langword="true"/> if the type is static, <see langword="false"/> otherwise.</returns>
     public static bool IsStatic(this Type type)
     {
         return type is { IsClass: true, IsAbstract: true, IsSealed: true };
     }
 
     /// <summary>
-    /// Gets a darkened version of a color.
+    /// Gets a darkened version of a <see cref="Color32"/>.
     /// </summary>
-    /// <param name="color">The original color.</param>
+    /// <param name="color">The original <see cref="Color32"/>.</param>
     /// <param name="darknessAmount">A darkness amount between 0 and 255.</param>
-    /// <returns>The darkened color.</returns>
+    /// <returns>The darkened <see cref="Color32"/>.</returns>
     public static Color32 GetShadowColor(this Color32 color, byte darknessAmount)
     {
         return
@@ -544,11 +544,11 @@ public static class Extensions
     }
 
     /// <summary>
-    /// Chunks a collection of NetData into smaller arrays.
+    /// Chunks a collection of <see cref="NetData"/> into smaller arrays.
     /// </summary>
-    /// <param name="dataCollection">A collection of NetData objects.</param>
+    /// <param name="dataCollection">An <see cref="IEnumerable{T}"/> of <see cref="NetData"/>s.</param>
     /// <param name="chunkSize">The max chunk size in bytes.</param>
-    /// <returns>A Queue of NetData arrays.</returns>
+    /// <returns>A <see cref="Queue{T}"/> of <see cref="NetData"/> arrays.</returns>
     public static Queue<NetData[]> ChunkNetData(this IEnumerable<NetData> dataCollection, int chunkSize)
     {
         Queue<NetData[]> chunks = [];
@@ -585,10 +585,10 @@ public static class Extensions
     }
 
     /// <summary>
-    /// Determines if a given OptionBehaviour is for a custom option.
+    /// Determines if a given <see cref="OptionBehaviour"/> is for a custom option.
     /// </summary>
-    /// <param name="optionBehaviour">The OptionBehaviour to be tested.</param>
-    /// <returns>True if the OptionBehaviour is for a custom options, false otherwise.</returns>
+    /// <param name="optionBehaviour">The <see cref="OptionBehaviour"/> to be tested.</param>
+    /// <returns><see langword="true"/> if the <see cref="OptionBehaviour"/> is for a custom options, <see langword="false"/> otherwise.</returns>
     public static bool IsCustom(this OptionBehaviour optionBehaviour)
     {
         return ModdedOptionsManager.ModdedOptions.Values.Any(
@@ -596,11 +596,11 @@ public static class Extensions
     }
 
     /// <summary>
-    /// Randomizes a list.
+    /// Randomizes a <see cref="List{T}"/>.
     /// </summary>
-    /// <param name="list">The list object.</param>
-    /// <typeparam name="T">The type of object the list contains.</typeparam>
-    /// <returns>A randomized list made from the original list.</returns>
+    /// <param name="list">The <see cref="List{T}"/> object.</param>
+    /// <typeparam name="T">The type of object the <paramref name="list"/> contains.</typeparam>
+    /// <returns>A randomized <see cref="List{T}"/> made from the original <paramref name="list"/>.</returns>
     public static List<T> Randomize<T>(this List<T> list)
     {
         List<T> randomizedList = [];
@@ -616,33 +616,33 @@ public static class Extensions
     }
 
     /// <summary>
-    /// Darkens a color by a specified amount.
+    /// Darkens a <see cref="Color"/> by a specified amount.
     /// </summary>
-    /// <param name="color">The original color.</param>
-    /// <param name="amount">A float amount between 0 and 1.</param>
-    /// <returns>The darkened color.</returns>
+    /// <param name="color">The original <see cref="Color"/>.</param>
+    /// <param name="amount">A <see langword="float"/> amount between 0 and 1.</param>
+    /// <returns>The darkened <see cref="Color"/>.</returns>
     public static Color DarkenColor(this Color color, float amount = 0.45f)
     {
         return new Color(color.r - amount, color.g - amount, color.b - amount);
     }
 
     /// <summary>
-    /// Lightens a color by a specified amount.
+    /// Lightens a <see cref="Color"/> by a specified amount.
     /// </summary>
-    /// <param name="color">The original color.</param>
-    /// <param name="amount">A float amount between 0.0 and 1.0.</param>
-    /// <returns>The lightened color.</returns>
+    /// <param name="color">The original <see cref="Color"/>.</param>
+    /// <param name="amount">A <see langword="float"/> amount between 0.0 and 1.0.</param>
+    /// <returns>The lightened <see cref="Color"/>.</returns>
     public static Color LightenColor(this Color color, float amount = 0.45f)
     {
         return new Color(color.r + amount, color.g + amount, color.b + amount);
     }
 
     /// <summary>
-    /// Gets the nearest dead body to a player.
+    /// Gets the nearest <see cref="DeadBody"/> to a <see cref="PlayerControl"/>.
     /// </summary>
-    /// <param name="playerControl">The player object.</param>
+    /// <param name="playerControl">The <see cref="PlayerControl"/> object.</param>
     /// <param name="radius">The radius to search within.</param>
-    /// <returns>The dead body if it is found, or null there is none within the radius.</returns>
+    /// <returns>The <see cref="DeadBody"/> if it is found, or <see langword="null"/> there is none within the radius.</returns>
     public static DeadBody? GetNearestDeadBody(this PlayerControl playerControl, float radius)
     {
         return Helpers
@@ -651,15 +651,15 @@ public static class Extensions
     }
 
     /// <summary>
-    /// Finds the nearest object of a specified type to a player. It will only work if the object has a collider.
+    /// Finds the nearest <typeparamref name="T"/> to a <see cref="PlayerControl"/>. It will only work if the object has a collider.
     /// </summary>
-    /// <param name="playerControl">The player object.</param>
+    /// <param name="playerControl">The <see cref="PlayerControl"/> object.</param>
     /// <param name="radius">The radius to search within.</param>
     /// <param name="filter">The contact filter.</param>
     /// <param name="colliderTag">An optional collider tag.</param>
-    /// <param name="predicate">Optional predicate to test if the object is valid.</param>
+    /// <param name="predicate">Optional predicate to test if the <typeparamref name="T"/> is valid.</param>
     /// <typeparam name="T">The type of the object.</typeparam>
-    /// <returns>The object if it was found, or null if there is none within the radius.</returns>
+    /// <returns>The <typeparamref name="T"/> if it was found, or <see langword="null"/> if there is none within the radius.</returns>
     public static T? GetNearestObjectOfType<T>(
         this PlayerControl playerControl,
         float radius,
@@ -672,15 +672,15 @@ public static class Extensions
     }
 
     /// <summary>
-    /// Gets the closest player that matches the given criteria.
+    /// Gets the closest <see cref="PlayerControl"/> that matches the given criteria.
     /// </summary>
-    /// <param name="playerControl">The player object.</param>
+    /// <param name="playerControl">The <see cref="PlayerControl"/> object.</param>
     /// <param name="includeImpostors">Whether impostors should be included in the search.</param>
     /// <param name="distance">The radius to search within.</param>
     /// <param name="ignoreColliders">Whether colliders should be ignored when searching.</param>
     /// <param name="includeGhosts">Determines if Ghosts are included.</param>
-    /// <param name="predicate">Optional predicate to test if the object is valid.</param>
-    /// <returns>The closest player if there is one, false otherwise.</returns>
+    /// <param name="predicate">Optional predicate to test if the <see cref="PlayerControl"/> is valid.</param>
+    /// <returns>The closest <see cref="PlayerControl"/> if there is one, <see langword="false"/> otherwise.</returns>
     public static PlayerControl? GetClosestPlayer(
         this PlayerControl playerControl,
         bool includeImpostors,
@@ -700,10 +700,10 @@ public static class Extensions
     }
 
     /// <summary>
-    /// Fixed version of Reactor's SetOutline.
+    /// Fixed version of <see cref="Reactor.Utilities.Extensions.UnityExtensions.SetOutline(Renderer, Color?)"/>.
     /// </summary>
-    /// <param name="renderer">The renderer you want to update the outline for.</param>
-    /// <param name="color">The outline color.</param>
+    /// <param name="renderer">The <see cref="Renderer"/> you want to update the outline for.</param>
+    /// <param name="color">The outline <see cref="Color"/>.</param>
     public static void UpdateOutline(this Renderer renderer, Color? color)
     {
         renderer.material.SetFloat(ShaderID.Outline, color.HasValue ? 1 : 0);
@@ -716,7 +716,7 @@ public static class Extensions
     /// <summary>
     /// Registers a new mod keybind as a user-assignable button action in Rewired.
     /// </summary>
-    /// <param name="userData">The Rewired user data to add the action to.</param>
+    /// <param name="userData">The Rewired <see cref="UserData"/> to add the action to.</param>
     /// <param name="id">The internal name of the action.</param>
     /// <param name="name">Text shown in the rebinding UI.</param>
     /// /// <param name="group">Group shown above the label.</param>

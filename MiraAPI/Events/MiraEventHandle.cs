@@ -3,7 +3,7 @@
 namespace MiraAPI.Events;
 
 /// <summary>
-/// Event handle to use when unregistering an event.
+/// Event handle to use when unregistering a <see cref="MiraEvent"/>.
 /// </summary>
 public class MiraEventHandle
 {

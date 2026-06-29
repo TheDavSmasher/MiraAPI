@@ -6,7 +6,7 @@ using MiraAPI.Events.Vanilla.Usables;
 namespace MiraAPI.Patches.Events;
 
 /// <summary>
-/// Patches to invoke vent related MiraEvents.
+/// Patches to invoke <see cref="Vent"/> related <see cref="MiraEvent"/>s.
 /// </summary>
 [HarmonyPatch]
 public static class VentEventPatches

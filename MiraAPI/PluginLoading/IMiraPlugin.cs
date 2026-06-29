@@ -38,8 +38,8 @@ public interface IMiraPlugin
     public virtual string CustomOptionMenuTwoDescription => "Apply game settings for this mod!";
 
     /// <summary>
-    /// Gets the BepInEx configuration file for the plugin.
+    /// Gets the <see cref="ConfigFile"/> for the plugin.
     /// </summary>
-    /// <returns>The BepInEx configuration file for the plugin.</returns>
+    /// <returns>The <see cref="ConfigFile"/> for the plugin.</returns>
     public ConfigFile GetConfigFile();
 }

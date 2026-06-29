@@ -10,7 +10,7 @@ using Object = UnityEngine.Object;
 namespace MiraAPI.LocalSettings;
 
 /// <summary>
-/// Represents a local settings button.
+/// Represents a <see cref="LocalSettingsTab"/> button.
 /// </summary>
 public class LocalSettingsButton(string text, Action onClick)
 {
@@ -25,7 +25,7 @@ public class LocalSettingsButton(string text, Action onClick)
     public Action OnClick { get; set; } = onClick;
 
     /// <summary>
-    /// Gets the tab instance this button belongs to.
+    /// Gets the <see cref="LocalSettingsTab"/> instance this button belongs to.
     /// </summary>
     public LocalSettingsTab? Tab { get; internal set; }
 

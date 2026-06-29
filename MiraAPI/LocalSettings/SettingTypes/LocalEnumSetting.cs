@@ -11,17 +11,17 @@ using Object = UnityEngine.Object;
 namespace MiraAPI.LocalSettings.SettingTypes;
 
 /// <summary>
-/// Local setting class for enums.
+/// Local setting class for <see langword="enum"/>s.
 /// </summary>
 public class LocalEnumSetting : LocalSettingBase<int>
 {
     /// <summary>
-    /// Gets the enum type of the setting.
+    /// Gets the <see cref="Enum"/> type of the setting.
     /// </summary>
     public Type EnumType { get; }
 
     /// <summary>
-    /// Gets the enum values.
+    /// Gets the <see langword="enum"/> values.
     /// </summary>
     public string[] Values { get; }
 
@@ -29,8 +29,8 @@ public class LocalEnumSetting : LocalSettingBase<int>
     /// Initializes a new instance of the <see cref="LocalEnumSetting"/> class.
     /// </summary>
     /// <inheritdoc/>
-    /// <param name="enumType">The enum type.</param>
-    /// <param name="values">The optional values array to replace the enum names.</param>
+    /// <param name="enumType">The <see cref="Enum"/> type.</param>
+    /// <param name="values">The optional values array to replace the <see langword="enum"/> names.</param>
     public LocalEnumSetting(
         Type tab,
         ConfigEntryBase configEntry,

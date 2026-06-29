@@ -3,14 +3,14 @@
 namespace MiraAPI.Utilities;
 
 /// <summary>
-/// Extension methods for the Color struct.
+/// Extension methods for the <see cref="Color"/> struct.
 /// </summary>
 public static class ColorExtensions
 {
     /// <summary>
-    /// Gets the relative luminance of a color (WCAG 2.1 specification). 0 is black, 1 is white.
+    /// Gets the relative luminance of a <see cref="Color"/> (WCAG 2.1 specification). 0 is black, 1 is white.
     /// </summary>
-    /// <param name="color">Color to calculate luminance for.</param>
+    /// <param name="color"><see cref="Color"/> to calculate luminance for.</param>
     /// <returns>Luminance value between 0 and 1.</returns>
     public static float GetRelativeLuminance(this Color color)
     {
@@ -21,11 +21,11 @@ public static class ColorExtensions
     }
 
     /// <summary>
-    /// Calculates the contrast ratio between two colors (WCAG 2.1 specification).
+    /// Calculates the contrast ratio between two <see cref="Color"/>s (WCAG 2.1 specification).
     /// </summary>
-    /// <param name="colorA">First color.</param>
-    /// <param name="colorB">Second color.</param>
-    /// <returns>Contrast ratio between the two colors.</returns>
+    /// <param name="colorA">First <see cref="Color"/>.</param>
+    /// <param name="colorB">Second <see cref="Color"/>.</param>
+    /// <returns>Contrast ratio between the two <see cref="Color"/>s.</returns>
     public static float GetContrastRatio(this Color colorA, Color colorB)
     {
         var luminanceA = colorA.GetRelativeLuminance();
@@ -34,11 +34,11 @@ public static class ColorExtensions
     }
 
     /// <summary>
-    /// Generates an accessible alternate color with sufficient contrast.
+    /// Generates an accessible alternate <see cref="Color"/> with sufficient contrast.
     /// </summary>
-    /// <param name="color">Base color.</param>
+    /// <param name="color">Base <see cref="Color"/>.</param>
     /// <param name="desiredRatio">Target contrast ratio (default 4.5f for AA).</param>
-    /// <returns>Alternate color with sufficient contrast.</returns>
+    /// <returns>Alternate <see cref="Color"/> with sufficient contrast.</returns>
     public static Color FindAlternateColor(this Color color, float desiredRatio = 4.5f)
     {
         var lightColor = FindMinimumContrastColor(color, Color.white, desiredRatio);
@@ -48,12 +48,12 @@ public static class ColorExtensions
     }
 
     /// <summary>
-    /// Finds the color with the minimum contrast ratio to the target color.
+    /// Finds the <see cref="Color"/> with the minimum contrast ratio to the target <see cref="Color"/>.
     /// </summary>
-    /// <param name="baseColor">The base color to start from.</param>
-    /// <param name="targetColor">The target color to compare against.</param>
+    /// <param name="baseColor">The base <see cref="Color"/> to start from.</param>
+    /// <param name="targetColor">The target <see cref="Color"/> to compare against.</param>
     /// <param name="desiredRatio">The desired contrast ratio.</param>
-    /// <returns>The color with the minimum contrast ratio to the target color.</returns>
+    /// <returns>The <see cref="Color"/> with the minimum contrast ratio to the target <see cref="Color"/>.</returns>
     public static Color FindMinimumContrastColor(Color baseColor, Color targetColor, float desiredRatio)
     {
         var baseLuminance = baseColor.GetRelativeLuminance();

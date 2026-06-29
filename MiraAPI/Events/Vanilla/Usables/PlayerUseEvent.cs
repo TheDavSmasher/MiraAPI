@@ -11,19 +11,19 @@ public class PlayerUseEvent : MiraCancelableEvent
     public IUsable Usable { get; }
 
     /// <summary>
-    /// Gets a value indicating whether the IUsable is a <see cref="Console"/>, <see cref="MapConsole"/>, or <see cref="SystemConsole"/>.
+    /// Gets a value indicating whether the <see cref="Usable"/> is a <see cref="Console"/>, <see cref="MapConsole"/>, or <see cref="SystemConsole"/>.
     /// </summary>
     public bool IsPrimaryConsole { get; }
 
     /// <summary>
-    /// Gets a value indicating whether the IUsable is a <see cref="Vent"/>.
+    /// Gets a value indicating whether the <see cref="Usable"/> is a <see cref="Vent"/>.
     /// </summary>
     public bool IsVent { get; }
 
     /// <summary>
     /// Initializes a new instance of the <see cref="PlayerUseEvent"/> class.
     /// </summary>
-    /// <param name="usable">The IUsable.</param>
+    /// <param name="usable">The <see cref="IUsable"/>.</param>
     public PlayerUseEvent(IUsable usable)
     {
         Usable = usable;

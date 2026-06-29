@@ -4,7 +4,7 @@ using System.Reflection;
 namespace MiraAPI.GameOptions.Attributes;
 
 /// <summary>
-/// Represents an attribute that is used to define a modded option.
+/// Represents an attribute that is used to define an <see cref="IModdedOption"/>.
 /// </summary>
 /// <param name="title">The option title.</param>
 /// <param name="roleType">Optional parameter to specify a role Type.</param>
@@ -26,13 +26,13 @@ public abstract class ModdedOptionAttribute(string title, Type? roleType = null)
     /// <summary>
     /// Sets the value of the option.
     /// </summary>
-    /// <param name="value">The new value as an object.</param>
+    /// <param name="value">The new value as an <see langword="object"/>.</param>
     public abstract void SetValue(object value);
 
     /// <summary>
     /// Gets the value of the option.
     /// </summary>
-    /// <returns>The value of the option as an object.</returns>
+    /// <returns>The value of the option as an <see langword="object"/>.</returns>
     public abstract object GetValue();
 
     internal abstract IModdedOption? CreateOption(object? value, PropertyInfo property);

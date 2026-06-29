@@ -8,7 +8,7 @@ namespace MiraAPI.Roles;
 public static class RoleId
 {
     /// <summary>
-    /// Gets the ID of a role.
+    /// Gets the ID of an <typeparamref name="T"/>.
     /// </summary>
     /// <typeparam name="T">The type of the role.</typeparam>
     /// <returns>The role ID as a ushort.</returns>

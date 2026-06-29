@@ -6,7 +6,7 @@ using MiraAPI.Utilities;
 namespace MiraAPI.LocalSettings.Attributes;
 
 /// <summary>
-/// Creates a slider setting for the <see cref="ConfigEntry{T}"/>.
+/// Creates a <see cref="LocalSliderSetting"/> for the <see cref="ConfigEntry{T}"/>.
 /// </summary>
 /// <inheritdoc/>
 /// <param name="min">Minimum range.</param>

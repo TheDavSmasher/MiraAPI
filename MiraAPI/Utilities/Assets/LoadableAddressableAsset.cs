@@ -15,7 +15,7 @@ public class LoadableAddressableAsset<T>(string uid) : LoadableAsset<T> where T 
 
     /// <summary>
     /// Initializes a new instance of the <see cref="LoadableAddressableAsset{T}"/> class, with added garbageCollector logic,
-    /// to help with https://github.com/BepInEx/Il2CppInterop/issues/40.
+    /// to help with <see href="https://github.com/BepInEx/Il2CppInterop/issues/40"/>.
     /// </summary>
     /// <param name="uid">The guid of the asset.</param>
     /// <param name="garbageCollection">A lambda that allows GCHandle.Alloc calls without garbage collection interferences.</param>

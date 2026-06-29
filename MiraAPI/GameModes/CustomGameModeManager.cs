@@ -6,12 +6,12 @@ using Reactor.Utilities;
 namespace MiraAPI.GameModes;
 
 /// <summary>
-/// Manages custom gamemodes.
+/// Manages <see cref="CustomGameMode"/>s.
 /// </summary>
 public static class CustomGameModeManager
 {
     /// <summary>
-    /// List of registered gamemodes.
+    /// List of registered <see cref="CustomGameMode"/>.
     /// </summary>
     internal static readonly Dictionary<int, CustomGameMode> GameModes = [];
 
@@ -21,14 +21,14 @@ public static class CustomGameModeManager
     }
 
     /// <summary>
-    /// Gets the current gamemode.
+    /// Gets the current <see cref="CustomGameMode"/>.
     /// </summary>
     public static CustomGameMode? ActiveMode { get; internal set; } = new DefaultMode();
 
     /// <summary>
-    /// Set current gamemode.
+    /// Set current <see cref="CustomGameMode"/>.
     /// </summary>
-    /// <param name="id">gamemode ID.</param>
+    /// <param name="id"><see cref="CustomGameMode"/> ID.</param>
     public static void SetGameMode(int id)
     {
         if (GameModes.TryGetValue(id, out var gameMode))
@@ -41,9 +41,9 @@ public static class CustomGameModeManager
     }
 
     /// <summary>
-    /// Register gamemode from type.
+    /// Register <see cref="CustomGameMode"/> from type.
     /// </summary>
-    /// <param name="gameModeType">Type of gamemode class, should inherit from <see cref="CustomGameMode"/>.</param>
+    /// <param name="gameModeType">Type of <see cref="CustomGameMode"/>, should inherit from <see cref="CustomGameMode"/>.</param>
     internal static void RegisterGameMode(Type gameModeType)
     {
         if (!typeof(CustomGameMode).IsAssignableFrom(gameModeType))

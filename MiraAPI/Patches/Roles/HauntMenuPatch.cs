@@ -6,7 +6,7 @@ using UnityEngine;
 namespace MiraAPI.Patches.Roles;
 
 /// <summary>
-/// Patches the haunt menu to show the actual role name rather than team.
+/// Patches the <see cref="HauntMenuMinigame"/> to show the actual role name rather than team.
 /// </summary>
 [HarmonyPatch(typeof(HauntMenuMinigame), nameof(HauntMenuMinigame.SetHauntTarget))]
 // SetFilterText was INLINED

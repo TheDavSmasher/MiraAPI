@@ -8,7 +8,7 @@ namespace MiraAPI.Events.Vanilla.Meeting.Voting;
 public class BeforeVoteEvent : MiraCancelableEvent
 {
     /// <summary>
-    /// Gets the instance of the voter's vote data.
+    /// Gets the instance of the voter's <see cref="PlayerVoteArea"/>.
     /// </summary>
     public PlayerVoteArea VoteArea { get; }
 
@@ -20,7 +20,7 @@ public class BeforeVoteEvent : MiraCancelableEvent
     /// <summary>
     /// Initializes a new instance of the <see cref="BeforeVoteEvent"/> class.
     /// </summary>
-    /// <param name="playerVoteArea">The player vote area that was voted on.</param>
+    /// <param name="playerVoteArea">The <see cref="PlayerVoteArea"/> that was voted on.</param>
     /// <param name="voter">The player who voted.</param>
     public BeforeVoteEvent(PlayerVoteArea playerVoteArea, PlayerControl voter)
     {

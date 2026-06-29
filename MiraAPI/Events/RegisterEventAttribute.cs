@@ -3,7 +3,7 @@
 namespace MiraAPI.Events;
 
 /// <summary>
-/// Register an event.
+/// Register a <see cref="MiraEvent"/> handler.
 /// </summary>
 [AttributeUsage(AttributeTargets.Method)]
 public class RegisterEventAttribute : Attribute

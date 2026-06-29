@@ -8,7 +8,7 @@ using Reactor.Utilities;
 namespace MiraAPI.LocalSettings;
 
 /// <summary>
-/// Manages local settings.
+/// Manages <see cref="LocalSettingsTab"/>s.
 /// </summary>
 public static class LocalSettingsManager
 {

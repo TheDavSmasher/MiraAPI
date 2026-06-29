@@ -3,7 +3,7 @@
 namespace MiraAPI.Keybinds;
 
 /// <summary>
-/// Class containing all default keybinds.
+/// Class containing all default <see cref="MiraKeybind"/>s.
 /// Recommended for cross-mod compatibility.
 /// </summary>
 [RegisterCustomKeybinds]

@@ -72,13 +72,13 @@ public static class TaskAdderPatches
         __instance.TaskParent = inner.transform;
         var crewmateFolder = __instance.Root.SubFolders.ToArray().FirstOrDefault(x => x.FolderName == CrewmateName)!;
         var impostorFolder = __instance.Root.SubFolders.ToArray().FirstOrDefault(x => x.FolderName == ImpostorName)!;
-        //var neutralFolder = __instance.CreateFolder("Neutral", __instance.Root, 2, Color.gray);
+        // var neutralFolder = __instance.CreateFolder("Neutral", __instance.Root, 2, Color.gray);
         var modifiersFolder = __instance.CreateFolder(ModifiersName, __instance.Root, 0, Color.blue);
 
         folders.Clear();
         folders.Add(crewmateFolder.FolderName, crewmateFolder);
         folders.Add(impostorFolder.FolderName, impostorFolder);
-        //folders.Add("Neutrals", neutralFolder);
+        // folders.Add("Neutrals", neutralFolder);
         folders.Add(ModifiersName, modifiersFolder);
 
         int folderIdx = 2;

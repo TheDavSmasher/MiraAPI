@@ -63,7 +63,7 @@ internal static class GameOptionsMenuPatch
             var filteredGroups =
                 GameSettingMenuPatches.SelectedMod?.InternalOptionGroups
                     .Where(x => x.OptionableType == null &&
-                                !x.ShowInModifiersMenu && x.ParentMenu == MenuCategory.Roles) ?? [];
+                                x.ParentMenu == MenuCategory.Roles) ?? [];
 
             foreach (var group in filteredGroups)
             {
@@ -171,7 +171,7 @@ internal static class GameOptionsMenuPatch
     private static void ModifiersUpdate(ref float num)
     {
         var groups = GameSettingMenuPatches.SelectedMod?.InternalOptionGroups
-            .Where(x => x.ShowInModifiersMenu || x.OptionableType?.IsAssignableTo(typeof(BaseModifier)) == true) ?? [];
+            .Where(x => x.ParentMenu is MenuCategory.Modifiers || x.OptionableType?.IsAssignableTo(typeof(BaseModifier)) == true) ?? [];
 
         foreach (var modGroup in groups)
         {
@@ -182,7 +182,7 @@ internal static class GameOptionsMenuPatch
     private static void ModifiersCreate(GameOptionsMenu menu)
     {
         var groups = GameSettingMenuPatches.SelectedMod?.InternalOptionGroups
-            .Where(x => x.ShowInModifiersMenu || x.OptionableType?.IsAssignableTo(typeof(BaseModifier)) == true) ?? [];
+            .Where(x => x.ParentMenu is MenuCategory.Modifiers || x.OptionableType?.IsAssignableTo(typeof(BaseModifier)) == true) ?? [];
         foreach (var group in groups)
         {
             CreateGroup(menu, group);
@@ -218,7 +218,7 @@ internal static class GameOptionsMenuPatch
         }
 
         var filteredGroups = GameSettingMenuPatches.SelectedMod?.InternalOptionGroups
-            .Where(x => x.OptionableType == null && !x.ShowInModifiersMenu && x.ParentMenu == MenuCategory.Roles) ?? [];
+            .Where(x => x.OptionableType == null && x.ParentMenu == MenuCategory.Roles) ?? [];
 
         foreach (var group in filteredGroups)
         {

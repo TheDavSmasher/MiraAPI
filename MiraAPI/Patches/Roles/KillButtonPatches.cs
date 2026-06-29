@@ -7,13 +7,13 @@ using UnityEngine;
 namespace MiraAPI.Patches.Roles;
 
 /// <summary>
-/// Fix kill button issues for neutral killers.
+/// Fix <see cref="KillButton"/> issues for neutral killers.
 /// </summary>
 [HarmonyPatch(typeof(KillButton))]
 public static class KillButtonPatches
 {
     /// <summary>
-    /// SetTarget for custom roles.
+    /// <see cref="KillButton.SetTarget(PlayerControl)"/> for custom roles.
     /// </summary>
     [HarmonyPrefix]
     [HarmonyPatch(nameof(KillButton.SetTarget))]
@@ -46,7 +46,8 @@ public static class KillButtonPatches
     }
 
     /// <summary>
-    /// Use Custom Murder instead of Murder Player from vanilla.
+    /// Use <see cref="MiraAPI.Networking.CustomMurderRpc.RpcCustomMurder(PlayerControl, PlayerControl, MeetingCheck, bool, bool, bool, bool, bool, bool)"/>
+    /// instead of <see cref="PlayerControl.RpcMurderPlayer(PlayerControl, bool)"/> from vanilla.
     /// </summary>
     [HarmonyPrefix]
     [HarmonyPatch(nameof(KillButton.DoClick))]
