@@ -52,9 +52,9 @@ public abstract class ModdedOption<T> : IModdedOption
     public T DefaultValue { get; }
 
     /// <summary>
-    /// Gets the event that is invoked when the value of the option changes.
+    /// Gets or sets the event that is invoked when the value of the option changes.
     /// </summary>
-    public Action<T>? ChangedEvent { get; init; }
+    public Action<T>? ChangedEvent { get; set; }
 
     /// <inheritdoc />
     public Func<bool> Visible { get; set; }
