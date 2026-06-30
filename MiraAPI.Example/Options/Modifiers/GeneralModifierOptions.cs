@@ -9,7 +9,7 @@ public class GeneralModifierOptions : AbstractOptionGroup
 
     public override uint GroupPriority => 0;
 
-    public override bool ShowInModifiersMenu => true;
+    public override MenuCategory ParentMenu => MenuCategory.Modifiers;
 
     [ModdedToggleOption("Some Boolean Option")]
     public bool SomeBooleanOption { get; set; } = true;

@@ -40,7 +40,7 @@ public abstract class AbstractOptionGroup
     /// <summary>
     /// Gets a value indicating which menu the group is in.
     /// </summary>
-    public virtual MenuCategory ParentMenu => MenuCategory.Roles;
+    public virtual MenuCategory ParentMenu => MenuCategory.Game;
 
     /// <summary>
     /// Gets the function that determines whether the group should be visible or not.

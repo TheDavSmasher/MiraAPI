@@ -63,7 +63,7 @@ internal static class GameOptionsMenuPatch
             var filteredGroups =
                 GameSettingMenuPatches.SelectedMod?.InternalOptionGroups
                     .Where(x => x.OptionableType == null &&
-                                x.ParentMenu == MenuCategory.Roles) ?? [];
+                                x.ParentMenu == MenuCategory.Game) ?? [];
 
             foreach (var group in filteredGroups)
             {
@@ -218,7 +218,7 @@ internal static class GameOptionsMenuPatch
         }
 
         var filteredGroups = GameSettingMenuPatches.SelectedMod?.InternalOptionGroups
-            .Where(x => x.OptionableType == null && x.ParentMenu == MenuCategory.Roles) ?? [];
+            .Where(x => x.OptionableType == null && x.ParentMenu == MenuCategory.Game) ?? [];
 
         foreach (var group in filteredGroups)
         {
