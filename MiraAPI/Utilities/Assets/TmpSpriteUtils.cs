@@ -9,11 +9,11 @@ public static class TmpSpriteUtils
     private static Shader _spriteShader;
     private static Dictionary<string, TMP_SpriteAsset> LoadedSprites = [];
     public static TMP_SpriteAsset AssetHolder;
-    public static TMP_SpriteAsset CreateSpriteAsset(Sprite sprite, string assetName)
+    public static TMP_SpriteAsset CreateSpriteAsset(Sprite sprite, string assetName, float scale = 1)
     {
-        return CreateSpriteAsset(sprite.texture, sprite.rect, assetName);
+        return CreateSpriteAsset(sprite.texture, sprite.rect, assetName, scale);
     }
-    public static TMP_SpriteAsset CreateSpriteAsset(Texture2D sourceTexture, Rect rect, string assetName)
+    public static TMP_SpriteAsset CreateSpriteAsset(Texture2D sourceTexture, Rect rect, string assetName, float scale = 1)
     {
         if (LoadedSprites.TryGetValue(assetName, out var existingAsset))
         {
@@ -50,7 +50,7 @@ public static class TmpSpriteUtils
 
         spriteAsset.spriteInfoList = new Il2CppSystem.Collections.Generic.List<TMP_Sprite>();
 
-        AddSpriteToAsset(spriteAsset, rect, assetName);
+        AddSpriteToAsset(spriteAsset, rect, assetName, scale);
 
         spriteAsset.DontUnload().DontDestroy();
         spriteAsset.UpdateLookupTables();
@@ -62,7 +62,7 @@ public static class TmpSpriteUtils
         return spriteAsset;
     }
 
-    private static void AddSpriteToAsset(TMP_SpriteAsset spriteAsset, Rect rect, string spriteName)
+    private static void AddSpriteToAsset(TMP_SpriteAsset spriteAsset, Rect rect, string spriteName, float scale)
     {
         TMP_Sprite newSprite = new TMP_Sprite
         {
@@ -75,7 +75,7 @@ public static class TmpSpriteUtils
             xOffset = -(rect.width / 3),
             yOffset = rect.height / 1.25f,
             xAdvance = rect.width,
-            scale = 1,
+            scale = scale,
         };
 
         spriteAsset.spriteInfoList.Add(newSprite);
