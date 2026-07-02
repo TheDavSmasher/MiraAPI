@@ -72,7 +72,7 @@ public static class TmpSpriteUtils
             y = 0,
             width = rect.width,
             height = rect.height,
-            xOffset = -(rect.width / 3),
+            xOffset = -(rect.width / 3) + (scale - 1) * (rect.width / 2),
             yOffset = rect.height / 1.25f,
             xAdvance = rect.width,
             scale = scale,
