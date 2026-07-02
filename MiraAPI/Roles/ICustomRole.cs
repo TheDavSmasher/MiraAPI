@@ -5,6 +5,7 @@ using MiraAPI.GameOptions;
 using MiraAPI.Modifiers;
 using MiraAPI.PluginLoading;
 using Reactor.Utilities;
+using TMPro;
 using UnityEngine;
 
 namespace MiraAPI.Roles;

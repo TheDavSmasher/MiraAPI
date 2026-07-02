@@ -437,8 +437,7 @@ public static class RoleSettingMenuPatches
             roleSetting.Role.StringName,
             roleSetting.RoleMaxCount,
             roleSetting.RoleChance,
-            roleSetting.Role.TeamType,
-            false);
+            roleSetting.Role.TeamType);
 
         if (AmongUsClient.Instance.AmHost)
         {

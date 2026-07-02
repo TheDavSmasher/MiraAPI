@@ -26,9 +26,11 @@ public static class NotificationPopperPatch
 
         var textColor = customRole.OptionsMenuColor.ToTextColor();
 
+        var icon = customRole.Configuration.IconTmp ? $"<sprite name=\"{customRole.Configuration.IconTmp.name}\">" : string.Empty;
         var item = TranslationController.Instance.GetString(
             StringNames.LobbyChangeSettingNotificationRole,
             string.Concat(
+                icon,
                 "<font=\"Barlow-Black SDF\" material=\"Barlow-Black Outline\">",
                 textColor,
                 TranslationController.Instance.GetString(key, Array.Empty<Object>()),

@@ -3,6 +3,7 @@ using System;
 using Il2CppInterop.Runtime.Attributes;
 using MiraAPI.Patches.Freeplay;
 using MiraAPI.Utilities.Assets;
+using TMPro;
 using UnityEngine;
 namespace MiraAPI.Roles;
 
@@ -86,6 +87,12 @@ public record struct CustomRoleConfiguration
     /// </summary>
     [HideFromIl2Cpp]
     public LoadableAsset<Sprite>? Icon { get; set; } = null;
+
+    /// <summary>
+    /// Gets or sets the <see cref="TMP_SpriteAsset"/> for the Role Icon.
+    /// </summary>
+    [HideFromIl2Cpp]
+    public TMP_SpriteAsset IconTmp { get; set; }
 
     /// <summary>
     /// Gets or sets the Intro sound for the Role.

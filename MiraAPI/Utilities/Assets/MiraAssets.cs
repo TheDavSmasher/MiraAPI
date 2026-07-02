@@ -134,4 +134,6 @@ public static class MiraAssets
     /// Gets the sprite used for timed modifier file in TaskAdderGame.
     /// </summary>
     public static LoadableResourceAsset TimedModifierFile { get; } = new("MiraAPI.Resources.TimedModifierFile.png");
+
+    internal static LoadableResourceAsset BlankSprite { get; } = new("MiraAPI.Resources.BlankSprite.png");
 }
