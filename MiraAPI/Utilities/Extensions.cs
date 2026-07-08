@@ -342,9 +342,8 @@ public static class Extensions
     {
         yield return Resources.UnloadUnusedAssets();
 
-        GC.Collect(0, GCCollectionMode.Forced, blocking: true);
         GC.WaitForPendingFinalizers();
-        GC.Collect(0, GCCollectionMode.Forced, blocking: true);
+        GC.Collect(0, GCCollectionMode.Forced);
     }
 
     /// <summary>
