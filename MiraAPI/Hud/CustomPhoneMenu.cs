@@ -1,7 +1,9 @@
 ﻿using AmongUs.GameOptions;
 using Reactor.Utilities.Extensions;
 using System;
+using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.Events;
 #pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
@@ -18,6 +20,18 @@ namespace MiraAPI.Hud;
 [SuppressMessage("StyleCop.CSharp.MaintainabilityRules", "SA1401:Fields should be private", Justification = "Unity Convention")]
 public abstract class CustomPhoneMenu(IntPtr il2CppPtr) : Minigame(il2CppPtr)
 {
+    public interface IMenuEntry
+    {
+        ShapeshifterPanel Panel { get; }
+    }
+
+    protected record class BasicEntry(ShapeshifterPanel Panel) : IMenuEntry
+    {
+        public static implicit operator ShapeshifterPanel(BasicEntry entry) => entry.Panel;
+    }
+
+    public List<IMenuEntry> menuEntries;
+
     public float xStart = -0.8f;
     public float yStart = 2.15f;
     public float xOffset = 1.95f;
@@ -72,5 +86,39 @@ public abstract class CustomPhoneMenu(IntPtr il2CppPtr) : Minigame(il2CppPtr)
     public override sealed void Begin(PlayerTask task)
     {
         throw new NotImplementedException("Use the other Begin method.");
+    }
+
+    protected void RegisterPanels<TEntry>(
+        IEnumerable<TEntry> entries,
+        Action<ShapeshifterPanel, int, TEntry> entrySetter,
+        Func<ShapeshifterPanel, TEntry, IMenuEntry>? menuConfig = null)
+    {
+        menuEntries ??= [];
+
+        int currentEntries = menuEntries.Count;
+
+        var list = entries.ToList();
+
+        for (var i = 0; i < list.Count; i++)
+        {
+            var index = currentEntries + i;
+            var entry = list[i];
+
+            var shapeshifterPanel = Instantiate(panelPrefab, transform);
+            shapeshifterPanel!.transform.localPosition = new Vector3(0f, 0f, -1f);
+            entrySetter(shapeshifterPanel, index, entry);
+            var entryMenuConfig = menuConfig ?? ((s, _) => new BasicEntry(s));
+            var menuEntry = entryMenuConfig(shapeshifterPanel, entry);
+            menuEntries.Add(menuEntry);
+        }
+    }
+
+    protected void RegisterPanels<TEntry>(
+        IEnumerable<TEntry> entries,
+        Action<TEntry?> onEntryClick,
+        Action<ShapeshifterPanel, int, TEntry, Action> entrySetter,
+        Func<ShapeshifterPanel, TEntry, IMenuEntry>? menuConfig = null)
+    {
+        RegisterPanels(entries, (p, i, e) => entrySetter(p, i, e, () => onEntryClick(e)), menuConfig);
     }
 }
