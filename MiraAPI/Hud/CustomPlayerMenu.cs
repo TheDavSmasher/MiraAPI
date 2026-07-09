@@ -2,11 +2,9 @@
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
-using AmongUs.GameOptions;
 using Il2CppInterop.Runtime.Attributes;
 using MiraAPI.Patches.Stubs;
 using Reactor.Utilities.Attributes;
-using Reactor.Utilities.Extensions;
 using UnityEngine;
 using UnityEngine.Events;
 #pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
@@ -52,23 +50,20 @@ public class CustomPlayerMenu(IntPtr il2CppPtr) : CustomPhoneMenu(il2CppPtr)
         }));
 
         DebugAnalytics.Instance.Analytics.MinigameOpened(PlayerControl.LocalPlayer.Data, TaskType);
-        var list = PlayerControl.AllPlayerControls.ToArray().Where(playerMatch).ToList();
-        potentialVictims = [];
         var list2 = new Il2CppSystem.Collections.Generic.List<UiElement>();
-
-        for (var i = 0; i < list.Count; i++)
-        {
-            var player = list[i];
-            var num = i % 3;
-            var num2 = i / 3;
-            var flag = PlayerControl.LocalPlayer.Data.Role.NameColor == player.Data.Role.NameColor;
-            var shapeshifterPanel = Instantiate(panelPrefab, transform);
-            shapeshifterPanel.transform.localPosition = new Vector3(xStart + num * xOffset, yStart + num2 * yOffset, -1f);
-            shapeshifterPanel.SetPlayer(i, player.Data, (Il2CppSystem.Action)(() => { onClick(player); }));
-            shapeshifterPanel.NameText.color = flag ? player.Data.Role.NameColor : Color.white;
-            potentialVictims.Add(shapeshifterPanel);
-            list2.Add(shapeshifterPanel.Button);
-        }
+        RegisterPanels(
+            PlayerControl.AllPlayerControls.ToArray().Where(playerMatch),
+            (shapeshifterPanel, i, player) =>
+            {
+                var num = i % 3;
+                var num2 = i / 3;
+                var flag = PlayerControl.LocalPlayer.Data.Role.NameColor == player.Data.Role.NameColor;
+                shapeshifterPanel.transform.localPosition = new Vector3(xStart + num * xOffset, yStart + num2 * yOffset, -1f);
+                shapeshifterPanel.SetPlayer(i, player.Data, (Il2CppSystem.Action)(() => { onClick(player); }));
+                shapeshifterPanel.NameText.color = flag ? player.Data.Role.NameColor : Color.white;
+                list2.Add(shapeshifterPanel.Button);
+            });
+        potentialVictims = menuEntries.Cast<ShapeshifterPanel>().ToList();
         ControllerManager.Instance.OpenOverlayMenu(name, backButton, defaultButtonSelected, list2);
     }
 }
