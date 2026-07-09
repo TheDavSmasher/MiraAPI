@@ -22,15 +22,8 @@ namespace MiraAPI.Hud;
 [SuppressMessage("Design", "CA1051:Do not declare visible instance fields", Justification = "Unity Convention")]
 [SuppressMessage("StyleCop.CSharp.NamingRules", "SA1307:Accessible fields should begin with upper-case letter", Justification = "Unity Convention")]
 [SuppressMessage("StyleCop.CSharp.MaintainabilityRules", "SA1401:Fields should be private", Justification = "Unity Convention")]
-public class CustomPlayerMenu(IntPtr il2CppPtr) : Minigame(il2CppPtr)
+public class CustomPlayerMenu(IntPtr il2CppPtr) : CustomPhoneMenu(il2CppPtr)
 {
-    public ShapeshifterPanel panelPrefab;
-    public float xStart = -0.8f;
-    public float yStart = 2.15f;
-    public float xOffset = 1.95f;
-    public float yOffset = -0.65f;
-    public UiElement backButton;
-    public UiElement defaultButtonSelected;
     public List<ShapeshifterPanel> potentialVictims;
 
     /// <summary>
@@ -39,45 +32,7 @@ public class CustomPlayerMenu(IntPtr il2CppPtr) : Minigame(il2CppPtr)
     /// <returns>New <see cref="CustomPlayerMenu"/> object.</returns>
     public static CustomPlayerMenu Create()
     {
-        var shapeShifterRole = RoleManager.Instance.GetRole(RoleTypes.Shapeshifter);
-
-        var ogMenu = shapeShifterRole.TryCast<ShapeshifterRole>()!.ShapeshifterMenu;
-        var newMenu = Instantiate(ogMenu);
-        var customMenu = newMenu.gameObject.AddComponent<CustomPlayerMenu>();
-
-        customMenu.panelPrefab = newMenu.PanelPrefab;
-        customMenu.xStart = newMenu.XStart;
-        customMenu.yStart = newMenu.YStart;
-        customMenu.xOffset = newMenu.XOffset;
-        customMenu.yOffset = newMenu.YOffset;
-        customMenu.backButton = newMenu.BackButton;
-        var back = customMenu.backButton.GetComponent<PassiveButton>();
-        back.OnClick.RemoveAllListeners();
-        back.OnClick.AddListener((UnityAction)(() =>
-        {
-            Instance.Close();
-        }));
-
-        customMenu.CloseSound = newMenu.CloseSound;
-        customMenu.logger = newMenu.logger;
-        customMenu.OpenSound = newMenu.OpenSound;
-
-        newMenu.DestroyImmediate();
-
-        customMenu.transform.SetParent(Camera.main!.transform, false);
-        customMenu.transform.localPosition = new Vector3(0f, 0f, -50f);
-        return customMenu;
-    }
-
-    private void OnDisable()
-    {
-        ControllerManager.Instance.CloseOverlayMenu(name);
-    }
-
-    /// <inheritdoc />
-    public override void Begin(PlayerTask task)
-    {
-        throw new NotImplementedException("Use the other Begin method.");
+        return Create<CustomPlayerMenu>();
     }
 
     /// <summary>
