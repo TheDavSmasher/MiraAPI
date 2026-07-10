@@ -153,12 +153,19 @@ public sealed class ModdedOptionVisiblityAttribute(Type? holderType = null, stri
 #pragma warning disable S3011 // Reflection should not be used to increase accessibility of classes, methods, or fields
     private MemberInfo? GetVisibilityMember(AbstractOptionGroup group, PropertyInfo property, out Type type)
     {
-        type = holderType ?? group.GetType();
-        memberName ??= $"{property.Name}Visible";
+        Type groupType = group.GetType();
         BindingFlags flags = BindingFlags.Static | BindingFlags.Public;
-        if (holderType == null)
+
+        type = holderType ?? groupType;
+        memberName ??= $"{property.Name}Visible";
+        if (type.IsAssignableTo(typeof(AbstractOptionGroup)))
         {
-            flags |= BindingFlags.Instance | BindingFlags.NonPublic;
+            flags |= BindingFlags.Instance;
+
+            if (type == groupType)
+            {
+                flags |= BindingFlags.NonPublic;
+            }
         }
         return type.GetMember(memberName, flags).FirstOrDefault();
     }
