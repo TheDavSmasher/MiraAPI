@@ -26,7 +26,11 @@ public sealed class ModdedOptionVisiblityAttribute(Type? holderType = null, stri
 
     internal Func<bool>? GetVisibility(AbstractOptionGroup group, PropertyInfo property)
     {
-        MemberInfo? member = GetVisibilityMember(group, property, out Type type);
+        if (GetVisibilityMember(group, property, out Type type) is not { } member)
+        {
+            Error($"Member {memberName} does not exist in {type.FullName}");
+            return null;
+        }
 
         if (member is MethodInfo vMethod)
         {
@@ -44,15 +48,18 @@ public sealed class ModdedOptionVisiblityAttribute(Type? holderType = null, stri
 
             return () => (bool)vMethod.Invoke(group, null)!;
         }
-        // TODO: Properties and/or fields
 
-        Error($"Valid member {memberName} does not exist in group {type.FullName}.");
+        Error($"Member {memberName} of {type.FullName} is not valid for Visible function.");
         return null;
     }
 
     internal Func<int, bool>? GetListVisibility(AbstractOptionGroup group, PropertyInfo property)
     {
-        MemberInfo? member = GetVisibilityMember(group, property, out Type type);
+        if (GetVisibilityMember(group, property, out Type type) is not { } member)
+        {
+            Error($"Member {memberName} does not exist in {type.FullName}");
+            return null;
+        }
 
         if (member is MethodInfo vMethod)
         {
@@ -79,9 +86,8 @@ public sealed class ModdedOptionVisiblityAttribute(Type? holderType = null, stri
             }
             return i => (bool)vMethod.Invoke(group, [i])!;
         }
-        // TODO: Properties and/or fields
 
-        Error($"Valid member {memberName} does not exist in group {type.FullName}.");
+        Error($"Member {memberName} of {type.FullName} is not valid for Visible function.");
         return null;
     }
 
