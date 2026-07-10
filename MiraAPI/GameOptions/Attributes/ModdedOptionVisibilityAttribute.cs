@@ -27,7 +27,7 @@ public sealed class ModdedOptionVisiblityAttribute(Type? holderType = null, stri
 
     internal Func<bool>? GetVisibility(AbstractOptionGroup group, PropertyInfo property)
     {
-        if (GetVisibilityMember(group, property, out Type type) is not { } member)
+        if (GetVisibilityMember(group, property, out Type type, out var instanceGet) is not { } member)
         {
             Error($"Member {memberName} does not exist in {type.FullName}");
             return null;
@@ -48,7 +48,7 @@ public sealed class ModdedOptionVisiblityAttribute(Type? holderType = null, stri
                 return null;
             }
 
-            return () => (bool)vProperty.GetValue(group)!;
+            return () => (bool)vProperty.GetValue(instanceGet?.Invoke())!;
         }
         if (member is MethodInfo vMethod)
         {
@@ -65,7 +65,7 @@ public sealed class ModdedOptionVisiblityAttribute(Type? holderType = null, stri
                 return null;
             }
 
-            return () => (bool)vMethod.Invoke(group, null)!;
+            return () => (bool)vMethod.Invoke(instanceGet?.Invoke(), null)!;
         }
 
         Error($"Member {memberName} of {type.FullName} is not valid for Visible function.");
@@ -74,7 +74,7 @@ public sealed class ModdedOptionVisiblityAttribute(Type? holderType = null, stri
 
     internal Func<int, bool>? GetListVisibility(AbstractOptionGroup group, PropertyInfo property)
     {
-        if (GetVisibilityMember(group, property, out Type type) is not { } member)
+        if (GetVisibilityMember(group, property, out Type type, out var instanceGet) is not { } member)
         {
             Error($"Member {memberName} does not exist in {type.FullName}");
             return null;
@@ -103,12 +103,12 @@ public sealed class ModdedOptionVisiblityAttribute(Type? holderType = null, stri
                     return null;
                 }
 
-                return i => ((IList<bool>)vProperty.GetValue(group)!)[i];
+                return i => ((IList<bool>)vProperty.GetValue(instanceGet?.Invoke())!)[i];
             }
 
             if (indexParams.Length == 0)
             {
-                return _ => (bool)vProperty.GetValue(group)!;
+                return _ => (bool)vProperty.GetValue(instanceGet?.Invoke())!;
             }
             if (indexParams[0].ParameterType != typeof(int))
             {
@@ -116,7 +116,7 @@ public sealed class ModdedOptionVisiblityAttribute(Type? holderType = null, stri
                 return null;
             }
 
-            return i => (bool)vProperty.GetValue(group, [i])!;
+            return i => (bool)vProperty.GetValue(instanceGet?.Invoke(), [i])!;
         }
         if (member is MethodInfo vMethod)
         {
@@ -135,7 +135,7 @@ public sealed class ModdedOptionVisiblityAttribute(Type? holderType = null, stri
 
             if (paramList.Length == 0)
             {
-                return _ => (bool)vMethod.Invoke(group, null)!;
+                return _ => (bool)vMethod.Invoke(instanceGet?.Invoke(), null)!;
             }
             if (paramList[0].ParameterType != typeof(int))
             {
@@ -143,7 +143,7 @@ public sealed class ModdedOptionVisiblityAttribute(Type? holderType = null, stri
                 return null;
             }
 
-            return i => (bool)vMethod.Invoke(group, [i])!;
+            return i => (bool)vMethod.Invoke(instanceGet?.Invoke(), [i])!;
         }
 
         Error($"Member {memberName} of {type.FullName} is not valid for Visible function.");
@@ -151,11 +151,12 @@ public sealed class ModdedOptionVisiblityAttribute(Type? holderType = null, stri
     }
 
 #pragma warning disable S3011 // Reflection should not be used to increase accessibility of classes, methods, or fields
-    private MemberInfo? GetVisibilityMember(AbstractOptionGroup group, PropertyInfo property, out Type type)
+    private MemberInfo? GetVisibilityMember(AbstractOptionGroup group, PropertyInfo property, out Type type, out Func<object>? instanceGet)
     {
         Type groupType = group.GetType();
         BindingFlags flags = BindingFlags.Static | BindingFlags.Public;
 
+        instanceGet = null;
         type = holderType ?? groupType;
         memberName ??= $"{property.Name}Visible";
         if (type.IsAssignableTo(typeof(AbstractOptionGroup)))
@@ -165,9 +166,26 @@ public sealed class ModdedOptionVisiblityAttribute(Type? holderType = null, stri
             if (type == groupType)
             {
                 flags |= BindingFlags.NonPublic;
+                instanceGet = () => group;
+            }
+            else
+            {
+                var instanceProp = typeof(OptionGroupSingleton<>).MakeGenericType(type)
+                    .GetProperty(nameof(OptionGroupSingleton<>.Instance))!;
+                instanceGet = () => instanceProp.GetValue(null)!;
             }
         }
-        return type.GetMember(memberName, flags).FirstOrDefault();
+        MemberInfo? member = type.GetMember(memberName, flags).FirstOrDefault();
+        if (instanceGet != null)
+        {
+            MethodInfo? method = (member as PropertyInfo)?.GetGetMethod()
+                               ?? member as MethodInfo;
+            if (method != null && method.IsStatic)
+            {
+                instanceGet = null;
+            }
+        }
+        return member;
     }
 #pragma warning restore S3011 // Reflection should not be used to increase accessibility of classes, methods, or fields
 }
