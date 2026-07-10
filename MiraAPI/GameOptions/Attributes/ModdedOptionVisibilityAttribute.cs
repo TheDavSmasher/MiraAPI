@@ -1,4 +1,5 @@
-﻿using System;
+﻿using MiraAPI.GameOptions.OptionTypes;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -35,9 +36,10 @@ public sealed class ModdedOptionVisiblityAttribute(Type? holderType = null, stri
 
         if (member is PropertyInfo vProperty)
         {
-            if (vProperty.PropertyType != typeof(bool))
+            if (!vProperty.PropertyType.IsAssignableTo(typeof(bool)) &&
+                !vProperty.PropertyType.IsAssignableTo(typeof(ModdedOption<bool>)))
             {
-                Error($"Property {memberName} is not a bool.");
+                Error($"Property {memberName} is not a bool or a bool ModdedOption.");
                 return null;
             }
 
@@ -82,9 +84,11 @@ public sealed class ModdedOptionVisiblityAttribute(Type? holderType = null, stri
 
         if (member is PropertyInfo vProperty)
         {
-            if (vProperty.PropertyType != typeof(bool) && !vProperty.PropertyType.IsAssignableTo(typeof(IList<bool>)))
+            if (!vProperty.PropertyType.IsAssignableTo(typeof(bool)) &&
+                !vProperty.PropertyType.IsAssignableTo(typeof(ModdedOption<bool>)) &&
+                !vProperty.PropertyType.IsAssignableTo(typeof(IList<bool>)))
             {
-                Error($"Property {memberName} is not a bool value or indexer, or list of bools.");
+                Error($"Property {memberName} is not a bool value or indexer, a list of bools, or a bool ModdedOption.");
                 return null;
             }
 
