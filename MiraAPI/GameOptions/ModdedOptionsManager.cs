@@ -111,6 +111,13 @@ public static class ModdedOptionsManager
         OptionAttributes.Add(property, attribute);
         attribute.HolderOption = option;
 
+        var visibilityAttr = property.GetCustomAttribute<ModdedOptionVisiblityAttribute>();
+        var visibilityFunc = visibilityAttr?.GetVisibility(group, property);
+        if (visibilityFunc != null)
+        {
+            option.Visible = visibilityFunc;
+        }
+
         RegisterOption(option, group, property.Name, pluginInfo);
     }
 
@@ -196,9 +203,16 @@ public static class ModdedOptionsManager
         attribute.HolderOptionList = optionList;
         attribute.Value = propertyVal;
 
+        var visibilityAttr = property.GetCustomAttribute<ModdedOptionVisiblityAttribute>();
+        var visibilityFunc = visibilityAttr?.GetListVisibility(group, property);
         for (int i = 0; i < optionList.Count; i++)
         {
-            RegisterOption(optionList[i], group, property.Name + i, pluginInfo);
+            var option = optionList[i];
+            if (visibilityFunc != null)
+            {
+                option.Visible = () => visibilityFunc(i);
+            }
+            RegisterOption(option, group, property.Name + i, pluginInfo);
         }
     }
 
