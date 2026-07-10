@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 
@@ -32,6 +33,23 @@ public sealed class ModdedOptionVisiblityAttribute(Type? holderType = null, stri
             return null;
         }
 
+        if (member is PropertyInfo vProperty)
+        {
+            if (vProperty.PropertyType != typeof(bool))
+            {
+                Error($"Property {memberName} is not a bool.");
+                return null;
+            }
+
+            var indexParams = vProperty.GetIndexParameters();
+            if (indexParams.Length > 0)
+            {
+                Error($"Property {memberName} cannot be an indexer.");
+                return null;
+            }
+
+            return () => (bool)vProperty.GetValue(group)!;
+        }
         if (member is MethodInfo vMethod)
         {
             if (vMethod.ReturnType != typeof(bool))
@@ -39,6 +57,7 @@ public sealed class ModdedOptionVisiblityAttribute(Type? holderType = null, stri
                 Error($"Method {memberName} does not return a bool.");
                 return null;
             }
+
             var paramList = vMethod.GetParameters();
             if (paramList.Length > 0)
             {
@@ -61,6 +80,44 @@ public sealed class ModdedOptionVisiblityAttribute(Type? holderType = null, stri
             return null;
         }
 
+        if (member is PropertyInfo vProperty)
+        {
+            if (vProperty.PropertyType != typeof(bool) && !vProperty.PropertyType.IsAssignableTo(typeof(IList<bool>)))
+            {
+                Error($"Property {memberName} is not a bool value or indexer, or list of bools.");
+                return null;
+            }
+
+            var indexParams = vProperty.GetIndexParameters();
+            if (indexParams.Length > 1)
+            {
+                Error($"Indexer {memberName} has too many parameters.");
+                return null;
+            }
+
+            if (vProperty.PropertyType.IsAssignableTo(typeof(IList<bool>)))
+            {
+                if (indexParams.Length != 0)
+                {
+                    Error($"Property {memberName} cannot be an indexer of lists of bools.");
+                    return null;
+                }
+
+                return i => ((IList<bool>)vProperty.GetValue(group)!)[i];
+            }
+
+            if (indexParams.Length == 0)
+            {
+                return _ => (bool)vProperty.GetValue(group)!;
+            }
+            if (indexParams[0].ParameterType != typeof(int))
+            {
+                Error($"Indexer {memberName}'s parameter is not an int.");
+                return null;
+            }
+
+            return i => (bool)vProperty.GetValue(group, [i])!;
+        }
         if (member is MethodInfo vMethod)
         {
             if (vMethod.ReturnType != typeof(bool))
@@ -68,22 +125,24 @@ public sealed class ModdedOptionVisiblityAttribute(Type? holderType = null, stri
                 Error($"Method {memberName} does not return a bool.");
                 return null;
             }
+
             var paramList = vMethod.GetParameters();
             if (paramList.Length > 1)
             {
                 Error($"Method {memberName} has too many parameters.");
                 return null;
             }
+
             if (paramList.Length == 0)
             {
                 return _ => (bool)vMethod.Invoke(group, null)!;
             }
-
             if (paramList[0].ParameterType != typeof(int))
             {
                 Error($"Method {memberName}'s parameter is not an int.");
                 return null;
             }
+
             return i => (bool)vMethod.Invoke(group, [i])!;
         }
 
