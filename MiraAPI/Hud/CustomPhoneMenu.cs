@@ -47,14 +47,23 @@ public abstract class CustomPhoneMenu(IntPtr il2CppPtr) : Minigame(il2CppPtr)
     public UiElement backButton;
     public UiElement defaultButtonSelected;
 
+    // These are the Highlight, Icon, and IsSelected variable respectively.
+    protected Action<SpriteRenderer, SpriteRenderer, bool>? onMouseOverAction;
+    protected Action<SpriteRenderer, SpriteRenderer, bool>? onMouseOutAction;
+
     protected virtual float MenuDepth => -50f;
 
     /// <summary>
     /// Creates a <typeparamref name="TMenu"/>.
     /// </summary>
     /// <typeparam name="TMenu">The type of <see cref="CustomPhoneMenu"/>.</typeparam>
+    /// <param name="onMouseOut">Function that can optionally be run when the mouse is moved outside a menu panel.</param>
+    /// <param name="onMouseOver">Function that can optionally be run when the mouse is moved over a menu panel.</param>
     /// <returns>New <typeparamref name="TMenu"/> object.</returns>
-    protected static TMenu Create<TMenu>() where TMenu : CustomPhoneMenu
+    protected static TMenu Create<TMenu>(
+        Action<SpriteRenderer, SpriteRenderer, bool>? onMouseOut = null,
+        Action<SpriteRenderer, SpriteRenderer, bool>? onMouseOver = null
+        ) where TMenu : CustomPhoneMenu
     {
         var shapeShifterRole = RoleManager.Instance.GetRole(RoleTypes.Shapeshifter);
 
@@ -82,6 +91,10 @@ public abstract class CustomPhoneMenu(IntPtr il2CppPtr) : Minigame(il2CppPtr)
 
         customMenu.transform.SetParent(Camera.main!.transform, false);
         customMenu.transform.localPosition = new Vector3(0f, 0f, customMenu.MenuDepth);
+
+        customMenu.onMouseOverAction = onMouseOver;
+        customMenu.onMouseOutAction = onMouseOut;
+
         return customMenu;
     }
 
@@ -113,12 +126,31 @@ public abstract class CustomPhoneMenu(IntPtr il2CppPtr) : Minigame(il2CppPtr)
             var entry = list[i];
 
             var shapeshifterPanel = Instantiate(panelPrefab, transform);
-            shapeshifterPanel!.transform.localPosition = new Vector3(0f, 0f, -1f);
+            shapeshifterPanel.transform.localPosition = new Vector3(0f, 0f, -1f);
             entryPanelConfig(shapeshifterPanel, index, entry);
 
             menuEntryMaker ??= (s, _) => new BasicEntry(s);
             var menuEntry = menuEntryMaker(shapeshifterPanel, entry);
             menuEntries.Add(menuEntry);
+
+            var nameplate = shapeshifterPanel.gameObject.transform.FindChild("Nameplate");
+            var highlight = nameplate.FindChild("Highlight").GetComponent<SpriteRenderer>();
+            var icon = highlight.transform.GetChild(0).GetComponent<SpriteRenderer>();
+
+            if (onMouseOverAction != null)
+            {
+                shapeshifterPanel.Button.OnMouseOver.RemoveAllListeners();
+                shapeshifterPanel.Button.OnMouseOver = new UnityEvent();
+                shapeshifterPanel.Button.OnMouseOver.AddListener((UnityAction)
+                    (() => onMouseOverAction(highlight, icon, IsEntrySelected(menuEntry))));
+            }
+            if (onMouseOutAction != null)
+            {
+                shapeshifterPanel.Button.OnMouseOut.RemoveAllListeners();
+                shapeshifterPanel.Button.OnMouseOut = new UnityEvent();
+                shapeshifterPanel.Button.OnMouseOut.AddListener((UnityAction)
+                    (() => onMouseOutAction(highlight, icon, IsEntrySelected(menuEntry))));
+            }
         }
     }
 
@@ -130,4 +162,6 @@ public abstract class CustomPhoneMenu(IntPtr il2CppPtr) : Minigame(il2CppPtr)
     {
         RegisterPanels(entries, (p, i, e) => entryPanelConfig(p, i, e, () => onEntryClick(e)), menuEntryConfig);
     }
+
+    protected abstract bool IsEntrySelected(IMenuEntry entry);
 }
