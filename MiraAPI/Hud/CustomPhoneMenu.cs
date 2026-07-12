@@ -32,14 +32,14 @@ public abstract class CustomPhoneMenu(IntPtr il2CppPtr) : Minigame(il2CppPtr)
     /// Menu Entry used when specifically only the Panel itself is required.
     /// </summary>
     /// <param name="Panel">The <see cref="ShapeshifterPanel"/> instance.</param>
-    protected record class BasicEntry(ShapeshifterPanel Panel) : IMenuEntry
+    protected sealed record class BasicEntry(ShapeshifterPanel Panel) : IMenuEntry
     {
         public static implicit operator ShapeshifterPanel(BasicEntry entry) => entry.Panel;
 
         public static implicit operator BasicEntry(ShapeshifterPanel panel) => new(panel);
     }
 
-    public List<IMenuEntry> menuEntries;
+    protected List<IMenuEntry> menuEntries = [];
 
     public List<ShapeshifterPanel> EntryPanels => menuEntries.Select(e => e.Panel).ToList();
 
@@ -122,8 +122,6 @@ public abstract class CustomPhoneMenu(IntPtr il2CppPtr) : Minigame(il2CppPtr)
         Action<ShapeshifterPanel, int, TEntry> entryPanelConfig,
         Func<ShapeshifterPanel, TEntry, IMenuEntry>? menuEntryMaker = null)
     {
-        menuEntries ??= [];
-
         int currentEntries = menuEntries.Count;
 
         var list = entries.ToList();
