@@ -165,7 +165,7 @@ public abstract class CustomPhoneMenu(IntPtr il2CppPtr) : Minigame(il2CppPtr)
         RegisterPanels(entries, (p, i, e) => entryPanelConfig(p, i, e, () => onEntryClick(e)), menuEntryConfig);
     }
 
-    protected abstract bool IsEntrySelected(IMenuEntry entry);
+    protected virtual bool IsEntrySelected(IMenuEntry entry) => false;
 
     [HideFromIl2Cpp]
     protected static void SetNameplateAppearance(
