@@ -47,6 +47,8 @@ public abstract class CustomPhoneMenu(IntPtr il2CppPtr) : Minigame(il2CppPtr)
     public UiElement backButton;
     public UiElement defaultButtonSelected;
 
+    protected virtual float MenuDepth => -50f;
+
     /// <summary>
     /// Creates a <typeparamref name="TMenu"/>.
     /// </summary>
@@ -79,7 +81,7 @@ public abstract class CustomPhoneMenu(IntPtr il2CppPtr) : Minigame(il2CppPtr)
         newMenu.DestroyImmediate();
 
         customMenu.transform.SetParent(Camera.main!.transform, false);
-        customMenu.transform.localPosition = new Vector3(0f, 0f, -50f);
+        customMenu.transform.localPosition = new Vector3(0f, 0f, customMenu.MenuDepth);
         return customMenu;
     }
 
