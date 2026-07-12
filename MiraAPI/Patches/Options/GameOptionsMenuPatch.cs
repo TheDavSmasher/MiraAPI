@@ -36,6 +36,13 @@ internal static class GameOptionsMenuPatch
     }
 
     [HarmonyPostfix]
+    [HarmonyPatch(nameof(GameOptionsMenu.CloseMenu))]
+    public static void FullMenuClosePatch(GameOptionsMenu __instance)
+    {
+        Utilities.Extensions.ClearGarbageCollector();
+    }
+
+    [HarmonyPostfix]
     [HarmonyPatch(nameof(GameOptionsMenu.Update))]
     // ReSharper disable once InconsistentNaming
     public static void UpdatePatch(GameOptionsMenu __instance)

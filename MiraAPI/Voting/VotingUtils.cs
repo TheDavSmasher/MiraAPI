@@ -207,6 +207,9 @@ public static class VotingUtils
             return;
         }
 
+        // If modified, these will visually change.
+        votes = @event.Votes;
+
         MeetingHud.Instance.TitleText.text =
             TranslationController.Instance.GetString(
                 StringNames.MeetingVotingResults,
