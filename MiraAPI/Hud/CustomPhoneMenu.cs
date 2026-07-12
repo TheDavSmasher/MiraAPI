@@ -98,8 +98,8 @@ public abstract class CustomPhoneMenu(IntPtr il2CppPtr) : Minigame(il2CppPtr)
 
     protected void RegisterPanels<TEntry>(
         IEnumerable<TEntry> entries,
-        Action<ShapeshifterPanel, int, TEntry> entrySetter,
-        Func<ShapeshifterPanel, TEntry, IMenuEntry>? menuConfig = null)
+        Action<ShapeshifterPanel, int, TEntry> entryPanelConfig,
+        Func<ShapeshifterPanel, TEntry, IMenuEntry>? menuEntryMaker = null)
     {
         menuEntries ??= [];
 
@@ -114,9 +114,10 @@ public abstract class CustomPhoneMenu(IntPtr il2CppPtr) : Minigame(il2CppPtr)
 
             var shapeshifterPanel = Instantiate(panelPrefab, transform);
             shapeshifterPanel!.transform.localPosition = new Vector3(0f, 0f, -1f);
-            entrySetter(shapeshifterPanel, index, entry);
-            var entryMenuConfig = menuConfig ?? ((s, _) => new BasicEntry(s));
-            var menuEntry = entryMenuConfig(shapeshifterPanel, entry);
+            entryPanelConfig(shapeshifterPanel, index, entry);
+
+            menuEntryMaker ??= (s, _) => new BasicEntry(s);
+            var menuEntry = menuEntryMaker(shapeshifterPanel, entry);
             menuEntries.Add(menuEntry);
         }
     }
@@ -124,9 +125,9 @@ public abstract class CustomPhoneMenu(IntPtr il2CppPtr) : Minigame(il2CppPtr)
     protected void RegisterPanels<TEntry>(
         IEnumerable<TEntry> entries,
         Action<TEntry?> onEntryClick,
-        Action<ShapeshifterPanel, int, TEntry, Action> entrySetter,
-        Func<ShapeshifterPanel, TEntry, IMenuEntry>? menuConfig = null)
+        Action<ShapeshifterPanel, int, TEntry, Action> entryPanelConfig,
+        Func<ShapeshifterPanel, TEntry, IMenuEntry>? menuEntryConfig = null)
     {
-        RegisterPanels(entries, (p, i, e) => entrySetter(p, i, e, () => onEntryClick(e)), menuConfig);
+        RegisterPanels(entries, (p, i, e) => entryPanelConfig(p, i, e, () => onEntryClick(e)), menuEntryConfig);
     }
 }
