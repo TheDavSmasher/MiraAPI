@@ -39,9 +39,9 @@ public abstract class CustomPhoneMenu(IntPtr il2CppPtr) : Minigame(il2CppPtr)
         public static implicit operator BasicEntry(ShapeshifterPanel panel) => new(panel);
     }
 
-    protected List<IMenuEntry> menuEntries = [];
+    protected List<IMenuEntry> MenuEntries { get; set; } = [];
 
-    public List<ShapeshifterPanel> EntryPanels => menuEntries.Select(e => e.Panel).ToList();
+    public List<ShapeshifterPanel> EntryPanels => MenuEntries.Select(e => e.Panel).ToList();
 
     public float xStart = -0.8f;
     public float yStart = 2.15f;
@@ -122,7 +122,7 @@ public abstract class CustomPhoneMenu(IntPtr il2CppPtr) : Minigame(il2CppPtr)
         Action<ShapeshifterPanel, int, TEntry> entryPanelConfig,
         Func<ShapeshifterPanel, TEntry, IMenuEntry>? menuEntryMaker = null)
     {
-        int currentEntries = menuEntries.Count;
+        int currentEntries = MenuEntries.Count;
 
         var list = entries.ToList();
 
@@ -137,7 +137,7 @@ public abstract class CustomPhoneMenu(IntPtr il2CppPtr) : Minigame(il2CppPtr)
 
             menuEntryMaker ??= (s, _) => new BasicEntry(s);
             var menuEntry = menuEntryMaker(shapeshifterPanel, entry);
-            menuEntries.Add(menuEntry);
+            MenuEntries.Add(menuEntry);
 
             var button = shapeshifterPanel.Button;
             var nameplate = shapeshifterPanel.gameObject.transform.FindChild("Nameplate");
@@ -194,5 +194,16 @@ public abstract class CustomPhoneMenu(IntPtr il2CppPtr) : Minigame(il2CppPtr)
         {
             button.UnselectedColor = uColor;
         }
+    }
+}
+
+/// <inheritdoc cref="CustomPhoneMenu(IntPtr)"/>
+/// <typeparam name="TMenu">The type of menu entries.</typeparam>
+public abstract class CustomPhoneMenu<TMenu>(IntPtr il2CppPtr) : CustomPhoneMenu(il2CppPtr) where TMenu : CustomPhoneMenu.IMenuEntry
+{
+    protected new List<TMenu> MenuEntries
+    {
+        get => base.MenuEntries.Cast<TMenu>().ToList();
+        set => base.MenuEntries = value.Cast<IMenuEntry>().ToList();
     }
 }
