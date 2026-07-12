@@ -1,4 +1,6 @@
 ﻿using AmongUs.GameOptions;
+using Il2CppInterop.Runtime.Attributes;
+using MiraAPI.Utilities.Assets;
 using Reactor.Utilities.Extensions;
 using System;
 using System.Collections.Generic;
@@ -164,4 +166,28 @@ public abstract class CustomPhoneMenu(IntPtr il2CppPtr) : Minigame(il2CppPtr)
     }
 
     protected abstract bool IsEntrySelected(IMenuEntry entry);
+
+    [HideFromIl2Cpp]
+    protected static void SetNameplateAppearance(
+        IMenuEntry menuEntry, LoadableAsset<Sprite>? sprite, Color? overColor, Color? unselectedColor)
+    {
+        ShapeshifterPanel panel = menuEntry.Panel;
+
+        var nameplate = panel.gameObject.transform.FindChild("Nameplate");
+        var highlight = nameplate.FindChild("Highlight").GetComponent<SpriteRenderer>();
+        var icon = highlight.transform.GetChild(0).GetComponent<SpriteRenderer>();
+        if (sprite != null)
+        {
+            icon.sprite = sprite.LoadAsset();
+        }
+        var button = nameplate.GetComponent<ButtonRolloverHandler>();
+        if (overColor is { } oColor)
+        {
+            button.OverColor = oColor;
+        }
+        if (unselectedColor is { } uColor)
+        {
+            button.UnselectedColor = uColor;
+        }
+    }
 }
