@@ -63,7 +63,7 @@ public class CustomPlayerMenu(IntPtr il2CppPtr) : CustomPhoneMenu(il2CppPtr)
                 shapeshifterPanel.NameText.color = flag ? player.Data.Role.NameColor : Color.white;
                 list2.Add(shapeshifterPanel.Button);
             });
-        potentialVictims = menuEntries.Cast<ShapeshifterPanel>().ToList();
+        potentialVictims = EntryPanels;
         ControllerManager.Instance.OpenOverlayMenu(name, backButton, defaultButtonSelected, list2);
     }
 }

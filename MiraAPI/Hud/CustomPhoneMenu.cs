@@ -10,6 +10,7 @@ using UnityEngine;
 using UnityEngine.Events;
 #pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
 #pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring as nullable.
+#pragma warning disable S2365 // Properties should not make collection or array copies
 
 namespace MiraAPI.Hud;
 
@@ -40,6 +41,8 @@ public abstract class CustomPhoneMenu(IntPtr il2CppPtr) : Minigame(il2CppPtr)
 
     public List<IMenuEntry> menuEntries;
 
+    public List<ShapeshifterPanel> EntryPanels => menuEntries.Select(e => e.Panel).ToList();
+
     public float xStart = -0.8f;
     public float yStart = 2.15f;
     public float xOffset = 1.95f;
@@ -49,9 +52,12 @@ public abstract class CustomPhoneMenu(IntPtr il2CppPtr) : Minigame(il2CppPtr)
     public UiElement backButton;
     public UiElement defaultButtonSelected;
 
-    // These are the Highlight, Icon, and IsSelected variable respectively.
-    protected Action<SpriteRenderer, SpriteRenderer, bool>? onMouseOverAction;
-    protected Action<SpriteRenderer, SpriteRenderer, bool>? onMouseOutAction;
+    public Transform PhoneUI => transform.FindChild("PhoneUI");
+
+    public delegate void PanelButtonOnMouse(SpriteRenderer highlight, SpriteRenderer icon, bool isSelected);
+
+    protected PanelButtonOnMouse? onMouseOverAction;
+    protected PanelButtonOnMouse? onMouseOutAction;
 
     protected virtual float MenuDepth => -50f;
 
@@ -63,8 +69,8 @@ public abstract class CustomPhoneMenu(IntPtr il2CppPtr) : Minigame(il2CppPtr)
     /// <param name="onMouseOver">Function that can optionally be run when the mouse is moved over a menu panel.</param>
     /// <returns>New <typeparamref name="TMenu"/> object.</returns>
     protected static TMenu Create<TMenu>(
-        Action<SpriteRenderer, SpriteRenderer, bool>? onMouseOut = null,
-        Action<SpriteRenderer, SpriteRenderer, bool>? onMouseOver = null
+        PanelButtonOnMouse? onMouseOut = null,
+        PanelButtonOnMouse? onMouseOver = null
         ) where TMenu : CustomPhoneMenu
     {
         var shapeShifterRole = RoleManager.Instance.GetRole(RoleTypes.Shapeshifter);
@@ -135,22 +141,23 @@ public abstract class CustomPhoneMenu(IntPtr il2CppPtr) : Minigame(il2CppPtr)
             var menuEntry = menuEntryMaker(shapeshifterPanel, entry);
             menuEntries.Add(menuEntry);
 
+            var button = shapeshifterPanel.Button;
             var nameplate = shapeshifterPanel.gameObject.transform.FindChild("Nameplate");
             var highlight = nameplate.FindChild("Highlight").GetComponent<SpriteRenderer>();
             var icon = highlight.transform.GetChild(0).GetComponent<SpriteRenderer>();
 
             if (onMouseOverAction != null)
             {
-                shapeshifterPanel.Button.OnMouseOver.RemoveAllListeners();
-                shapeshifterPanel.Button.OnMouseOver = new UnityEvent();
-                shapeshifterPanel.Button.OnMouseOver.AddListener((UnityAction)
+                button.OnMouseOver.RemoveAllListeners();
+                button.OnMouseOver = new UnityEvent();
+                button.OnMouseOver.AddListener((UnityAction)
                     (() => onMouseOverAction(highlight, icon, IsEntrySelected(menuEntry))));
             }
             if (onMouseOutAction != null)
             {
-                shapeshifterPanel.Button.OnMouseOut.RemoveAllListeners();
-                shapeshifterPanel.Button.OnMouseOut = new UnityEvent();
-                shapeshifterPanel.Button.OnMouseOut.AddListener((UnityAction)
+                button.OnMouseOut.RemoveAllListeners();
+                button.OnMouseOut = new UnityEvent();
+                button.OnMouseOut.AddListener((UnityAction)
                     (() => onMouseOutAction(highlight, icon, IsEntrySelected(menuEntry))));
             }
         }
