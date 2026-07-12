@@ -25,9 +25,15 @@ public abstract class CustomPhoneMenu(IntPtr il2CppPtr) : Minigame(il2CppPtr)
         ShapeshifterPanel Panel { get; }
     }
 
+    /// <summary>
+    /// Menu Entry used when specifically only the Panel itself is required.
+    /// </summary>
+    /// <param name="Panel">The <see cref="ShapeshifterPanel"/> instance.</param>
     protected record class BasicEntry(ShapeshifterPanel Panel) : IMenuEntry
     {
         public static implicit operator ShapeshifterPanel(BasicEntry entry) => entry.Panel;
+
+        public static implicit operator BasicEntry(ShapeshifterPanel panel) => new(panel);
     }
 
     public List<IMenuEntry> menuEntries;
