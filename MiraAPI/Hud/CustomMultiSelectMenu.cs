@@ -49,6 +49,8 @@ public abstract class CustomMultiSelectMenu<TEntry>(IntPtr il2CppPtr)
     {
         TMenu customMenu = Create<TMenu>(onMouseOut, onMouseOver);
 
+        // TODO: create/add confirm button with click listener
+
         customMenu.activeColor = activeColor;
 
         customMenu.hoverSelectSprite = hoverSelectSprite;
@@ -131,6 +133,7 @@ public abstract class CustomMultiSelectMenu<TEntry>(IntPtr il2CppPtr)
 
         if (!canRepeat && selectedEntries.Remove(menuEntry)) // Unselect previous choice
         {
+            // TODO: if confirm button is enabled, disable it
             SetNameplateAppearance(menuEntry, false);
             return;
         }
@@ -143,6 +146,12 @@ public abstract class CustomMultiSelectMenu<TEntry>(IntPtr il2CppPtr)
         }
 
         // Total selections reached
+        if (shouldConfirm)
+        {
+            // TODO: enable confirm button with click listener to call onClick
+            return;
+        }
+
         onClick(selectedEntries.Select(se => se.Entry).ToList());
         selectedEntries.Clear();
     }
