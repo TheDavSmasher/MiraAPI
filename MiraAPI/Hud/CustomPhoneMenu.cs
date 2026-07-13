@@ -200,9 +200,9 @@ public abstract class CustomPhoneMenu(IntPtr il2CppPtr) : Minigame(il2CppPtr), I
         IEnumerable<TEntry> entries,
         Action<TEntry?> onEntryClick,
         Action<ShapeshifterPanel, int, TEntry, Action> entryPanelConfig,
-        Func<ShapeshifterPanel, TEntry, IMenuEntry>? menuEntryConfig = null)
+        Func<ShapeshifterPanel, TEntry, IMenuEntry>? menuEntryMaker = null)
     {
-        RegisterPanels(entries, (p, i, e) => entryPanelConfig(p, i, e, () => onEntryClick(e)), menuEntryConfig);
+        RegisterPanels(entries, (p, i, e) => entryPanelConfig(p, i, e, () => onEntryClick(e)), menuEntryMaker);
     }
 
     protected virtual bool IsEntrySelected(IMenuEntry entry) => false;
