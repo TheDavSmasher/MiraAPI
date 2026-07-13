@@ -3,10 +3,8 @@ using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using Il2CppInterop.Runtime.Attributes;
-using MiraAPI.Patches.Stubs;
 using Reactor.Utilities.Attributes;
 using UnityEngine;
-using UnityEngine.Events;
 #pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
 #pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring as nullable.
 
@@ -20,7 +18,7 @@ namespace MiraAPI.Hud;
 [SuppressMessage("Design", "CA1051:Do not declare visible instance fields", Justification = "Unity Convention")]
 [SuppressMessage("StyleCop.CSharp.NamingRules", "SA1307:Accessible fields should begin with upper-case letter", Justification = "Unity Convention")]
 [SuppressMessage("StyleCop.CSharp.MaintainabilityRules", "SA1401:Fields should be private", Justification = "Unity Convention")]
-public class CustomPlayerMenu(IntPtr il2CppPtr) : CustomPhoneMenu(il2CppPtr)
+public class CustomPlayerMenu(IntPtr il2CppPtr) : CustomMultiSelectMenu<PlayerControl>(il2CppPtr)
 {
     public List<ShapeshifterPanel> potentialVictims;
 
@@ -41,29 +39,14 @@ public class CustomPlayerMenu(IntPtr il2CppPtr) : CustomPhoneMenu(il2CppPtr)
     [HideFromIl2Cpp]
     public void Begin(Func<PlayerControl, bool> playerMatch, Action<PlayerControl?> onClick)
     {
-        MinigameStubs.Begin(this, null);
-
-        var back = backButton.GetComponent<PassiveButton>();
-        back.OnClick.AddListener((UnityAction)(() =>
-        {
-            onClick(null);
-        }));
-
-        DebugAnalytics.Instance.Analytics.MinigameOpened(PlayerControl.LocalPlayer.Data, TaskType);
-        var list2 = new Il2CppSystem.Collections.Generic.List<UiElement>();
-        RegisterPanels(
-            PlayerControl.AllPlayerControls.ToArray().Where(playerMatch),
-            (shapeshifterPanel, i, player) =>
-            {
-                var num = i % 3;
-                var num2 = i / 3;
-                var flag = PlayerControl.LocalPlayer.Data.Role.NameColor == player.Data.Role.NameColor;
-                shapeshifterPanel.transform.localPosition = new Vector3(xStart + num * xOffset, yStart + num2 * yOffset, -1f);
-                shapeshifterPanel.SetPlayer(i, player.Data, (Il2CppSystem.Action)(() => { onClick(player); }));
-                shapeshifterPanel.NameText.color = flag ? player.Data.Role.NameColor : Color.white;
-                list2.Add(shapeshifterPanel.Button);
-            });
+        Begin(PlayerControl.AllPlayerControls.ToArray().Where(playerMatch), onClick);
         potentialVictims = EntryPanels;
-        ControllerManager.Instance.OpenOverlayMenu(name, backButton, defaultButtonSelected, list2);
+    }
+
+    protected override void SetupPanelEntry(ShapeshifterPanel panel, int i, PlayerControl player, Action onClick)
+    {
+        var flag = PlayerControl.LocalPlayer.Data.Role.NameColor == player.Data.Role.NameColor;
+        panel.SetPlayer(i, player.Data, (Il2CppSystem.Action)onClick);
+        panel.NameText.color = flag ? player.Data.Role.NameColor : Color.white;
     }
 }
