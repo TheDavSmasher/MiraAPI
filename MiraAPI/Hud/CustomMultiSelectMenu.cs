@@ -81,6 +81,7 @@ public abstract class CustomMultiSelectMenu<TEntry>(IntPtr il2CppPtr)
         var back = backButton.GetComponent<PassiveButton>();
         back.OnClick.AddListener((UnityAction)(() =>
         {
+            selectedEntries.Clear();
             onClick(null);
         }));
 
