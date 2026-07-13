@@ -35,6 +35,8 @@ public abstract class CustomMultiSelectMenu<TEntry>(IntPtr il2CppPtr)
     private Color? hoverSelectColor;
     private Color? hoverDeselectColor;
 
+    public UiElement confirmButton;
+
     private Action<List<TEntry>>? onSelection;
 
     public record MenuEntry(ShapeshifterPanel Panel, TEntry Entry) : IMenuEntry;
@@ -51,7 +53,11 @@ public abstract class CustomMultiSelectMenu<TEntry>(IntPtr il2CppPtr)
     {
         TMenu customMenu = Create<TMenu>(onMouseOut, onMouseOver);
 
-        // TODO: create/add confirm button with click listener
+        customMenu.confirmButton = null!; // TODO: create/add confirm button
+
+        var button = customMenu.confirmButton.GetComponent<PassiveButton>();
+        button.OnClick.RemoveAllListeners();
+        button.OnClick.AddListener((UnityAction)customMenu.OnCompleteSelection);
 
         customMenu.activeColor = activeColor;
 
@@ -153,12 +159,17 @@ public abstract class CustomMultiSelectMenu<TEntry>(IntPtr il2CppPtr)
         // Total selections reached
         if (shouldConfirm)
         {
-            // TODO: enable confirm button with click listener to call onClick
+            // TODO: enable confirm button
             return;
         }
 
-        onSelection!(selectedEntries.Select(se => se.Entry).ToList());
+        OnCompleteSelection();
         selectedEntries.Clear();
+    }
+
+    private void OnCompleteSelection()
+    {
+        onSelection!(selectedEntries.Select(se => se.Entry).ToList());
     }
 
     protected override bool IsEntrySelected(IMenuEntry entry)
