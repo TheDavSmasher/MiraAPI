@@ -35,6 +35,8 @@ public abstract class CustomMultiSelectMenu<TEntry>(IntPtr il2CppPtr)
     private Color? hoverSelectColor;
     private Color? hoverDeselectColor;
 
+    private Action<List<TEntry>>? onSelection;
+
     public record MenuEntry(ShapeshifterPanel Panel, TEntry Entry) : IMenuEntry;
 
     protected static TMenu Create<TMenu>(
@@ -80,6 +82,8 @@ public abstract class CustomMultiSelectMenu<TEntry>(IntPtr il2CppPtr)
         this.totalSelections = totalSelections;
         this.shouldConfirm = shouldConfirm;
         this.canRepeat = canRepeat;
+        this.onSelection = onClick;
+
         var back = backButton.GetComponent<PassiveButton>();
         back.OnClick.AddListener((UnityAction)(() =>
         {
@@ -96,7 +100,7 @@ public abstract class CustomMultiSelectMenu<TEntry>(IntPtr il2CppPtr)
                 var num = i % 3;
                 var num2 = i / 3;
                 shapeshifterPanel.transform.localPosition = new Vector3(xStart + num * xOffset, yStart + num2 * yOffset, -1f);
-                SetupPanelEntry(shapeshifterPanel, i, entry, () => OnEntryClick(entry, onClick));
+                SetupPanelEntry(shapeshifterPanel, i, entry, () => OnEntryClick(entry));
                 list2.Add(shapeshifterPanel.Button);
             },
             (p, e) => new MenuEntry(p, e));
@@ -128,7 +132,7 @@ public abstract class CustomMultiSelectMenu<TEntry>(IntPtr il2CppPtr)
         Begin(entries, list => onClick(list?[0], list?[1]), 2, shouldConfirm, canRepeat);
     }
 
-    private void OnEntryClick(TEntry entry, Action<List<TEntry>> onClick)
+    private void OnEntryClick(TEntry entry)
     {
         MenuEntry menuEntry = MenuEntries.First(e => e.Entry == entry);
 
@@ -153,7 +157,7 @@ public abstract class CustomMultiSelectMenu<TEntry>(IntPtr il2CppPtr)
             return;
         }
 
-        onClick(selectedEntries.Select(se => se.Entry).ToList());
+        onSelection!(selectedEntries.Select(se => se.Entry).ToList());
         selectedEntries.Clear();
     }
 
