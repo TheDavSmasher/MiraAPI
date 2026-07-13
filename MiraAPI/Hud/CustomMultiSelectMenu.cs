@@ -108,10 +108,11 @@ public abstract class CustomMultiSelectMenu<TEntry>(IntPtr il2CppPtr)
     /// </summary>
     /// <param name="entries">All entries to give the custom menu.</param>
     /// <param name="onClick">Function called when the selection is made.</param>
+    /// <param name="shouldConfirm">Wheter the set of both selections should be confirmed manually.</param>
     [HideFromIl2Cpp]
-    protected void Begin(IEnumerable<TEntry> entries, Action<TEntry?> onClick)
+    protected void Begin(IEnumerable<TEntry> entries, Action<TEntry?> onClick, bool shouldConfirm)
     {
-        Begin(entries, list => onClick(list?[0]), 1, false);
+        Begin(entries, list => onClick(list?[0]), 1, shouldConfirm);
     }
 
     /// <summary>
