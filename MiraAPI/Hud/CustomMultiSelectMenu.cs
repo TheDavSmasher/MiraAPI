@@ -26,6 +26,7 @@ public abstract class CustomMultiSelectMenu<TEntry>(IntPtr il2CppPtr)
 {
     private int totalSelections;
     private bool shouldConfirm;
+    private bool canRepeat;
     private readonly List<MenuEntry> selectedEntries = [];
 
     private LoadableAsset<Sprite>? hoverSelectSprite;
@@ -68,13 +69,15 @@ public abstract class CustomMultiSelectMenu<TEntry>(IntPtr il2CppPtr)
     /// <param name="onClick">Function called when all selections are made/confirmed.</param>
     /// <param name="totalSelections">The number of selections required.</param>
     /// <param name="shouldConfirm">Wheter the entire selection should be confirmed manually.</param>
+    /// <param name="canRepeat">If the same entry can be selected multiple times, else unselect entry on click.</param>
     [HideFromIl2Cpp]
-    protected void Begin(IEnumerable<TEntry> entries, Action<List<TEntry>?> onClick, int totalSelections, bool shouldConfirm)
+    protected void Begin(IEnumerable<TEntry> entries, Action<List<TEntry>?> onClick, int totalSelections, bool shouldConfirm, bool canRepeat = false)
     {
         MinigameStubs.Begin(this, null);
 
         this.totalSelections = totalSelections;
         this.shouldConfirm = shouldConfirm;
+        this.canRepeat = canRepeat;
         var back = backButton.GetComponent<PassiveButton>();
         back.OnClick.AddListener((UnityAction)(() =>
         {
@@ -112,7 +115,7 @@ public abstract class CustomMultiSelectMenu<TEntry>(IntPtr il2CppPtr)
     {
         MenuEntry menuEntry = MenuEntries.First(e => e.Entry == entry);
 
-        if (selectedEntries.Remove(menuEntry)) // Unselect previous choice
+        if (!canRepeat && selectedEntries.Remove(menuEntry)) // Unselect previous choice
         {
             SetNameplateAppearance(menuEntry, false);
             return;
