@@ -143,11 +143,14 @@ public abstract class CustomPhoneMenu(IntPtr il2CppPtr) : Minigame(il2CppPtr), I
         ControllerManager.Instance.CloseOverlayMenu(name);
     }
 
-    /// <inheritdoc />
+#pragma warning disable CS0809 // Obsolete member overrides non-obsolete member
+    [Obsolete("Will always fail. Call or define another Begin method that calls MinigameStubs.Begin", true)]
+    [SuppressMessage("Info Code Smell", "S1133:Deprecated code should be removed", Justification = "Overrides an unusable method.")]
     public override sealed void Begin(PlayerTask task)
     {
         throw new NotImplementedException("Use the other Begin method.");
     }
+#pragma warning restore CS0809 // Obsolete member overrides non-obsolete member
 
     protected void RegisterPanels<TEntry>(
         IEnumerable<TEntry> entries,
