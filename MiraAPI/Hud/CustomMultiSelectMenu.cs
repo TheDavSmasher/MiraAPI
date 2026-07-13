@@ -111,6 +111,19 @@ public abstract class CustomMultiSelectMenu<TEntry>(IntPtr il2CppPtr)
         Begin(entries, list => onClick(list?[0]), 1, false);
     }
 
+    /// <summary>
+    /// Begins/opens the custom menu, requiring two selections.
+    /// </summary>
+    /// <param name="entries">All entries to give the custom menu.</param>
+    /// <param name="onClick">Function called when both selections are made.</param>
+    /// <param name="shouldConfirm">Wheter the set of both selections should be confirmed manually.</param>
+    /// <param name="canRepeat">If the same entry can be selected both times, else unselect entry on click.</param>
+    [HideFromIl2Cpp]
+    protected void Begin(IEnumerable<TEntry> entries, Action<TEntry?, TEntry?> onClick, bool shouldConfirm, bool canRepeat = false)
+    {
+        Begin(entries, list => onClick(list?[0], list?[1]), 2, shouldConfirm, canRepeat);
+    }
+
     private void OnEntryClick(TEntry entry, Action<List<TEntry>> onClick)
     {
         MenuEntry menuEntry = MenuEntries.First(e => e.Entry == entry);

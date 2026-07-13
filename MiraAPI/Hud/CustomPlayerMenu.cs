@@ -43,6 +43,20 @@ public class CustomPlayerMenu(IntPtr il2CppPtr) : CustomMultiSelectMenu<PlayerCo
         potentialVictims = EntryPanels;
     }
 
+    /// <summary>
+    /// Begins/opens the custom player menu.
+    /// </summary>
+    /// <param name="playerMatch">Function to determine if player should show in the custom menu.</param>
+    /// <param name="onClick"><see cref="PassiveButton.OnClick"/> action for the two-player selection.</param>
+    /// <param name="shouldConfirm">Wheter the set of both selections should be confirmed manually.</param>
+    /// <param name="canRepeat">If the same entry can be selected both times, else unselect entry on click.</param>
+    [HideFromIl2Cpp]
+    public void Begin(Func<PlayerControl, bool> playerMatch, Action<PlayerControl?, PlayerControl?> onClick, bool shouldConfirm = false, bool canRepeat = false)
+    {
+        Begin(PlayerControl.AllPlayerControls.ToArray().Where(playerMatch), onClick, shouldConfirm, canRepeat);
+        potentialVictims = EntryPanels;
+    }
+
     protected override void SetupPanelEntry(ShapeshifterPanel panel, int i, PlayerControl player, Action onClick)
     {
         var flag = PlayerControl.LocalPlayer.Data.Role.NameColor == player.Data.Role.NameColor;
