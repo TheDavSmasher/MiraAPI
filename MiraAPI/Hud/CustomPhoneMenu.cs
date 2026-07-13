@@ -152,6 +152,14 @@ public abstract class CustomPhoneMenu(IntPtr il2CppPtr) : Minigame(il2CppPtr), I
     }
 #pragma warning restore CS0809 // Obsolete member overrides non-obsolete member
 
+    /// <summary>
+    /// Register new menu panels given a set of entries.
+    /// </summary>
+    /// <typeparam name="TEntry">The type of the entry.</typeparam>
+    /// <param name="entries">The entries to create panels for.</param>
+    /// <param name="entryPanelConfig">Function to configure the menu's panel once created, given its index and entry.</param>
+    /// <param name="menuEntryMaker">Function to create a <see cref="IMenuEntry"/> for a given panel and it's entry.
+    ///     If <see langword="null"/>, it will create <see cref="BasicEntry"/>s, acting as wrappers for the <see cref="ShapeshifterPanel"/>s.</param>
     protected void RegisterPanels<TEntry>(
         IEnumerable<TEntry> entries,
         Action<ShapeshifterPanel, int, TEntry> entryPanelConfig,
@@ -196,6 +204,12 @@ public abstract class CustomPhoneMenu(IntPtr il2CppPtr) : Minigame(il2CppPtr), I
         }
     }
 
+    /// <inheritdoc cref="RegisterPanels{TEntry}(IEnumerable{TEntry}, Action{ShapeshifterPanel, int, TEntry}, Func{ShapeshifterPanel, TEntry, IMenuEntry}?)"/>
+    /// <param name="entries"></param>
+    /// <param name="onEntryClick">Action to perform when a given entry is clicked on.
+    ///     Argument will be <see langword="null"/> if the back button was clicked instead.</param>
+    /// <param name="entryPanelConfig">Function to configure the menu's panel once created, given its index, entry, and onClick action.</param>
+    /// <param name="menuEntryMaker"></param>
     protected void RegisterPanels<TEntry>(
         IEnumerable<TEntry> entries,
         Action<TEntry?> onEntryClick,
@@ -205,8 +219,20 @@ public abstract class CustomPhoneMenu(IntPtr il2CppPtr) : Minigame(il2CppPtr), I
         RegisterPanels(entries, (p, i, e) => entryPanelConfig(p, i, e, () => onEntryClick(e)), menuEntryMaker);
     }
 
+    /// <summary>
+    /// Determines if a given entry is currently selected, not just hovered over.
+    /// </summary>
+    /// <param name="entry">The <see cref="IMenuEntry"/> to check.</param>
+    /// <returns><see langword="true"/> if the <paramref name="entry"/> is selected, else <see langword="false"/>.</returns>
     protected virtual bool IsEntrySelected(IMenuEntry entry) => false;
 
+    /// <summary>
+    /// Set the icon, over color, and unselected color for a given entry.
+    /// </summary>
+    /// <param name="menuEntry">The menu entry.</param>
+    /// <param name="sprite">The <see cref="Sprite"/> to use as the icon, if any.</param>
+    /// <param name="overColor">The <see cref="Color"/> to use when hovering over an entry.</param>
+    /// <param name="unselectedColor">The <see cref="Color"/> to use when not hovering over an entry.</param>
     [HideFromIl2Cpp]
     protected static void SetNameplateAppearance(
         IMenuEntry menuEntry, LoadableAsset<Sprite>? sprite, Color? overColor, Color? unselectedColor)

@@ -58,6 +58,7 @@ public class CustomPlayerMenu(IntPtr il2CppPtr) : CustomMultiSelectMenu<PlayerCo
         potentialVictims = EntryPanels;
     }
 
+    /// <inheritdoc/>
     protected override void SetupPanelEntry(ShapeshifterPanel panel, int i, PlayerControl player, Action onClick)
     {
         var flag = PlayerControl.LocalPlayer.Data.Role.NameColor == player.Data.Role.NameColor;

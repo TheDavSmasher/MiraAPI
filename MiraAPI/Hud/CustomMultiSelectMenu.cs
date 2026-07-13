@@ -41,6 +41,18 @@ public abstract class CustomMultiSelectMenu<TEntry>(IntPtr il2CppPtr)
 
     public record MenuEntry(ShapeshifterPanel Panel, TEntry Entry) : IMenuEntry;
 
+    /// <summary>
+    /// Creates a <typeparamref name="TMenu"/>.
+    /// </summary>
+    /// <typeparam name="TMenu">The type of <see cref="CustomMultiSelectMenu{TEntry}"/>.</typeparam>
+    /// <param name="activeColor">The <see cref="Color"/> to use when an entry is selected but not hovered over.</param>
+    /// <param name="hoverSelectSprite">The <see cref="Sprite"/> to use when an entry is hovered over while not selected.</param>
+    /// <param name="hoverSelectColor">The <see cref="Color"/> to use when an entry is hovered over while not selected.</param>
+    /// <param name="hoverDeselectSprite">The <see cref="Sprite"/> to use when an entry is hovered over while selected.</param>
+    /// <param name="hoverDeselectColor">The <see cref="Color"/> to use when an entry is hovered over while selected.</param>
+    /// <param name="onMouseOut">Function that can optionally be run when the mouse is moved outside a menu panel.</param>
+    /// <param name="onMouseOver">Function that can optionally be run when the mouse is moved over a menu panel.</param>
+    /// <returns>New <typeparamref name="TMenu"/> object.</returns>
     protected static TMenu Create<TMenu>(
         Color? activeColor = null,
         LoadableAsset<Sprite>? hoverSelectSprite = null,
@@ -70,6 +82,13 @@ public abstract class CustomMultiSelectMenu<TEntry>(IntPtr il2CppPtr)
         return customMenu;
     }
 
+    /// <summary>
+    /// Setup the given <paramref name="panel"/> once created, given its index, entry, and onClick action.
+    /// </summary>
+    /// <param name="panel">The panel to configure.</param>
+    /// <param name="i">The <paramref name="panel"/>'s index.</param>
+    /// <param name="entry">The <paramref name="panel"/>'s <typeparamref name="TEntry"/> entry.</param>
+    /// <param name="onClick">Action to perform when the <paramref name="panel"/> is clicked on.</param>
     protected abstract void SetupPanelEntry(ShapeshifterPanel panel, int i, TEntry entry, Action onClick);
 
     /// <summary>
@@ -172,11 +191,15 @@ public abstract class CustomMultiSelectMenu<TEntry>(IntPtr il2CppPtr)
         onSelection!(selectedEntries.Select(se => se.Entry).ToList());
     }
 
+    /// <inheritdoc/>
     protected override bool IsEntrySelected(IMenuEntry entry)
     {
         return selectedEntries.Any(e => e.Panel == entry.Panel);
     }
 
+    /// <inheritdoc cref="CustomPhoneMenu.SetNameplateAppearance(IMenuEntry, LoadableAsset{Sprite}?, Color?, Color?)"/>
+    /// <param name="menuEntry"></param>
+    /// <param name="isSelected">Whether the menu entry is actively selected.</param>
     [HideFromIl2Cpp]
     protected void SetNameplateAppearance(IMenuEntry menuEntry, bool isSelected)
     {
