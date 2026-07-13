@@ -1,4 +1,5 @@
 ﻿using Il2CppInterop.Runtime.Attributes;
+using MiraAPI.Patches.Stubs;
 using MiraAPI.Utilities.Assets;
 using Reactor.Utilities;
 using Reactor.Utilities.Extensions;
@@ -363,5 +364,26 @@ public abstract class CustomPaginableMenu(IntPtr il2CppPtr) : CustomPhoneMenu<Cu
         }
 
         return bounds;
+    }
+
+    /// <summary>
+    /// Begins/opens the custom player menu. After registering panels, it will prepare the search, pages, and open the menu.
+    /// </summary>
+    /// <param name="registerEntryPanels">Function where all panels should be registered.</param>
+    [HideFromIl2Cpp]
+    protected void Begin(Action registerEntryPanels)
+    {
+        MinigameStubs.Begin(this, null);
+
+        searchText = string.Empty;
+        currentPage = 0;
+
+        registerEntryPanels();
+
+        EnsureSearchUi();
+
+        var list2 = ShowPage();
+
+        ControllerManager.Instance.OpenOverlayMenu(name, backButton, defaultButtonSelected, list2);
     }
 }
