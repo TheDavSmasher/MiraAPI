@@ -15,6 +15,17 @@ using UnityEngine.Events;
 namespace MiraAPI.Hud;
 
 /// <summary>
+/// Defines an entry in a <see cref="CustomPhoneMenu"/> with a Panel.
+/// </summary>
+public interface IMenuEntry
+{
+    /// <summary>
+    /// Gets the base Panel of the menu entry.
+    /// </summary>
+    ShapeshifterPanel Panel { get; }
+}
+
+/// <summary>
 /// Custom Phone Menu using the <see cref="ShapeshifterPanel"/> as a base.
 /// </summary>
 /// <param name="il2CppPtr">Used by Il2Cpp. Do not use constructor, this is a <see cref="MonoBehaviour"/>.</param>
@@ -23,11 +34,6 @@ namespace MiraAPI.Hud;
 [SuppressMessage("StyleCop.CSharp.MaintainabilityRules", "SA1401:Fields should be private", Justification = "Unity Convention")]
 public abstract class CustomPhoneMenu(IntPtr il2CppPtr) : Minigame(il2CppPtr)
 {
-    public interface IMenuEntry
-    {
-        ShapeshifterPanel Panel { get; }
-    }
-
     /// <summary>
     /// Menu Entry used when specifically only the Panel itself is required.
     /// </summary>
@@ -199,7 +205,7 @@ public abstract class CustomPhoneMenu(IntPtr il2CppPtr) : Minigame(il2CppPtr)
 
 /// <inheritdoc cref="CustomPhoneMenu(IntPtr)"/>
 /// <typeparam name="TMenu">The type of menu entries.</typeparam>
-public abstract class CustomPhoneMenu<TMenu>(IntPtr il2CppPtr) : CustomPhoneMenu(il2CppPtr) where TMenu : CustomPhoneMenu.IMenuEntry
+public abstract class CustomPhoneMenu<TMenu>(IntPtr il2CppPtr) : CustomPhoneMenu(il2CppPtr) where TMenu : IMenuEntry
 {
     protected new List<TMenu> MenuEntries
     {
