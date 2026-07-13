@@ -26,13 +26,39 @@ public interface IMenuEntry
 }
 
 /// <summary>
+/// Defines a custom menu with a list of <see cref="ICustomMenu"/> entries.
+/// </summary>
+public interface ICustomMenu
+{
+    /// <summary>
+    /// Gets all registered <see cref="IMenuEntry"/>s.
+    /// </summary>
+    List<IMenuEntry> MenuEntries { get; }
+}
+
+/// <summary>
+/// Defines a custom menu with a list of only <typeparamref name="TMenu"/> entries.
+/// <para/>
+/// Only implement this if you want to define a single new type of menu entries explicitly.
+/// Must reference the member of the <see cref="CustomPhoneMenu"/> superclass that is being hidden by this one to work.
+/// </summary>
+/// <typeparam name="TMenu">The type of menu entry.</typeparam>
+public interface ICustomMenu<TMenu> : ICustomMenu where TMenu : IMenuEntry
+{
+    /// <summary>
+    /// Gets all registered <typeparamref name="TMenu"/>s.
+    /// </summary>
+    new List<TMenu> MenuEntries { get; }
+}
+
+/// <summary>
 /// Custom Phone Menu using the <see cref="ShapeshifterPanel"/> as a base.
 /// </summary>
 /// <param name="il2CppPtr">Used by Il2Cpp. Do not use constructor, this is a <see cref="MonoBehaviour"/>.</param>
 [SuppressMessage("Design", "CA1051:Do not declare visible instance fields", Justification = "Unity Convention")]
 [SuppressMessage("StyleCop.CSharp.NamingRules", "SA1307:Accessible fields should begin with upper-case letter", Justification = "Unity Convention")]
 [SuppressMessage("StyleCop.CSharp.MaintainabilityRules", "SA1401:Fields should be private", Justification = "Unity Convention")]
-public abstract class CustomPhoneMenu(IntPtr il2CppPtr) : Minigame(il2CppPtr)
+public abstract class CustomPhoneMenu(IntPtr il2CppPtr) : Minigame(il2CppPtr), ICustomMenu
 {
     /// <summary>
     /// Menu Entry used when specifically only the Panel itself is required.
@@ -45,7 +71,7 @@ public abstract class CustomPhoneMenu(IntPtr il2CppPtr) : Minigame(il2CppPtr)
         public static implicit operator BasicEntry(ShapeshifterPanel panel) => new(panel);
     }
 
-    protected List<IMenuEntry> MenuEntries { get; set; } = [];
+    public List<IMenuEntry> MenuEntries { get; protected set; } = [];
 
     public List<ShapeshifterPanel> EntryPanels => MenuEntries.Select(e => e.Panel).ToList();
 
@@ -205,11 +231,11 @@ public abstract class CustomPhoneMenu(IntPtr il2CppPtr) : Minigame(il2CppPtr)
 
 /// <inheritdoc cref="CustomPhoneMenu(IntPtr)"/>
 /// <typeparam name="TMenu">The type of menu entries.</typeparam>
-public abstract class CustomPhoneMenu<TMenu>(IntPtr il2CppPtr) : CustomPhoneMenu(il2CppPtr) where TMenu : IMenuEntry
+public abstract class CustomPhoneMenu<TMenu>(IntPtr il2CppPtr) : CustomPhoneMenu(il2CppPtr), ICustomMenu<TMenu> where TMenu : IMenuEntry
 {
-    protected new List<TMenu> MenuEntries
+    public new List<TMenu> MenuEntries
     {
         get => base.MenuEntries.Cast<TMenu>().ToList();
-        set => base.MenuEntries = value.Cast<IMenuEntry>().ToList();
+        protected set => base.MenuEntries = value.Cast<IMenuEntry>().ToList();
     }
 }
