@@ -97,6 +97,17 @@ public abstract class CustomMultiSelectMenu<TEntry>(IntPtr il2CppPtr)
         ControllerManager.Instance.OpenOverlayMenu(name, backButton, defaultButtonSelected, list2);
     }
 
+    /// <summary>
+    /// Begins/opens the custom menu, only requiring a single selection.
+    /// </summary>
+    /// <param name="entries">All entries to give the custom menu.</param>
+    /// <param name="onClick">Function called when the selection is made.</param>
+    [HideFromIl2Cpp]
+    protected void Begin(IEnumerable<TEntry> entries, Action<TEntry?> onClick)
+    {
+        Begin(entries, list => onClick(list?[0]), 1, false);
+    }
+
     private void OnEntryClick(TEntry entry, Action<List<TEntry>> onClick)
     {
         MenuEntry menuEntry = MenuEntries.First(e => e.Entry == entry);
