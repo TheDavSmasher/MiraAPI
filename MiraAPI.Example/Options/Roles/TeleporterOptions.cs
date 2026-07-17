@@ -6,7 +6,7 @@ using MiraAPI.Utilities;
 
 namespace MiraAPI.Example.Options.Roles;
 
-public class TeleporterOptions : AbstractOptionGroup<TeleporterRole>
+public class TeleporterOptions : AbstractRoleOptionGroup<TeleporterRole>
 {
     public override string GroupName => "Teleporter";
 
