@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using Il2CppInterop.Runtime.Attributes;
 using MiraAPI.Modifiers;
+using TMPro;
 using UnityEngine;
 
 namespace MiraAPI.GameOptions;
@@ -57,6 +59,11 @@ public abstract class AbstractOptionGroup
     /// Zero is the highest priority, and the default value is the max <see langword="uint"/> value.
     /// </summary>
     public virtual uint GroupPriority => uint.MaxValue;
+
+    /// <summary>
+    /// Gets the default notification settings for the group.
+    /// </summary>
+    public virtual OptionNotifConfiguration Configuration => new(new Color(0.7333f, 0.7333f, 0.7333f, 1));
 
     internal bool AllOptionsHidden { get; set; }
 

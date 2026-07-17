@@ -1,10 +1,11 @@
 ﻿using System;
 using BepInEx.Configuration;
+using Il2CppInterop.Runtime.Attributes;
 using MiraAPI.Networking;
 using MiraAPI.PluginLoading;
 using Reactor.Localization.Utilities;
 using Reactor.Networking.Rpc;
-using Reactor.Utilities;
+using TMPro;
 using UnityEngine;
 
 namespace MiraAPI.GameOptions.OptionTypes;
@@ -190,4 +191,10 @@ public abstract class ModdedOption<T> : IModdedOption
     {
         return option.Value;
     }
+
+    /// <inheritdoc />
+    public AbstractOptionGroup ParentGroup { get; set; }
+
+    /// <inheritdoc />
+    public OptionNotifConfiguration Configuration => new(ParentGroup);
 }
