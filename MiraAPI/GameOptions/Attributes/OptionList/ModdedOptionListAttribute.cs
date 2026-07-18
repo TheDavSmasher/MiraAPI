@@ -1,24 +1,28 @@
 ﻿using System;
 using System.Collections;
 using System.Reflection;
+using System.Text.RegularExpressions;
 
 namespace MiraAPI.GameOptions.Attributes;
 
 /// <summary>
 /// Represents an attribute that is used to define a list of modded options.
 /// </summary>
-/// <param name="titler">A function to title of the options.</param>
+/// <param name="title">The title of the options.</param>
 [AttributeUsage(AttributeTargets.Property)]
-public abstract class ModdedOptionListAttribute(Func<int, string> titler) : PropertyOptionAttribute
+public abstract class ModdedOptionListAttribute(string title) : PropertyOptionAttribute
 {
     internal IModdedOptionList? HolderOptionList { get; set; }
 
     internal object? Value { get; set; }
 
     /// <summary>
-    /// Gets the function to title of the options.
+    /// Gets the title of the options.
+    /// If the string contains a format parameter, e.g., <c>{0}</c>, then the option's index will be given to it.
+    /// The string cannot contain more than one parameter.
+    /// If no parameter is given, the title will simply append the index to the end of it.
     /// </summary>
-    public Func<int, string> Titler => titler;
+    public string Title => title;
 
     /// <summary>
     /// Sets the value of all the options.
@@ -63,4 +67,25 @@ public abstract class ModdedOptionListAttribute(Func<int, string> titler) : Prop
     public abstract object GetValue(int idx);
 
     internal abstract IModdedOptionList? CreateOptionList(IList value, PropertyInfo property);
+
+    /// <summary>
+    /// Gets the <see cref="Title"/> formatted with the option's index.
+    /// </summary>
+    /// <param name="index">The option's index.</param>
+    /// <returns>The formatted option's title.</returns>
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Globalization", "CA1305:Specify IFormatProvider", Justification = "I don't even know if this is worth it.")]
+    protected string GetFormattedTitle(int index)
+    {
+        Match match = Regex.Match(Title, @"\{(\d+)(?::[^}]+)?\}");
+
+        if (match.Success)
+        {
+            if (match.Groups.Count == 1 && match.Groups[0].Value == "0")
+            {
+                return string.Format(Title, index);
+            }
+            Error("ModdedOptionList Title cannot contain more than the first parameter for formatting.");
+        }
+        return Title + index;
+    }
 }

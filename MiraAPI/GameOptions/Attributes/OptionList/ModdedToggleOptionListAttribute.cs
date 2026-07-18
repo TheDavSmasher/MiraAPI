@@ -8,14 +8,14 @@ namespace MiraAPI.GameOptions.Attributes;
 /// <summary>
 /// Attribute for a list of toggle options.
 /// </summary>
-/// <param name="titler">The function to get each option's title.</param>
+/// <param name="title">The option's title.</param>
 [AttributeUsage(AttributeTargets.Property)]
-public class ModdedToggleOptionListAttribute(Func<int, string> titler) : ModdedOptionListAttribute(titler)
+public class ModdedToggleOptionListAttribute(string title) : ModdedOptionListAttribute(title)
 {
     internal override IModdedOptionList CreateOptionList(IList value, PropertyInfo property)
     {
         var optList = new ModdedOptionList<ModdedToggleOption>(
-            value.Count, idx => new(Titler(idx), (bool)(value[idx] ?? false)));
+            value.Count, idx => new(GetFormattedTitle(idx), (bool)(value[idx] ?? false)));
         return optList;
     }
 
@@ -33,6 +33,6 @@ public class ModdedToggleOptionListAttribute(Func<int, string> titler) : ModdedO
         {
             return opt.Value;
         }
-        throw new InvalidOperationException($"Holder option for {Titler(idx)} is not a ModdedToggleOption.");
+        throw new InvalidOperationException($"Holder option for {GetFormattedTitle(idx)} is not a ModdedToggleOption.");
     }
 }

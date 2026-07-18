@@ -11,21 +11,21 @@ namespace MiraAPI.GameOptions.Attributes;
 /// </summary>
 [AttributeUsage(AttributeTargets.Property)]
 public class ModdedNumberOptionListAttribute(
-    Func<int, string> titler,
+    string title,
     float min,
     float max,
     float increment = 1,
     MiraNumberSuffixes suffixType = MiraNumberSuffixes.None,
     string? formatString = null,
     bool zeroInfinity = false)
-    : ModdedOptionListAttribute(titler)
+    : ModdedOptionListAttribute(title)
 {
     internal override IModdedOptionList CreateOptionList(IList value, PropertyInfo property)
     {
         return new ModdedOptionList<ModdedNumberOption>(value.Count, idx =>
         {
             return new(
-                Titler(idx),
+                GetFormattedTitle(idx),
                 (float)(value[idx] ?? min + increment),
                 min,
                 max,
@@ -50,6 +50,6 @@ public class ModdedNumberOptionListAttribute(
         {
             return opt.Value;
         }
-        throw new InvalidOperationException($"HolderOption for option \"{Titler(idx)}\" is not a ModdedNumberOption");
+        throw new InvalidOperationException($"HolderOption for option \"{GetFormattedTitle(idx)}\" is not a ModdedNumberOption");
     }
 }
