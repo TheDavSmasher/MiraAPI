@@ -208,15 +208,15 @@ public abstract class CustomPhoneMenu(IntPtr il2CppPtr) : Minigame(il2CppPtr), I
     /// <param name="entries"></param>
     /// <param name="onEntryClick">Action to perform when a given entry is clicked on.
     ///     Argument will be <see langword="null"/> if the back button was clicked instead.</param>
-    /// <param name="entryPanelConfig">Function to configure the menu's panel once created, given its index, entry, and onClick action.</param>
+    /// <param name="entryPanelActionConfig">Function to configure the menu's panel once created, given its index, entry, and onClick action.</param>
     /// <param name="menuEntryMaker"></param>
     protected void RegisterPanels<TEntry>(
         IEnumerable<TEntry> entries,
         Action<TEntry?> onEntryClick,
-        Action<ShapeshifterPanel, int, TEntry, Action> entryPanelConfig,
+        Action<ShapeshifterPanel, int, TEntry, Action> entryPanelActionConfig,
         Func<ShapeshifterPanel, TEntry, IMenuEntry>? menuEntryMaker = null)
     {
-        RegisterPanels(entries, (p, i, e) => entryPanelConfig(p, i, e, () => onEntryClick(e)), menuEntryMaker);
+        RegisterPanels(entries, (p, i, e) => entryPanelActionConfig(p, i, e, () => onEntryClick(e)), menuEntryMaker);
     }
 
     /// <summary>

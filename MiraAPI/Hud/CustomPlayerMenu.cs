@@ -59,10 +59,10 @@ public class CustomPlayerMenu(IntPtr il2CppPtr) : CustomMultiSelectMenu<PlayerCo
     }
 
     /// <inheritdoc/>
-    protected override void SetupPanelEntry(ShapeshifterPanel panel, int i, PlayerControl player, Action onClick)
+    protected override void SetupPanelEntry(ShapeshifterPanel panel, int i, PlayerControl entry, Action onClick)
     {
-        var flag = PlayerControl.LocalPlayer.Data.Role.NameColor == player.Data.Role.NameColor;
-        panel.SetPlayer(i, player.Data, (Il2CppSystem.Action)onClick);
-        panel.NameText.color = flag ? player.Data.Role.NameColor : Color.white;
+        var flag = PlayerControl.LocalPlayer.Data.Role.NameColor == entry.Data.Role.NameColor;
+        panel.SetPlayer(i, entry.Data, (Il2CppSystem.Action)onClick);
+        panel.NameText.color = flag ? entry.Data.Role.NameColor : Color.white;
     }
 }
