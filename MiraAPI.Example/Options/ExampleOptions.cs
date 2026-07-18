@@ -17,6 +17,10 @@ public class ExampleOptions : AbstractOptionGroup
     [ModdedToggleOption("Toggle Opt 2")]
     public bool ToggleOpt2 { get; set; } = true;
 
+    [ModdedToggleOption("Toggle Opt 3")]
+    [ModdedOptionVisiblity(nameof(ToggleOpt2))] // ToggleOpt3 will be visible only when ToggleOpt2 is true
+    public bool ToggleOpt3 { get; set; } = true;
+
     [ModdedNumberOption("Number Opt", min: 0, max: 10, increment: .25f, formatString: "0.00", suffixType: MiraNumberSuffixes.Percent)]
     public float NumberOpt { get; set; } = 4f;
 
