@@ -1,7 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Linq;
+using Il2CppInterop.Runtime.Attributes;
 using MiraAPI.Modifiers;
+using MiraAPI.Roles;
+using TMPro;
 using UnityEngine;
 
 namespace MiraAPI.GameOptions;
@@ -58,6 +62,11 @@ public abstract class AbstractOptionGroup
     /// </summary>
     public virtual uint GroupPriority => uint.MaxValue;
 
+    /// <summary>
+    /// Gets the default notification settings for the group.
+    /// </summary>
+    public virtual OptionNotifConfiguration Configuration => new(new Color(0.7333f, 0.7333f, 0.7333f, 1));
+
     internal bool AllOptionsHidden { get; set; }
 
     internal CategoryHeaderMasked? Header { get; set; }
@@ -72,9 +81,7 @@ public abstract class AbstractOptionGroup<T> : AbstractOptionGroup where T : IOp
     /// <inheritdoc />
     public override Type OptionableType => typeof(T);
 
-    /// <summary>
-    /// Gets a value indicating which menu the group is in.
-    /// </summary>
+    /// <inheritdoc />
     public override MenuCategory ParentMenu
     {
         get
@@ -89,6 +96,33 @@ public abstract class AbstractOptionGroup<T> : AbstractOptionGroup where T : IOp
                 return MenuCategory.Roles;
             }
             return MenuCategory.Game;
+        }
+    }
+}
+
+/// <summary>
+/// Base class for option groups. An option group is a collection of options that are displayed together in the options menu.
+/// </summary>
+/// <typeparam name="T">The custom role that the group is for.</typeparam>
+public abstract class AbstractRoleOptionGroup<T>() : AbstractOptionGroup<T> where T : ICustomRole
+{
+    /// <inheritdoc />
+    public override Type OptionableType => typeof(T);
+
+    /// <inheritdoc />
+    public override MenuCategory ParentMenu => MenuCategory.Roles;
+
+    /// <inheritdoc />
+    public override OptionNotifConfiguration Configuration
+    {
+        get
+        {
+            var role = CustomRoleManager.CustomMiraRoles.FirstOrDefault(x => x.GetType() == OptionableType);
+            if (role == null)
+            {
+                return new(new Color(0.7333f, 0.7333f, 0.7333f, 1));
+            }
+            return new(role.RoleColor, role.Configuration.IconTmp);
         }
     }
 }

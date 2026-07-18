@@ -90,7 +90,13 @@ public class ModdedEnumOption : ModdedOption<int>
     /// <inheritdoc />
     protected override void OnValueChanged(int newValue)
     {
-        HudManager.Instance.Notifier.AddSettingsChangeMessage(StringName, Data.GetValueString(newValue), false);
+        ModdedOptionsManager.AddSettingsChangeMessage(
+            HudManager.Instance.Notifier,
+            StringName,
+            Data.GetValueString(newValue),
+            Configuration.PopUpTextColor,
+            Configuration.PopUpIconTmp,
+            false);
         if (!OptionBehaviour)
         {
             return;
@@ -183,7 +189,13 @@ public class ModdedEnumOption<T> : ModdedOption<T> where T : Enum
     /// <inheritdoc />
     protected override void OnValueChanged(T newValue)
     {
-        HudManager.Instance.Notifier.AddSettingsChangeMessage(StringName, Data.GetValueString(Convert.ToInt32(newValue, NumberFormatInfo.InvariantInfo)), false);
+        ModdedOptionsManager.AddSettingsChangeMessage(
+            HudManager.Instance.Notifier,
+            StringName,
+            Data.GetValueString(Convert.ToInt32(newValue, NumberFormatInfo.InvariantInfo)),
+            Configuration.PopUpTextColor,
+            Configuration.PopUpIconTmp,
+            false);
         if (!OptionBehaviour)
         {
             return;

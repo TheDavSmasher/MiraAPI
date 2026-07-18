@@ -33,7 +33,7 @@ public static class NotificationPopperPatch
                 icon,
                 "<font=\"Barlow-Black SDF\" material=\"Barlow-Black Outline\">",
                 textColor,
-                TranslationController.Instance.GetString(key, Array.Empty<Object>()),
+                TranslationController.Instance.GetString(key),
                 "</color></font>"
             ),
             "<font=\"Barlow-Black SDF\" material=\"Barlow-Black Outline\">" + roleCount + "</font>",
