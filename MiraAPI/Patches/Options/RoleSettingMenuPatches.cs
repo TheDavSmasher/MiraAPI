@@ -76,7 +76,6 @@ public static class RoleSettingMenuPatches
 
         __instance.roleChances = new Il2CppSystem.Collections.Generic.List<RoleOptionSetting>();
         __instance.advancedSettingChildren = new Il2CppSystem.Collections.Generic.List<OptionBehaviour>();
-        Utilities.Extensions.ClearGarbageCollector();
 
         var maskBg = __instance.scrollBar.transform.FindChild("MaskBg");
         var hitbox = __instance.scrollBar.transform.FindChild("Hitbox");
@@ -328,7 +327,6 @@ public static class RoleSettingMenuPatches
                         obj.gameObject.DeepDestroy(false);
                     }
                     RoleOptionSettings.Clear();
-                    Utilities.Extensions.ClearGarbageCollector();
                     __instance.SetQuotaTab();
                 }));
             headerBtn.SetButtonEnableState(true);
@@ -437,8 +435,7 @@ public static class RoleSettingMenuPatches
             roleSetting.Role.StringName,
             roleSetting.RoleMaxCount,
             roleSetting.RoleChance,
-            roleSetting.Role.TeamType,
-            false);
+            roleSetting.Role.TeamType);
 
         if (AmongUsClient.Instance.AmHost)
         {
@@ -457,7 +454,6 @@ public static class RoleSettingMenuPatches
 
         CurrentRole = role;
         __instance.advancedSettingChildren.Clear();
-        Utilities.Extensions.ClearGarbageCollector();
 
         // TODO: create sub groups under the role settings.
         var filteredOptions = GameSettingMenuPatches.SelectedMod?.InternalOptionGroups

@@ -1,6 +1,7 @@
 ﻿using AmongUs.GameOptions;
 using MiraAPI.Patches.Stubs;
 using MiraAPI.Roles;
+using MiraAPI.Utilities.Assets;
 using Reactor.Utilities;
 using TMPro;
 using UnityEngine;
@@ -20,6 +21,8 @@ public class ChameloenRole : CrewmateRole, ICustomRole
     public CustomRoleConfiguration Configuration => new(this)
     {
         OptionsScreenshot = ExampleAssets.Banner,
+        Icon = MiraAssets.CrewmateFile,
+        IconTmp = TmpSpriteUtils.CreateSpriteAsset(MiraAssets.CrewmateFile.LoadAsset(), "ApiExample.Role.Impostor.ChameleonRole"),
         IntroSound = CustomRoleUtils.GetIntroSound(RoleTypes.Shapeshifter),
     };
 

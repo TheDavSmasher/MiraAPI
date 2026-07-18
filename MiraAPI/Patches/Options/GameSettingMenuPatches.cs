@@ -432,7 +432,7 @@ internal static class GameSettingMenuPatches
                 x => x.ParentMenu == MenuCategory.Modifiers || x.OptionableType?.IsAssignableTo(typeof(BaseModifier)) == true);
             var modHasOptions =
                 SelectedMod.InternalOptionGroups.Exists(x => x.OptionableType == null &&
-                    x.ParentMenu != MenuCategory.Modifiers && x.ParentMenu != MenuCategory.Roles);
+                    x.ParentMenu == MenuCategory.Game);
 
             _modifiersButton.gameObject.SetActive(true);
             _smallRolesButton.gameObject.SetActive(true);

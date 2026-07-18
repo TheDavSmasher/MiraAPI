@@ -326,7 +326,7 @@ public static class Extensions
         yield return null;
         if (clearGc)
         {
-            yield return CoFreeResources();
+            ClearGarbageCollector();
         }
     }
 
@@ -335,16 +335,8 @@ public static class Extensions
     /// </summary>
     public static void ClearGarbageCollector()
     {
-        Coroutines.Start(CoFreeResources());
-    }
-
-    private static IEnumerator CoFreeResources()
-    {
-        yield return Resources.UnloadUnusedAssets();
-
-        GC.Collect(0, GCCollectionMode.Forced, blocking: true);
-        GC.WaitForPendingFinalizers();
-        GC.Collect(0, GCCollectionMode.Forced, blocking: true);
+        Resources.UnloadUnusedAssets();
+        GC.Collect();
     }
 
     /// <summary>

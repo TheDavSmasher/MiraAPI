@@ -13,6 +13,8 @@ using MiraAPI.PluginLoading;
 using MiraAPI.Utilities;
 using Reactor.Networking.Rpc;
 using Reactor.Utilities;
+using TMPro;
+using UnityEngine;
 
 namespace MiraAPI.GameOptions;
 
@@ -30,6 +32,36 @@ public static class ModdedOptionsManager
 
     internal static uint NextId => _nextId++;
     private static uint _nextId = 1;
+
+    public static void AddSettingsChangeMessage(NotificationPopper notif, StringNames key, string value, Color textColor, TMP_SpriteAsset? sprite, bool playSound = true)
+    {
+        var item = string.Empty;
+        var text = textColor.ToTextColor();
+        if (sprite != null)
+        {
+            item = TranslationController.Instance.GetString(
+                StringNames.LobbyChangeSettingNotification,
+                string.Concat(
+                    "<sprite name=\"",
+                    sprite.name,
+                    "\"><font=\"Barlow-Black SDF\" material=\"Barlow-Black Outline\">",
+                    text,
+                    TranslationController.Instance.GetString(key),
+                    "</color></font>"),
+                "<font=\"Barlow-Black SDF\" material=\"Barlow-Black Outline\">" + value + "</font>"
+            );
+        }
+        else
+        {
+            item = TranslationController.Instance.GetString(
+                StringNames.LobbyChangeSettingNotification,
+                "<font=\"Barlow-Black SDF\" material=\"Barlow-Black Outline\">" +
+                text +
+                TranslationController.Instance.GetString(key) + "</color></font>",
+                "<font=\"Barlow-Black SDF\" material=\"Barlow-Black Outline\">" + value + "</font>");
+        }
+        notif.SettingsChangeMessageLogic(key, item, playSound);
+    }
 
     internal static bool RegisterGroup(Type type, MiraPluginInfo pluginInfo)
     {
@@ -226,6 +258,7 @@ public static class ModdedOptionsManager
 
         option.ConfigDefinition = new ConfigDefinition(groupName, propertyName);
 
+        option.ParentGroup = group;
         option.ParentMod = pluginInfo.MiraPlugin;
         pluginInfo.InternalOptions.Add(option);
         ModdedOptions.Add(option.Id, option);

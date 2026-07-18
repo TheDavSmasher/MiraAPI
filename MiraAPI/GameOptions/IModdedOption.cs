@@ -23,6 +23,16 @@ public interface IModdedOption
     string Title { get; set; }
 
     /// <summary>
+    /// Gets or sets the parent <see cref="AbstractOptionGroup"/> of the option.
+    /// </summary>
+    AbstractOptionGroup ParentGroup { get; set; }
+
+    /// <summary>
+    /// Gets the notification settings for the option.
+    /// </summary>
+    OptionNotifConfiguration Configuration { get; }
+
+    /// <summary>
     /// Gets the <see cref="StringNames"/> for the option, used for localization.
     /// </summary>
     StringNames StringName { get; }

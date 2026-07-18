@@ -36,6 +36,13 @@ internal static class GameOptionsMenuPatch
     }
 
     [HarmonyPostfix]
+    [HarmonyPatch(nameof(GameOptionsMenu.CloseMenu))]
+    public static void FullMenuClosePatch(GameOptionsMenu __instance)
+    {
+        Utilities.Extensions.ClearGarbageCollector();
+    }
+
+    [HarmonyPostfix]
     [HarmonyPatch(nameof(GameOptionsMenu.Update))]
     // ReSharper disable once InconsistentNaming
     public static void UpdatePatch(GameOptionsMenu __instance)
@@ -63,7 +70,7 @@ internal static class GameOptionsMenuPatch
             var filteredGroups =
                 GameSettingMenuPatches.SelectedMod?.InternalOptionGroups
                     .Where(x => x.OptionableType == null &&
-                                x.ParentMenu == MenuCategory.Roles) ?? [];
+                                x.ParentMenu == MenuCategory.Game) ?? [];
 
             foreach (var group in filteredGroups)
             {
@@ -218,7 +225,7 @@ internal static class GameOptionsMenuPatch
         }
 
         var filteredGroups = GameSettingMenuPatches.SelectedMod?.InternalOptionGroups
-            .Where(x => x.OptionableType == null && x.ParentMenu == MenuCategory.Roles) ?? [];
+            .Where(x => x.OptionableType == null && x.ParentMenu == MenuCategory.Game) ?? [];
 
         foreach (var group in filteredGroups)
         {
