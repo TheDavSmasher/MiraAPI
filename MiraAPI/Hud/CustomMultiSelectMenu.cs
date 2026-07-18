@@ -174,9 +174,12 @@ public abstract class CustomMultiSelectMenu<TEntry>(IntPtr il2CppPtr)
         }
 
         selectedEntries.Add(menuEntry);
-        if (selectedEntries.Count < totalSelections) // Add choice to list of selections
+        if (selectedEntries.Count <= totalSelections) // Add choice to list of selections
         {
             SetNameplateAppearance(menuEntry, true);
+        }
+        if (selectedEntries.Count < totalSelections)
+        {
             return;
         }
 
