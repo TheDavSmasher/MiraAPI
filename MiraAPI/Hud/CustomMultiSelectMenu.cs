@@ -168,6 +168,11 @@ public abstract class CustomMultiSelectMenu<TEntry>(IntPtr il2CppPtr)
             return;
         }
 
+        if (selectedEntries.Count >= totalSelections) // Do not go past total selections.
+        {
+            return;
+        }
+
         selectedEntries.Add(menuEntry);
         if (selectedEntries.Count < totalSelections) // Add choice to list of selections
         {
