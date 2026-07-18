@@ -196,5 +196,5 @@ public abstract class ModdedOption<T> : IModdedOption
     public AbstractOptionGroup ParentGroup { get; set; }
 
     /// <inheritdoc />
-    public OptionNotifConfiguration Configuration => new(ParentGroup);
+    public virtual OptionNotifConfiguration Configuration => new(ParentGroup);
 }
