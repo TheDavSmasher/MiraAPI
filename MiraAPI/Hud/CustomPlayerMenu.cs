@@ -36,7 +36,7 @@ public class CustomPlayerMenu(IntPtr il2CppPtr) : CustomMultiSelectMenu<PlayerCo
     /// </summary>
     /// <param name="playerMatch">Function to determine if player should show in the custom menu.</param>
     /// <param name="onClick"><see cref="PassiveButton.OnClick"/> action for player.</param>
-    /// <param name="shouldConfirm">Wheter the set of both selections should be confirmed manually.</param>
+    /// <param name="shouldConfirm">Whether the set of both selections should be confirmed manually.</param>
     [HideFromIl2Cpp]
     public void Begin(Func<PlayerControl, bool> playerMatch, Action<PlayerControl?> onClick, bool shouldConfirm = false)
     {
@@ -49,7 +49,7 @@ public class CustomPlayerMenu(IntPtr il2CppPtr) : CustomMultiSelectMenu<PlayerCo
     /// </summary>
     /// <param name="playerMatch">Function to determine if player should show in the custom menu.</param>
     /// <param name="onClick"><see cref="PassiveButton.OnClick"/> action for the two-player selection.</param>
-    /// <param name="shouldConfirm">Wheter the set of both selections should be confirmed manually.</param>
+    /// <param name="shouldConfirm">Whether the set of both selections should be confirmed manually.</param>
     /// <param name="canRepeat">If the same entry can be selected both times, else unselect entry on click.</param>
     [HideFromIl2Cpp]
     public void Begin(Func<PlayerControl, bool> playerMatch, Action<PlayerControl?, PlayerControl?> onClick, bool shouldConfirm = false, bool canRepeat = false)

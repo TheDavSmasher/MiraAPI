@@ -97,7 +97,7 @@ public abstract class CustomMultiSelectMenu<TEntry>(IntPtr il2CppPtr)
     /// <param name="entries">All entries to give the custom menu.</param>
     /// <param name="onClick">Function called when all selections are made/confirmed.</param>
     /// <param name="totalSelections">The number of selections required.</param>
-    /// <param name="shouldConfirm">Wheter the entire selection should be confirmed manually.</param>
+    /// <param name="shouldConfirm">Whether the entire selection should be confirmed manually.</param>
     /// <param name="canRepeat">If the same entry can be selected multiple times, else unselect entry on click.</param>
     [HideFromIl2Cpp]
     protected void Begin(IEnumerable<TEntry> entries, Action<List<TEntry>?> onClick, int totalSelections, bool shouldConfirm, bool canRepeat = false)
@@ -137,7 +137,7 @@ public abstract class CustomMultiSelectMenu<TEntry>(IntPtr il2CppPtr)
     /// </summary>
     /// <param name="entries">All entries to give the custom menu.</param>
     /// <param name="onClick">Function called when the selection is made.</param>
-    /// <param name="shouldConfirm">Wheter the set of both selections should be confirmed manually.</param>
+    /// <param name="shouldConfirm">Whether the set of both selections should be confirmed manually.</param>
     [HideFromIl2Cpp]
     protected void Begin(IEnumerable<TEntry> entries, Action<TEntry?> onClick, bool shouldConfirm)
     {
@@ -149,7 +149,7 @@ public abstract class CustomMultiSelectMenu<TEntry>(IntPtr il2CppPtr)
     /// </summary>
     /// <param name="entries">All entries to give the custom menu.</param>
     /// <param name="onClick">Function called when both selections are made.</param>
-    /// <param name="shouldConfirm">Wheter the set of both selections should be confirmed manually.</param>
+    /// <param name="shouldConfirm">Whether the set of both selections should be confirmed manually.</param>
     /// <param name="canRepeat">If the same entry can be selected both times, else unselect entry on click.</param>
     [HideFromIl2Cpp]
     protected void Begin(IEnumerable<TEntry> entries, Action<TEntry?, TEntry?> onClick, bool shouldConfirm, bool canRepeat = false)
