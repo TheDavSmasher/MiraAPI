@@ -1,10 +1,12 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
 using System.Reflection;
 using System.Text.RegularExpressions;
+using System.Timers;
 using HarmonyLib;
 using MiraAPI.GameOptions;
 using MiraAPI.Networking;
@@ -236,6 +238,44 @@ public static class Extensions
         else
         {
             obj?.Destroy();
+        }
+    }
+
+    /// <summary>
+    /// Runs a given action in a loop with a frame budget based on the current target frame rate. Once the budget is hit, the loop continues on the next frame.
+    /// </summary>
+    /// <param name="collection">The collection to iterate over.</param>
+    /// <param name="action">The action to perform on each item.</param>
+    /// <typeparam name="T">The type of the collection.</typeparam>
+    /// <returns>Coroutine.</returns>
+    public static IEnumerator CoLoopWithBudget<T>(this IEnumerable<T> collection, Action<T> action)
+    {
+        var fps = Application.targetFrameRate > 0 ? Application.targetFrameRate : 60;
+        long budget = 1 / (fps * 2); // default is half of current frame time.
+        yield return collection.CoLoopWithBudget(budget, action);
+    }
+
+    /// <summary>
+    /// Runs a given action in a loop with a given frame budget. Once the budget is hit, the loop continues on the next frame.
+    /// </summary>
+    /// <param name="collection">The collection to iterate over.</param>
+    /// <param name="frameBudget">The # of milliseconds to spend in the loop.</param>
+    /// <param name="action">The action to perform on each item.</param>
+    /// <typeparam name="T">The type of the collection.</typeparam>
+    /// <returns>Coroutine.</returns>
+    public static IEnumerator CoLoopWithBudget<T>(this IEnumerable<T> collection, long frameBudget, Action<T> action)
+    {
+        var timer = new Stopwatch();
+        timer.Start();
+        foreach (var item in collection)
+        {
+            action(item);
+
+            if (timer.ElapsedMilliseconds > frameBudget)
+            {
+                timer.Restart();
+                yield return null;
+            }
         }
     }
 

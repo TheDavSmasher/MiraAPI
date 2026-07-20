@@ -1,6 +1,10 @@
 ﻿using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using AmongUs.GameOptions;
+using BepInEx.Unity.IL2CPP.Utils.Collections;
 using HarmonyLib;
 using Il2CppInterop.Runtime.Attributes;
 using MiraAPI.GameOptions;
@@ -178,7 +182,8 @@ internal static class GameOptionsMenuPatch
     private static void ModifiersUpdate(ref float num)
     {
         var groups = GameSettingMenuPatches.SelectedMod?.InternalOptionGroups
-            .Where(x => x.ParentMenu is MenuCategory.Modifiers || x.OptionableType?.IsAssignableTo(typeof(BaseModifier)) == true) ?? [];
+            .Where(x => x.ParentMenu is MenuCategory.Modifiers ||
+                        x.OptionableType?.IsAssignableTo(typeof(BaseModifier)) == true) ?? [];
 
         foreach (var modGroup in groups)
         {
@@ -189,7 +194,8 @@ internal static class GameOptionsMenuPatch
     private static void ModifiersCreate(GameOptionsMenu menu)
     {
         var groups = GameSettingMenuPatches.SelectedMod?.InternalOptionGroups
-            .Where(x => x.ParentMenu is MenuCategory.Modifiers || x.OptionableType?.IsAssignableTo(typeof(BaseModifier)) == true) ?? [];
+            .Where(x => x.ParentMenu is MenuCategory.Modifiers ||
+                        x.OptionableType?.IsAssignableTo(typeof(BaseModifier)) == true) ?? [];
         foreach (var group in groups)
         {
             CreateGroup(menu, group);
@@ -208,20 +214,17 @@ internal static class GameOptionsMenuPatch
 
         __instance.MapPicker.gameObject.SetActive(false);
 
-        if (__instance.name == "MODIFIERS TAB")
+        switch (__instance.name)
         {
-            ModifiersCreate(__instance);
-            return false;
-        }
-        else if (__instance.name == "CUSTOM TAB 1")
-        {
-            CustomMenuOneCreate(__instance);
-            return false;
-        }
-        else if (__instance.name == "CUSTOM TAB 2")
-        {
-            CustomMenuTwoCreate(__instance);
-            return false;
+            case "MODIFIERS TAB":
+                ModifiersCreate(__instance);
+                return false;
+            case "CUSTOM TAB 1":
+                CustomMenuOneCreate(__instance);
+                return false;
+            case "CUSTOM TAB 2":
+                CustomMenuTwoCreate(__instance);
+                return false;
         }
 
         var filteredGroups = GameSettingMenuPatches.SelectedMod?.InternalOptionGroups
@@ -318,117 +321,120 @@ internal static class GameOptionsMenuPatch
             defaultPreset = preset;
         }
 
-        foreach (var newOpt in options)
-        {
-            newOpt.SetClickMask(menu.ButtonClickMask);
-
-            SpriteRenderer[] componentsInChildren = newOpt.GetComponentsInChildren<SpriteRenderer>(true);
-            foreach (var renderer in componentsInChildren)
+        menu.StartCoroutine(
+            options.CoLoopWithBudget((newOpt) =>
             {
-                if (group.GroupColor != MiraApiPlugin.DefaultHeaderColor)
+                newOpt.SetClickMask(menu.ButtonClickMask);
+
+                SpriteRenderer[] componentsInChildren = newOpt.GetComponentsInChildren<SpriteRenderer>(true);
+                foreach (var renderer in componentsInChildren)
                 {
-                    renderer.color = group.GroupColor.FindAlternateColor();
-                    if (renderer.transform.parent.TryGetComponent<GameOptionButton>(out var btn))
+                    if (group.GroupColor != MiraApiPlugin.DefaultHeaderColor)
                     {
-                        btn.interactableColor = group.GroupColor.FindAlternateColor();
-                        btn.interactableHoveredColor = Color.white;
+                        renderer.color = group.GroupColor.FindAlternateColor();
+                        if (renderer.transform.parent.TryGetComponent<GameOptionButton>(out var btn))
+                        {
+                            btn.interactableColor = group.GroupColor.FindAlternateColor();
+                            btn.interactableHoveredColor = Color.white;
+                        }
                     }
+
+                    renderer.material.SetInt(PlayerMaterial.MaskLayer, 20);
                 }
 
-                renderer.material.SetInt(PlayerMaterial.MaskLayer, 20);
-            }
-
-            foreach (var textMeshPro in newOpt.GetComponentsInChildren<TextMeshPro>(true))
-            {
-                if (group.GroupColor != MiraApiPlugin.DefaultHeaderColor)
+                foreach (var textMeshPro in newOpt.GetComponentsInChildren<TextMeshPro>(true))
                 {
-                    textMeshPro.color = group.GroupColor;
+                    if (group.GroupColor != MiraApiPlugin.DefaultHeaderColor)
+                    {
+                        textMeshPro.color = group.GroupColor;
+                    }
+
+                    textMeshPro.fontMaterial.SetFloat(ShaderID.StencilComp, 3f);
+                    textMeshPro.fontMaterial.SetFloat(ShaderID.Stencil, 20);
                 }
 
-                textMeshPro.fontMaterial.SetFloat(ShaderID.StencilComp, 3f);
-                textMeshPro.fontMaterial.SetFloat(ShaderID.Stencil, 20);
-            }
-
-            if (newOpt is ToggleOption toggle)
-            {
-                toggle.CheckMark.sprite = MiraAssets.Checkmark.LoadAsset();
-                toggle.CheckMark.color = group.GroupColor != MiraApiPlugin.DefaultHeaderColor
-                    ? group.GroupColor
-                    : MiraAssets.AcceptedTeal;
-                var rend = toggle.CheckMark.transform.parent.FindChild("ActiveSprite")
-                    .GetComponent<SpriteRenderer>();
-                rend.sprite = MiraAssets.CheckmarkBox.LoadAsset();
-                rend.color = group.GroupColor != MiraApiPlugin.DefaultHeaderColor
-                    ? group.GroupColor
-                    : MiraAssets.AcceptedTeal;
-            }
-
-            menu.Children.Add(newOpt);
-            var resetBtn = new GameObject("ResetOption");
-            resetBtn.transform.parent = newOpt.transform;
-            resetBtn.transform.localScale = new(.5f, .5f, 1);
-            resetBtn.layer = LayerMask.NameToLayer("UI");
-            resetBtn.transform.localPosition = new Vector3(-3.1f, 0f, -2f);
-            var resetRend = resetBtn.AddComponent<SpriteRenderer>();
-            resetRend.sprite = MiraAssets.ResetButton.LoadAsset();
-            resetRend.maskInteraction = SpriteMaskInteraction.VisibleInsideMask;
-            resetRend.color = group.GroupColor.Equals(MiraApiPlugin.DefaultHeaderColor)
-                ? Color.white
-                : group.GroupColor.FindAlternateColor();
-            var resetBoxCol = resetBtn.gameObject.AddComponent<BoxCollider2D>();
-            resetBoxCol.size = new Vector2(1f, 1f);
-            resetBoxCol.offset = new Vector2(0, 0);
-            var passiveButton = resetBtn.AddComponent<PassiveButton>();
-            passiveButton.OnClick = new Button.ButtonClickedEvent();
-            passiveButton.ClickSound = menu.BackButton.GetComponent<PassiveButton>().ClickSound;
-            passiveButton.OnMouseOver = new UnityEvent();
-            passiveButton.OnMouseOver.AddListener(
-                (UnityAction)(() =>
+                if (newOpt is ToggleOption toggle)
                 {
-                    resetRend.color = group.GroupColor != MiraApiPlugin.DefaultHeaderColor
+                    toggle.CheckMark.sprite = MiraAssets.Checkmark.LoadAsset();
+                    toggle.CheckMark.color = group.GroupColor != MiraApiPlugin.DefaultHeaderColor
                         ? group.GroupColor
                         : MiraAssets.AcceptedTeal;
-                }));
-            passiveButton.OnMouseOut = new UnityEvent();
-            passiveButton.OnMouseOut.AddListener(
-                (UnityAction)(() =>
-                {
-                    resetRend.color = group.GroupColor.Equals(MiraApiPlugin.DefaultHeaderColor)
-                        ? Color.white
-                        : group.GroupColor.FindAlternateColor();
-                }));
-            if (newOpt is ToggleOption toggleOpt)
-            {
-                passiveButton.OnClick.AddListener(
-                    (UnityAction)(() =>
-                    {
-                        defaultPreset!.ResetOption(toggleOpt);
-                    }));
-            }
-            else if (newOpt is NumberOption numOpt)
-            {
-                passiveButton.OnClick.AddListener(
-                    (UnityAction)(() =>
-                    {
-                        defaultPreset!.ResetOption(numOpt);
-                    }));
-            }
-            else if (newOpt is StringOption strOpt)
-            {
-                passiveButton.OnClick.AddListener(
-                    (UnityAction)(() =>
-                    {
-                        defaultPreset!.ResetOption(strOpt);
-                    }));
-            }
-            if (!defaultPreset!.IsOptionInPreset(newOpt))
-            {
-                resetBtn.Destroy();
-            }
+                    var rend = toggle.CheckMark.transform.parent.FindChild("ActiveSprite")
+                        .GetComponent<SpriteRenderer>();
+                    rend.sprite = MiraAssets.CheckmarkBox.LoadAsset();
+                    rend.color = group.GroupColor != MiraApiPlugin.DefaultHeaderColor
+                        ? group.GroupColor
+                        : MiraAssets.AcceptedTeal;
+                }
 
-            newOpt.Initialize();
-            newOpt.gameObject.SetActive(false);
-        }
+                menu.Children.Add(newOpt);
+                var resetBtn = new GameObject("ResetOption");
+                resetBtn.transform.parent = newOpt.transform;
+                resetBtn.transform.localScale = new(.5f, .5f, 1);
+                resetBtn.layer = LayerMask.NameToLayer("UI");
+                resetBtn.transform.localPosition = new Vector3(-3.1f, 0f, -2f);
+                var resetRend = resetBtn.AddComponent<SpriteRenderer>();
+                resetRend.sprite = MiraAssets.ResetButton.LoadAsset();
+                resetRend.maskInteraction = SpriteMaskInteraction.VisibleInsideMask;
+                resetRend.color = group.GroupColor.Equals(MiraApiPlugin.DefaultHeaderColor)
+                    ? Color.white
+                    : group.GroupColor.FindAlternateColor();
+                var resetBoxCol = resetBtn.gameObject.AddComponent<BoxCollider2D>();
+                resetBoxCol.size = new Vector2(1f, 1f);
+                resetBoxCol.offset = new Vector2(0, 0);
+                var passiveButton = resetBtn.AddComponent<PassiveButton>();
+                passiveButton.OnClick = new Button.ButtonClickedEvent();
+                passiveButton.ClickSound = menu.BackButton.GetComponent<PassiveButton>().ClickSound;
+                passiveButton.OnMouseOver = new UnityEvent();
+                passiveButton.OnMouseOver.AddListener(
+                    (UnityAction)(() =>
+                    {
+                        resetRend.color = group.GroupColor != MiraApiPlugin.DefaultHeaderColor
+                            ? group.GroupColor
+                            : MiraAssets.AcceptedTeal;
+                    }));
+                passiveButton.OnMouseOut = new UnityEvent();
+                passiveButton.OnMouseOut.AddListener(
+                    (UnityAction)(() =>
+                    {
+                        resetRend.color = group.GroupColor.Equals(MiraApiPlugin.DefaultHeaderColor)
+                            ? Color.white
+                            : group.GroupColor.FindAlternateColor();
+                    }));
+                if (newOpt is ToggleOption toggleOpt)
+                {
+                    passiveButton.OnClick.AddListener(
+                        (UnityAction)(() =>
+                        {
+                            defaultPreset!.ResetOption(toggleOpt);
+                        }));
+                }
+                else if (newOpt is NumberOption numOpt)
+                {
+                    passiveButton.OnClick.AddListener(
+                        (UnityAction)(() =>
+                        {
+                            defaultPreset!.ResetOption(numOpt);
+                        }));
+                }
+                else if (newOpt is StringOption strOpt)
+                {
+                    passiveButton.OnClick.AddListener(
+                        (UnityAction)(() =>
+                        {
+                            defaultPreset!.ResetOption(strOpt);
+                        }));
+                }
+
+                if (!defaultPreset!.IsOptionInPreset(newOpt))
+                {
+                    resetBtn.Destroy();
+                }
+
+                newOpt.Initialize();
+                newOpt.gameObject.SetActive(false);
+            }).WrapToIl2Cpp()
+        );
 
         var boxCol = categoryHeaderMasked.gameObject.AddComponent<BoxCollider2D>();
         boxCol.size = new Vector2(7, 0.7f);
