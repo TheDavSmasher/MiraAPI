@@ -70,6 +70,8 @@ public abstract class AbstractOptionGroup
     internal bool AllOptionsHidden { get; set; }
 
     internal CategoryHeaderMasked? Header { get; set; }
+
+    internal Coroutine? CreationCoroutine { get; set; }
 }
 
 /// <summary>

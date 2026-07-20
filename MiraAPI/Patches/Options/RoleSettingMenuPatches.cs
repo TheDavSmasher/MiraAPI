@@ -58,7 +58,7 @@ public static class RoleSettingMenuPatches
                 continue;
             }
 
-            obj.DeepDestroy(false);
+            obj.Destroy();
         }
 
         Headers.Clear();
@@ -69,7 +69,7 @@ public static class RoleSettingMenuPatches
                 continue;
             }
 
-            obj.gameObject.DeepDestroy(false);
+            obj.gameObject.Destroy();
         }
 
         RoleOptionSettings.Clear();
@@ -228,9 +228,9 @@ public static class RoleSettingMenuPatches
                 var blankLabel = quotaInst.transform.FindChild("BlankLabel").gameObject;
                 var chanceLabel = quotaInst.transform.FindChild("Chance Label").gameObject;
                 var countLabel = quotaInst.transform.FindChild("# Label").gameObject;
-                blankLabel.DeepDestroy(false);
-                chanceLabel.DeepDestroy(false);
-                countLabel.DeepDestroy(false);
+                blankLabel.Destroy();
+                chanceLabel.Destroy();
+                countLabel.Destroy();
                 usingNewQuota = true;
                 quotaThing = quotaInst;
             }
@@ -329,7 +329,7 @@ public static class RoleSettingMenuPatches
                             continue;
                         }
 
-                        obj.DeepDestroy(false);
+                        obj.Destroy();
                     }
 
                     Headers.Clear();
@@ -340,7 +340,7 @@ public static class RoleSettingMenuPatches
                             continue;
                         }
 
-                        obj.gameObject.DeepDestroy(false);
+                        obj.gameObject.Destroy();
                     }
 
                     RoleOptionSettings.Clear();
@@ -355,13 +355,21 @@ public static class RoleSettingMenuPatches
         }
 
         roleMenu.scrollBar.SetScrollBounds(roleMenu);
+        _quotaTabCoroutine = null;
     }
+
+    private static Coroutine? _quotaTabCoroutine;
 
     [HarmonyPrefix]
     [HarmonyPatch(nameof(RolesSettingsMenu.SetQuotaTab))]
     public static bool SetQuotaTabPatch(RolesSettingsMenu __instance)
     {
-        __instance.StartCoroutine(CoQuotaTabPatch(__instance).WrapToIl2Cpp());
+        if (_quotaTabCoroutine != null)
+        {
+            GameSettingMenu.Instance.StopCoroutine(_quotaTabCoroutine);
+        }
+
+        _quotaTabCoroutine = GameSettingMenu.Instance.StartCoroutine(CoQuotaTabPatch(__instance).WrapToIl2Cpp());
         return false;
     }
 
@@ -474,7 +482,7 @@ public static class RoleSettingMenuPatches
     {
         foreach (var optBehaviour in __instance.AdvancedRolesSettings.GetComponentsInChildren<OptionBehaviour>())
         {
-            optBehaviour.gameObject.DeepDestroy(false);
+            optBehaviour.gameObject.Destroy();
         }
 
         CurrentRole = role;
@@ -485,8 +493,6 @@ public static class RoleSettingMenuPatches
             .Where(x => x.GroupVisible() && x.OptionableType == role.GetType())
             .SelectMany(x => x.Options)
             .ToList() ?? [];
-
-        CurrentRoleOptions = filteredOptions;
 
         foreach (var option in filteredOptions)
         {
@@ -518,6 +524,7 @@ public static class RoleSettingMenuPatches
             newOpt.Initialize();
         }
 
+        CurrentRoleOptions = filteredOptions;
         __instance.scrollBar.ScrollToTop();
     }
 
@@ -670,7 +677,7 @@ public static class RoleSettingMenuPatches
             var newButton = Object.Instantiate(roleOptionSetting.buttons[0], roleOptionSetting.transform);
             newButton.name = "ConfigButton";
             newButton.transform.localPosition = new Vector3(0.4473f, -0.3f, -2f);
-            newButton.transform.FindChild("Text_TMP").gameObject.DeepDestroy();
+            newButton.transform.FindChild("Text_TMP").gameObject.Destroy();
             newButton.activeSprites.Destroy();
 
             var btnRend = newButton.transform.FindChild("ButtonSprite").GetComponent<SpriteRenderer>();

@@ -58,7 +58,7 @@ public static class Extensions
         bool isComplete;
         if (self.amClosing == Minigame.CloseState.Closing)
         {
-            self.gameObject.DeepDestroy();
+            self.gameObject.Destroy();
             return;
         }
         if (self.CloseSound && Constants.ShouldPlaySfx())
@@ -231,14 +231,7 @@ public static class Extensions
     /// <param name="clearGc">Whether to run the garbage collector immediately.</param>
     public static void DeepDestroy(this GameObject obj, bool clearGc = true)
     {
-        if (MainMenuManagerPatches.NeedsDeepDestroy)
-        {
-            Coroutines.Start(Nuke(obj, clearGc));
-        }
-        else
-        {
-            obj?.Destroy();
-        }
+        obj.Destroy();
     }
 
     /// <summary>
