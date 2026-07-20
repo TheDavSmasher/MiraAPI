@@ -1,9 +1,6 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using HarmonyLib;
+﻿using HarmonyLib;
 using Il2CppSystem;
 using MiraAPI.GameOptions;
-using MiraAPI.GameOptions.OptionTypes;
 using MiraAPI.Roles;
 using MiraAPI.Utilities;
 using UnityEngine;

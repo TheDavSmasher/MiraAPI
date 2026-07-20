@@ -1,6 +1,4 @@
-﻿using MiraAPI.Voting;
-
-namespace MiraAPI.Events.Vanilla.Meeting.Voting;
+﻿namespace MiraAPI.Events.Vanilla.Meeting.Voting;
 
 /// <summary>
 /// Event that is invoked after the local player successfully votes a player or skips. This event is not cancelable.

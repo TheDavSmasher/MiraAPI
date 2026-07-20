@@ -1,7 +1,6 @@
 ﻿using System.Linq;
 using AmongUs.GameOptions;
 using HarmonyLib;
-using InnerNet;
 using MiraAPI.Events;
 using MiraAPI.Events.Vanilla.Gameplay;
 using MiraAPI.Modifiers;

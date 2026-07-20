@@ -3,7 +3,6 @@ using System.Linq;
 using HarmonyLib;
 using MiraAPI.LocalSettings;
 using MiraAPI.Utilities.Assets;
-using Reactor.Utilities;
 using Reactor.Utilities.Extensions;
 using UnityEngine;
 using UnityEngine.Events;
