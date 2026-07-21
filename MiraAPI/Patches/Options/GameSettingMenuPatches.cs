@@ -419,6 +419,8 @@ internal static class GameSettingMenuPatches
         _customTwoButton!.transform.localPosition = _customTwoBtnOgPos;
         menu.RoleSettingsButton.transform.localPosition = _roleBtnOgPos;
 
+        CleanupTab(settings, roles);
+
         if (SelectedModIdx != 0)
         {
             _customOneButton.buttonText.text = SelectedMod!.MiraPlugin.CustomOptionMenuNameOne;
@@ -560,8 +562,6 @@ internal static class GameSettingMenuPatches
         {
             menu.ChangeTab(0, false);
         }
-
-        CleanupTab(settings, roles);
     }
 
     private static void ClearOptions(Il2CppSystem.Collections.Generic.List<OptionBehaviour> options)
@@ -605,6 +605,8 @@ internal static class GameSettingMenuPatches
         {
             CleanupSettings(_customTwoTab, MenuCategory.CustomTwo);
         }
+
+        Utilities.Extensions.ClearGarbageCollector();
 
         void CleanupRoleSettings(RolesSettingsMenu rolesMenu)
         {
