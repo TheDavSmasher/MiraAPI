@@ -366,7 +366,8 @@ public static class Extensions
     public static void ClearGarbageCollector()
     {
         Resources.UnloadUnusedAssets();
-        GC.Collect();
+        Il2CppSystem.GC.Collect(0, Il2CppSystem.GCCollectionMode.Forced);
+        GC.Collect(0, GCCollectionMode.Forced);
     }
 
     /// <summary>
