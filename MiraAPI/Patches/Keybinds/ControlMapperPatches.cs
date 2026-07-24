@@ -1,13 +1,8 @@
 ﻿using System.Linq;
 using HarmonyLib;
 using MiraAPI.Keybinds;
-using MiraAPI.LocalSettings;
-using Reactor.Utilities;
-using Reactor.Utilities.Extensions;
 using Rewired.UI.ControlMapper;
-using TMPro;
 using UnityEngine;
-using UnityEngine.Events;
 using UnityEngine.UI;
 
 namespace MiraAPI.Patches.Keybinds;

@@ -1,6 +1,5 @@
 using HarmonyLib;
 using MiraAPI.Keybinds;
-using MonoMod.Utils;
 using Rewired;
 
 namespace MiraAPI.Patches.Keybinds;

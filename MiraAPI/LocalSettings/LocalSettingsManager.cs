@@ -2,8 +2,6 @@
 using System.Collections.Generic;
 using System.Reflection;
 using BepInEx.Unity.IL2CPP;
-using MiraAPI.GameOptions;
-using Reactor.Utilities;
 
 namespace MiraAPI.LocalSettings;
 

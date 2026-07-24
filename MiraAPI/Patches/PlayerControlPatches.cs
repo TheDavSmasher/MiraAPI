@@ -8,7 +8,6 @@ using MiraAPI.Hud;
 using MiraAPI.Modifiers;
 using MiraAPI.Utilities;
 using MiraAPI.Voting;
-using Reactor.Utilities;
 using Reactor.Utilities.Extensions;
 
 namespace MiraAPI.Patches;

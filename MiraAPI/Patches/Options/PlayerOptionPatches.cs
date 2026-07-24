@@ -1,12 +1,8 @@
-﻿using System;
-using System.Linq;
+﻿using System.Linq;
 using HarmonyLib;
 using MiraAPI.GameOptions;
-using MiraAPI.GameOptions.OptionTypes;
 using MiraAPI.Utilities;
-using Reactor.Utilities;
 using UnityEngine;
-using Object = Il2CppSystem.Object;
 
 namespace MiraAPI.Patches.Options;
 

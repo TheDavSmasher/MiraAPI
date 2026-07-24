@@ -1,5 +1,4 @@
 ﻿using System;
-using BepInEx.Configuration;
 
 namespace MiraAPI.LocalSettings.Attributes;
 

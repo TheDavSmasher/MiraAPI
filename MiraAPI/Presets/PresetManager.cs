@@ -4,8 +4,7 @@ using System.Linq;
 using BepInEx.Configuration;
 using MiraAPI.PluginLoading;
 using MiraAPI.Roles;
-using MiraAPI.Utilities;
-using Reactor.Utilities;
+using Reactor.Utilities.Extensions;
 using UnityEngine;
 
 namespace MiraAPI.Presets;
@@ -62,7 +61,7 @@ public static class PresetManager
         {
             if (btn != null)
             {
-                btn.DeepDestroy();
+                btn.Destroy();
             }
         }
 

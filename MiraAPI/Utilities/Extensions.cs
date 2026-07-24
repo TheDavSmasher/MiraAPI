@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
 using System.Reflection;
@@ -8,10 +9,8 @@ using System.Text.RegularExpressions;
 using HarmonyLib;
 using MiraAPI.GameOptions;
 using MiraAPI.Networking;
-using MiraAPI.Patches.Menu;
 using MiraAPI.Roles;
 using MiraAPI.Voting;
-using Reactor.Utilities;
 using Reactor.Utilities.Extensions;
 using Rewired;
 using Rewired.Data;
@@ -56,7 +55,7 @@ public static class Extensions
         bool isComplete;
         if (self.amClosing == Minigame.CloseState.Closing)
         {
-            self.gameObject.DeepDestroy();
+            self.gameObject.Destroy();
             return;
         }
         if (self.CloseSound && Constants.ShouldPlaySfx())
@@ -229,13 +228,44 @@ public static class Extensions
     /// <param name="clearGc">Whether to run the garbage collector immediately.</param>
     public static void DeepDestroy(this GameObject obj, bool clearGc = true)
     {
-        if (MainMenuManagerPatches.NeedsDeepDestroy)
+        obj.Destroy();
+    }
+
+    /// <summary>
+    /// Runs a given action in a loop with a frame budget based on the current target frame rate. Once the budget is hit, the loop continues on the next frame.
+    /// </summary>
+    /// <param name="collection">The collection to iterate over.</param>
+    /// <param name="action">The action to perform on each item.</param>
+    /// <typeparam name="T">The type of the collection.</typeparam>
+    /// <returns>Coroutine.</returns>
+    public static IEnumerator CoLoopWithBudget<T>(this IEnumerable<T> collection, Action<T> action)
+    {
+        var fps = Application.targetFrameRate > 0 ? Application.targetFrameRate : 60;
+        long budget = 1 / (fps * 2); // default is half of current frame time.
+        yield return collection.CoLoopWithBudget(budget, action);
+    }
+
+    /// <summary>
+    /// Runs a given action in a loop with a given frame budget. Once the budget is hit, the loop continues on the next frame.
+    /// </summary>
+    /// <param name="collection">The collection to iterate over.</param>
+    /// <param name="frameBudget">The # of milliseconds to spend in the loop.</param>
+    /// <param name="action">The action to perform on each item.</param>
+    /// <typeparam name="T">The type of the collection.</typeparam>
+    /// <returns>Coroutine.</returns>
+    public static IEnumerator CoLoopWithBudget<T>(this IEnumerable<T> collection, long frameBudget, Action<T> action)
+    {
+        var timer = new Stopwatch();
+        timer.Start();
+        foreach (var item in collection)
         {
-            Coroutines.Start(Nuke(obj, clearGc));
-        }
-        else
-        {
-            obj?.Destroy();
+            action(item);
+
+            if (timer.ElapsedMilliseconds > frameBudget)
+            {
+                timer.Restart();
+                yield return null;
+            }
         }
     }
 
@@ -336,7 +366,8 @@ public static class Extensions
     public static void ClearGarbageCollector()
     {
         Resources.UnloadUnusedAssets();
-        GC.Collect();
+        Il2CppSystem.GC.Collect(0, Il2CppSystem.GCCollectionMode.Forced);
+        GC.Collect(0, GCCollectionMode.Forced);
     }
 
     /// <summary>

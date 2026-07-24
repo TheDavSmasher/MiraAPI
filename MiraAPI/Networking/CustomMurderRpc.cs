@@ -10,9 +10,6 @@ using MiraAPI.Events.Vanilla.Gameplay;
 using MiraAPI.Utilities;
 using Reactor.Networking.Attributes;
 using Reactor.Networking.Rpc;
-using Reactor.Utilities;
-using Reactor.Utilities.Extensions;
-using Rewired;
 using UnityEngine;
 using Object = UnityEngine.Object;
 

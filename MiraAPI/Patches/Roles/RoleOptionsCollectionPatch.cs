@@ -2,7 +2,6 @@
 using HarmonyLib;
 using Il2CppSystem.Collections.Generic;
 using MiraAPI.Roles;
-using Reactor.Utilities;
 
 namespace MiraAPI.Patches.Roles;
 

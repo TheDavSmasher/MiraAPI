@@ -8,7 +8,6 @@ using MiraAPI.Presets;
 using MiraAPI.Roles;
 using MiraAPI.Utilities;
 using MiraAPI.Utilities.Assets;
-using Reactor.Utilities;
 using Reactor.Utilities.Extensions;
 using TMPro;
 using UnityEngine;
@@ -262,7 +261,7 @@ internal static class GamePresetsTabPatches
             iconSpriteRend.sprite = MiraAssets.RefreshIcon.LoadAsset();
 
             Helpers.DivideSize(refreshButton.gameObject, 2f);
-            refreshButton.buttonText.gameObject.DeepDestroy();
+            refreshButton.buttonText.gameObject.Destroy();
 
             refreshButton.OnClick = new Button.ButtonClickedEvent();
             refreshButton.OnClick.AddListener((UnityAction)Refresh);

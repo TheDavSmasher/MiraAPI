@@ -4,7 +4,6 @@ using InnerNet;
 using MiraAPI.Events;
 using MiraAPI.Events.Vanilla.Meeting;
 using MiraAPI.Utilities;
-using Reactor.Utilities;
 
 namespace MiraAPI.Patches.Events;
 

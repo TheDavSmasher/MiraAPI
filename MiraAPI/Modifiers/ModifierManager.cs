@@ -6,7 +6,6 @@ using MiraAPI.Modifiers.Types;
 using MiraAPI.PluginLoading;
 using MiraAPI.Roles;
 using MiraAPI.Utilities;
-using Reactor.Utilities;
 using Reactor.Utilities.Extensions;
 using Random = System.Random;
 
