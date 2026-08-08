@@ -26,67 +26,48 @@ public static class LogicRoleSelectionNormalPatch
         List<RoleTypes> list = new List<RoleTypes>();
         IRoleOptionsCollection roleOptions = opts.RoleOptions;
 
-        var assignmentData = source.Where(x => !x.IsDead).Select(role =>
-            new RoleManager.RoleAssignmentData(
-                role,
-                roleOptions.GetNumPerGame(role.Role),
-                roleOptions.GetChancePerGame(role.Role))).ToList();
-        var source2 = CustomRoleUtils.GetPossibleRoles(assignmentData, x => x.Chance == 100);
-        var guaranteedRoles = source.Where(x => source2.Contains(((ushort)x.Role, 100)));
-        foreach (RoleManager.RoleAssignmentData roleAssignmentData in guaranteedRoles.Select((x) =>
-                     new RoleManager.RoleAssignmentData(x, roleOptions.GetNumPerGame(x.Role), 100)))
+        // Assign guaranteed roles first, just like the vanilla selector. This is
+        // important because the list of players is shared by both team passes.
+        foreach (var role in source.Where(x => roleOptions.GetChancePerGame(x.Role) == 100))
         {
-            while (true)
+            for (var i = 0; i < roleOptions.GetNumPerGame(role.Role); i++)
             {
-                RoleManager.RoleAssignmentData roleAssignmentData2 = roleAssignmentData;
-                int count = roleAssignmentData2.Count;
-                roleAssignmentData2.Count = count - 1;
-                if (count <= 0)
-                {
-                    break;
-                }
-
-                list.Add(roleAssignmentData.Role.Role);
+                list.Add(role.Role);
             }
         }
 
         __instance.AssignRolesFromList(players, teamMax, list, ref num);
 
-        var list2 = source.Where(x => !x.IsDead).Select(role =>
-            new RoleManager.RoleAssignmentData(
-                role,
-                roleOptions.GetNumPerGame(role.Role),
-                roleOptions.GetChancePerGame(role.Role))).ToList();
-
+        // A 100% role was already assigned above. Including it here can consume
+        // another player and, more importantly, leaves the fallback count wrong.
         list.Clear();
-        foreach (RoleManager.RoleAssignmentData roleAssignmentData3 in list2)
+        foreach (var role in source.Where(x =>
+                     roleOptions.GetChancePerGame(x.Role) > 0 &&
+                     roleOptions.GetChancePerGame(x.Role) < 100))
         {
-            for (int i = 0; i < roleAssignmentData3.Count; i++)
+            for (var i = 0; i < roleOptions.GetNumPerGame(role.Role); i++)
             {
-                if (HashRandom.Next(101) < roleAssignmentData3.Chance)
+                if (HashRandom.Next(101) < roleOptions.GetChancePerGame(role.Role))
                 {
-                    list.Add(roleAssignmentData3.Role.Role);
+                    list.Add(role.Role);
                 }
             }
         }
 
         __instance.AssignRolesFromList(players, teamMax, list, ref num);
-        var defaultRole2 = team is RoleTeamTypes.Crewmate ? RoleTypes.Crewmate : RoleTypes.Impostor;
-        try
-        {
-            defaultRole2 = defaultRole.Value;
-        }
-        catch
-        {
-            // Ignored
-        }
 
-        while (list.Count < players.Count && list.Count + num < teamMax)
+        // Do not read defaultRole here. The nullable argument is not marshalled
+        // reliably by IL2CPP and can return Crewmate for the impostor pass.
+        var defaultRole2 = team is RoleTeamTypes.Crewmate ? RoleTypes.Crewmate : RoleTypes.Impostor;
+
+        // Assign the remaining players up to the requested team limit. The
+        // vanilla list has been consumed by AssignRolesFromList at this point,
+        // so checking list.Count can leave players unassigned.
+        while (players.Count > 0 && num < teamMax)
         {
             list.Add(defaultRole2);
+            __instance.AssignRolesFromList(players, teamMax, list, ref num);
         }
-
-        __instance.AssignRolesFromList(players, teamMax, list, ref num);
 
         return false;
     }
