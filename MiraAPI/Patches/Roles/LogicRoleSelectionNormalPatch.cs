@@ -28,11 +28,12 @@ public static class LogicRoleSelectionNormalPatch
 
         // Assign guaranteed roles first, just like the vanilla selector. This is
         // important because the list of players is shared by both team passes.
-        foreach (var role in source.Where(x => roleOptions.GetChancePerGame(x.Role) == 100))
+        foreach (var role in source.Where(x => roleOptions.GetChancePerGame(x.Role) == 100)
+                     .Select(role => role.Role))
         {
-            for (var i = 0; i < roleOptions.GetNumPerGame(role.Role); i++)
+            for (var i = 0; i < roleOptions.GetNumPerGame(role); i++)
             {
-                list.Add(role.Role);
+                list.Add(role);
             }
         }
 
@@ -43,13 +44,14 @@ public static class LogicRoleSelectionNormalPatch
         list.Clear();
         foreach (var role in source.Where(x =>
                      roleOptions.GetChancePerGame(x.Role) > 0 &&
-                     roleOptions.GetChancePerGame(x.Role) < 100))
+                     roleOptions.GetChancePerGame(x.Role) < 100)
+                     .Select(role => role.Role))
         {
-            for (var i = 0; i < roleOptions.GetNumPerGame(role.Role); i++)
+            for (var i = 0; i < roleOptions.GetNumPerGame(role); i++)
             {
-                if (HashRandom.Next(101) < roleOptions.GetChancePerGame(role.Role))
+                if (HashRandom.Next(101) < roleOptions.GetChancePerGame(role))
                 {
-                    list.Add(role.Role);
+                    list.Add(role);
                 }
             }
         }
