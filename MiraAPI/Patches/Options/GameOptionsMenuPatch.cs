@@ -132,20 +132,24 @@ internal static class GameOptionsMenuPatch
 
         if (!group.GroupVisible.Invoke())
         {
-            if (group.Header.gameObject != null)
+            if (group.Header != null && group.Header.gameObject != null)
                 group.Header.gameObject.SetActive(false);
             foreach (var option in group.Options)
             {
-                option.OptionBehaviour?.gameObject.SetActive(false);
+                if (option.OptionBehaviour != null && option.OptionBehaviour.gameObject != null)
+                    option.OptionBehaviour?.gameObject.SetActive(false);
             }
 
             return;
         }
 
-        if (group.Header.gameObject != null)
-            group.Header.gameObject.SetActive(true);
-        group.Header.transform.localScale = Vector3.one * 0.63f;
-        group.Header.transform.localPosition = new Vector3(-0.903f, num, -2f);
+        if (group.Header != null)
+        {
+            if (group.Header.gameObject != null)
+                group.Header.gameObject.SetActive(true);
+            group.Header.transform.localScale = Vector3.one * 0.63f;
+            group.Header.transform.localPosition = new Vector3(-0.903f, num, -2f);
+        }
 
         num -= 0.58f;
 
