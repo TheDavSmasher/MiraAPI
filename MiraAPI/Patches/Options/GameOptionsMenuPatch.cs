@@ -132,7 +132,8 @@ internal static class GameOptionsMenuPatch
 
         if (!group.GroupVisible.Invoke())
         {
-            group.Header.gameObject.SetActive(false);
+            if (group.Header.gameObject != null)
+                group.Header.gameObject.SetActive(false);
             foreach (var option in group.Options)
             {
                 option.OptionBehaviour?.gameObject.SetActive(false);
@@ -141,7 +142,8 @@ internal static class GameOptionsMenuPatch
             return;
         }
 
-        group.Header.gameObject.SetActive(true);
+        if (group.Header.gameObject != null)
+            group.Header.gameObject.SetActive(true);
         group.Header.transform.localScale = Vector3.one * 0.63f;
         group.Header.transform.localPosition = new Vector3(-0.903f, num, -2f);
 
