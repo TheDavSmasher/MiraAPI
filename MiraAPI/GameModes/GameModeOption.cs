@@ -61,14 +61,11 @@ public static class GameModeOption
             Values.Add(mode.ID, CustomStringName.CreateAndRegister(mode.ColoredName));
     }
 
-
-    private static GameOptionsMenu? _instance;
-
+    
     [HarmonyPatch(typeof(GameOptionsMenu), nameof(GameOptionsMenu.CreateSettings))]
     [HarmonyPostfix]
     private static void CreateSettingsPatch(GameOptionsMenu __instance)
     {
-        _instance = __instance;
         if (MenuState.Instance.CurrentModIdx != 0 || GameManager.Instance.IsHideAndSeek() || CustomGameModeManager.ActiveMode == null)
         {
             return;
@@ -108,7 +105,7 @@ public static class GameModeOption
         __instance.Children.Add(OptionBehaviour);
         for (var i = 1; i < Values.Count; i++)
             OptionBehaviour.Values = (Il2CppStructArray<StringNames>)OptionBehaviour.Values.Add(Values.ElementAt(i).Value);
-        __instance.RefreshOptions(CustomGameModeManager.ActiveMode);
+        __instance.scrollBar.SetYBoundsMax(__instance.scrollBar.GetYBounds().max + 1);
     }
 
     private static void Set(int val)
@@ -117,13 +114,6 @@ public static class GameModeOption
         CustomGameModeManager.GetAndSetGameMode();
         HudPatches.SetGameModeText(CustomGameModeManager.GetMode(Values.ElementAt(_lastValue).Key).ColoredName);
         // could make Values a dict of AbstractGameMode too
-        if (_instance != null)
-            RefreshOptions(_instance, CustomGameModeManager.ActiveMode!);
-    }
-
-    private static void RefreshOptions(this GameOptionsMenu instance, AbstractGameMode mode)
-    {
-        instance.scrollBar.SetYBoundsMax(instance.scrollBar.GetYBounds().max + 1);
     }
 
     [HarmonyPatch(typeof(GameOptionsMenu), nameof(GameOptionsMenu.ValueChanged))]
@@ -316,7 +306,6 @@ public static class GameModeOption
                 newText.text = group.AllOptionsHidden
                     ? "<size=70%>(Click to open)</size>"
                     : "<size=70%>(Click to close)</size>";
-                menu.RefreshOptions(CustomGameModeManager.ActiveMode!);
             }));
         headerBtn.SetButtonEnableState(true);
     }
