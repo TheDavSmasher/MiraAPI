@@ -62,21 +62,6 @@ public static class RoleManagerPatches
         return false;
     }
 
-    [HarmonyPrefix]
-    [HarmonyPatch(nameof(RoleManager.SelectRoles))]
-    public static bool SelectRolePrefix(RoleManager __instance)
-    {
-        var roleSelection = GameManager.Instance.LogicRoleSelection.Cast<LogicRoleSelectionNormal>();
-        if (!AmongUsClient.Instance.AmHost || CustomGameModeManager.ActiveMode == null || roleSelection == null)
-        {
-            return true;
-        }
-
-        CustomGameModeManager.ActiveMode.AssignRoles(out var runOriginal, roleSelection);
-
-        return runOriginal;
-    }
-
     [HarmonyPostfix]
     [HarmonyPatch(nameof(RoleManager.SelectRoles))]
     public static void ModifierSelectionPatches(RoleManager __instance)
