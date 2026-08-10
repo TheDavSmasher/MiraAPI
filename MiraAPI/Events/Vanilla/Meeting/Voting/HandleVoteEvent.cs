@@ -25,9 +25,9 @@ public class HandleVoteEvent : MiraCancelableEvent
     public byte TargetId { get; }
 
     /// <summary>
-    /// Gets a value indicating whether to prevent the vote from commencing.
+    /// Gets or sets a value indicating whether to prevent the vote from commencing.
     /// </summary>
-    public bool PreventVote { get; }
+    public bool PreventVote { get; set; }
 
     /// <summary>
     /// Gets the <see cref="NetworkedPlayerInfo"/> of the target.
