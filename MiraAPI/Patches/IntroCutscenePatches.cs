@@ -30,6 +30,11 @@ public static class IntroCutscenePatches
     {
         var @event = new IntroBeginEvent(__instance);
         MiraEventManager.InvokeEvent(@event);
+
+        if (CustomGameModeManager.ActiveMode != null)
+        {
+            CustomGameModeManager.ActiveMode.Initialize();
+        }
     }
 
     [HarmonyPatch]
@@ -120,12 +125,6 @@ public static class IntroCutscenePatches
             else
             {
                 introCutscene = __instance.Cast<IntroCutscene>();
-            }
-
-            Info("IntroCutscene ended");
-            if (CustomGameModeManager.ActiveMode != null)
-            {
-                CustomGameModeManager.ActiveMode.Initialize();
             }
 
             MiraEventManager.InvokeEvent(new IntroEndEvent(introCutscene));
