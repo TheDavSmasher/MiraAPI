@@ -84,13 +84,15 @@ public static class CustomMurderRpc
 
         var beforeMurderEvent = new BeforeMurderEvent(source, target, inMeeting);
         MiraEventManager.InvokeEvent(beforeMurderEvent);
+        var defenseFlag = beforeMurderEvent.IgnoreDefense;
+        var indirectFlag = beforeMurderEvent.IsIndirectAttack;
         var isMeetingActive = MeetingHud.Instance != null || ExileController.Instance != null;
         if ((inMeeting is MeetingCheck.ForMeeting && !isMeetingActive) || (inMeeting is MeetingCheck.OutsideMeeting && isMeetingActive))
         {
             beforeMurderEvent.Cancel();
         }
 
-        if (target.ProtectedByGa())
+        if (!defenseFlag && target.ProtectedByGa())
         {
             beforeMurderEvent.Cancel();
             murderResultFlags = MurderResultFlags.FailedProtected;
@@ -114,6 +116,8 @@ public static class CustomMurderRpc
             PlayerControl.LocalPlayer,
             source,
             target,
+            indirectFlag,
+            defenseFlag,
             murderResultFlags,
             resetKillTimer,
             createDeadBody,
@@ -128,6 +132,8 @@ public static class CustomMurderRpc
     /// <param name="host">The game host.</param>
     /// <param name="source">The killer.</param>
     /// <param name="target">The player to murder.</param>
+    /// <param name="isIndirect">Should the kill be indirect.</param>
+    /// <param name="ignoreDefense">Should the kill ignore defense.</param>
     /// <param name="murderResultFlags">End result for the murder.</param>
     /// <param name="resetKillTimer">Should the kill timer be reset.</param>
     /// <param name="createDeadBody">Should a dead body be created.</param>
@@ -139,6 +145,8 @@ public static class CustomMurderRpc
         this PlayerControl host,
         PlayerControl source,
         PlayerControl target,
+        bool isIndirect,
+        bool ignoreDefense,
         MurderResultFlags murderResultFlags,
         bool resetKillTimer = true,
         bool createDeadBody = true,
@@ -154,14 +162,31 @@ public static class CustomMurderRpc
 
         var murderResultFlags2 = MurderResultFlags.DecisionByHost | murderResultFlags;
 
-        source.CustomMurder(
-            target,
-            murderResultFlags2,
-            resetKillTimer,
-            createDeadBody,
-            teleportMurderer,
-            showKillAnim,
-            playKillSound);
+        if (isIndirect || ignoreDefense)
+        {
+            source.CustomMurder(
+                target,
+                null,
+                isIndirect,
+                ignoreDefense,
+                murderResultFlags2,
+                resetKillTimer,
+                createDeadBody,
+                teleportMurderer,
+                showKillAnim,
+                playKillSound);
+        }
+        else
+        {
+            source.CustomMurder(
+                target,
+                murderResultFlags2,
+                resetKillTimer,
+                createDeadBody,
+                teleportMurderer,
+                showKillAnim,
+                playKillSound);
+        }
     }
 
     /// <summary>
@@ -200,13 +225,15 @@ public static class CustomMurderRpc
 
         var beforeMurderEvent = new BeforeMurderEvent(source, target, isIndirect, ignoreDefense, inMeeting);
         MiraEventManager.InvokeEvent(beforeMurderEvent);
+        var defenseFlag = beforeMurderEvent.IgnoreDefense;
+        var indirectFlag = beforeMurderEvent.IsIndirectAttack;
         var isMeetingActive = MeetingHud.Instance != null || ExileController.Instance != null;
         if ((inMeeting is MeetingCheck.ForMeeting && !isMeetingActive) || (inMeeting is MeetingCheck.OutsideMeeting && isMeetingActive))
         {
             beforeMurderEvent.Cancel();
         }
 
-        if (!ignoreDefense && target.ProtectedByGa())
+        if (!defenseFlag && target.ProtectedByGa())
         {
             beforeMurderEvent.Cancel();
             murderResultFlags = MurderResultFlags.FailedProtected;
@@ -230,8 +257,8 @@ public static class CustomMurderRpc
             PlayerControl.LocalPlayer,
             source,
             target,
-            isIndirect,
-            ignoreDefense,
+            indirectFlag,
+            defenseFlag,
             murderResultFlags,
             resetKillTimer,
             createDeadBody,
@@ -327,13 +354,15 @@ public static class CustomMurderRpc
 
         var beforeMurderEvent = new BeforeMurderEvent(source, target, framed, isIndirect, ignoreDefense, inMeeting);
         MiraEventManager.InvokeEvent(beforeMurderEvent);
+        var defenseFlag = beforeMurderEvent.IgnoreDefense;
+        var indirectFlag = beforeMurderEvent.IsIndirectAttack;
         var isMeetingActive = MeetingHud.Instance != null || ExileController.Instance != null;
         if ((inMeeting is MeetingCheck.ForMeeting && !isMeetingActive) || (inMeeting is MeetingCheck.OutsideMeeting && isMeetingActive))
         {
             beforeMurderEvent.Cancel();
         }
 
-        if (!ignoreDefense && target.ProtectedByGa())
+        if (!defenseFlag && target.ProtectedByGa())
         {
             beforeMurderEvent.Cancel();
             murderResultFlags = MurderResultFlags.FailedProtected;
@@ -358,8 +387,8 @@ public static class CustomMurderRpc
             source,
             target,
             framed,
-            isIndirect,
-            ignoreDefense,
+            indirectFlag,
+            defenseFlag,
             murderResultFlags,
             resetKillTimer,
             createDeadBody,
@@ -420,7 +449,7 @@ public static class CustomMurderRpc
     }
 
     /// <summary>
-    /// Custom Murder method without networking. If you need a networked version, use <see cref="RpcCustomMurder(PlayerControl, PlayerControl, bool, bool, bool, bool, bool, bool)"/>.
+    /// Custom Murder method without networking. If you need a networked version, use <see cref="RpcFramedCustomMurder"/> or <see cref="RpcAdvancedCustomMurder"/>.
     /// </summary>
     /// <param name="source">The killer.</param>
     /// <param name="target">The player to murder.</param>
