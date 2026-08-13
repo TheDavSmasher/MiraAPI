@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using AmongUs.GameOptions;
 using MiraAPI.GameOptions;
 using MiraAPI.PluginLoading;
 using Reactor.Utilities.Extensions;
@@ -47,6 +48,16 @@ public abstract class AbstractGameMode : IOptionable
     /// Gets a value indicating whether the gamemode removes the normal game settings.
     /// </summary>
     public virtual bool ShowNormalGameSettings => true;
+
+    /// <summary>
+    /// Gets a value indicating whether the gamemode removes the normal role settings.
+    /// </summary>
+    public virtual bool ShowNormalRoleSettings => true;
+
+    /// <summary>
+    /// Gets a value indicating the default kill cooldown for impostors in this mode.
+    /// </summary>
+    public virtual float DefaultImpostorKillCooldown => GameOptionsManager.Instance.CurrentGameOptions.GetFloat(FloatOptionNames.KillCooldown);
 
     /// <summary>
     /// Called on GameManager.GetBodyType().
