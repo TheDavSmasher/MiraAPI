@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using AmongUs.Data;
 using AmongUs.GameOptions;
 using HarmonyLib;
 using InnerNet;
@@ -34,7 +35,9 @@ public class HideAndSeekMode : AbstractGameMode
     public override bool ShowGameModeIntroCutscene => true;
     public override bool GameModeBodyTypeOverride => true;
     public override bool ShowNormalGameSettings => false;
-    
+    public override bool ShowNormalRoleSettings => false;
+    public override float DefaultImpostorKillCooldown => 1f;
+
     public static int ImpostorPlayerID()
     {
         return OptionGroupSingleton<HnsImpostorOptions>.Instance.SelectedSeeker.Value;
@@ -395,6 +398,25 @@ public class HideAndSeekMode : AbstractGameMode
     {
         deadPlayerCount = 0;
         ShipStatus.Instance.BreakEmergencyButton();
+        PlayerControl.LocalPlayer.SetKillTimer(0.01f);
+    }
+
+    public override void CheckGameEnd(out bool runOriginal, LogicGameFlowNormal instance)
+    {
+        runOriginal = false;
+        if (Helpers.GetAlivePlayers().Count(x => x.Data.Role.IsImpostor) == 0)
+        {
+            instance.Manager.RpcEndGame(GameOverReason.ImpostorDisconnect, !DataManager.Player.Ads.HasPurchasedAdRemoval);
+        }
+        if (Helpers.GetAlivePlayers().Count(x => !x.Data.Role.IsImpostor) != 0)
+        {
+            /*if (instance.AllTimersExpired())
+            {
+                instance.Manager.RpcEndGame(GameOverReason.HideAndSeek_CrewmatesByTimer, !DataManager.Player.Ads.HasPurchasedAdRemoval);
+            }*/
+            return;
+        }
+        instance.Manager.RpcEndGame(GameOverReason.HideAndSeek_ImpostorsByKills, !DataManager.Player.Ads.HasPurchasedAdRemoval);
     }
 
     public override PlayerBodyTypes GetBodyType(PlayerControl player)
