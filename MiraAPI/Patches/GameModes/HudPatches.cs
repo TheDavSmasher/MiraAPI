@@ -16,8 +16,11 @@ internal static class HudPatches
     [HarmonyPostfix, HarmonyPatch(nameof(HudManager.Update))]
     public static void HudUpdatePatch(HudManager __instance)
     {
-        if (GameManager.Instance != null && GameManager.Instance.GameHasStarted)
-            CustomGameModeManager.ActiveMode?.HudUpdate(__instance);
+        if (GameManager.Instance != null && GameManager.Instance.GameHasStarted &&
+            CustomGameModeManager.ActiveMode != null)
+        {
+            CustomGameModeManager.ActiveMode.HudUpdate(__instance);
+        }
     }
 
 
