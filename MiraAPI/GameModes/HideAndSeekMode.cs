@@ -243,9 +243,7 @@ public class HideAndSeekMode : AbstractGameMode
 
     public override IEnumerator IntroCutscene(IntroCutscene __instance)
     {
-        deadPlayerCount = 0;
         SoundManager.Instance.PlaySound(__instance.IntroStinger, false, 1f, null);
-        ShipStatus.Instance.BreakEmergencyButton();
         Logger.GlobalInstance.Info("IntroCutscene :: CoBegin() :: Game Mode: Hide and Seek (MiraAPI)", null);
         __instance.LogPlayerRoleData();
         __instance.HideAndSeekPanels.SetActive(true);
@@ -392,6 +390,11 @@ public class HideAndSeekMode : AbstractGameMode
         }
         ShipStatus.Instance.StartSFX();
         UnityEngine.Object.Destroy(__instance.gameObject);
+    }
+    public override void Initialize()
+    {
+        deadPlayerCount = 0;
+        ShipStatus.Instance.BreakEmergencyButton();
     }
 
     public override PlayerBodyTypes GetBodyType(PlayerControl player)
