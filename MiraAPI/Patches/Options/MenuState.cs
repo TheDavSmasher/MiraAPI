@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using Il2CppInterop.Runtime.Attributes;
+using MiraAPI.GameModes;
 using MiraAPI.GameOptions;
 using MiraAPI.Modifiers;
 using MiraAPI.PluginLoading;
@@ -404,7 +405,8 @@ public class MenuState(IntPtr cppPtr) : MonoBehaviour(cppPtr)
         if (CurrentModIdx == 0)
         {
             Gsm.GameSettingsButton.gameObject.SetActive(true);
-            Gsm.RoleSettingsButton.gameObject.SetActive(true);
+            Gsm.RoleSettingsButton.gameObject.SetActive(
+                CustomGameModeManager.ActiveMode != null && CustomGameModeManager.ActiveMode.ShowNormalRoleSettings);
         }
         else
         {

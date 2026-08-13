@@ -61,7 +61,6 @@ public static class GameModeOption
             Values.Add(mode.ID, CustomStringName.CreateAndRegister(mode.ColoredName));
     }
 
-    
     [HarmonyPatch(typeof(GameOptionsMenu), nameof(GameOptionsMenu.CreateSettings))]
     [HarmonyPostfix]
     private static void CreateSettingsPatch(GameOptionsMenu __instance)
@@ -124,6 +123,10 @@ public static class GameModeOption
         {
             Info($"Game mode changed to {option.GetInt()}");
             RpcSyncGamemode(PlayerControl.LocalPlayer, option.GetInt());
+            if (GameSettingMenu.Instance && CustomGameModeManager.ActiveMode != null)
+            {
+                GameSettingMenu.Instance.RoleSettingsButton.gameObject.SetActive(CustomGameModeManager.ActiveMode.ShowNormalRoleSettings);
+            }
             return false;
         }
         return true;
