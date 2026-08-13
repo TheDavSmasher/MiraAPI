@@ -70,4 +70,40 @@ internal static class ConsolePatches
         canUse = couldUse = true;
         return true;
     }
+
+    [HarmonyPrefix, HarmonyPatch(typeof(MapConsole), nameof(MapConsole.Use))]
+    public static bool MapUsePatch(MapConsole __instance)
+    {
+        if (AmongUsClient.Instance.GameState == InnerNetClient.GameStates.Started && ShipStatus.Instance)
+        {
+            return CustomGameModeManager.ActiveMode == null ||
+                   CustomGameModeManager.ActiveMode!.CanUseMapConsole(__instance);
+        }
+
+        return true;
+    }
+
+    [HarmonyPrefix, HarmonyPatch(typeof(SystemConsole), nameof(SystemConsole.Use))]
+    public static bool SystemUsePatch(SystemConsole __instance)
+    {
+        if (AmongUsClient.Instance.GameState == InnerNetClient.GameStates.Started && ShipStatus.Instance)
+        {
+            return CustomGameModeManager.ActiveMode == null ||
+                   CustomGameModeManager.ActiveMode!.CanUseSystemConsole(__instance);
+        }
+
+        return true;
+    }
+
+    [HarmonyPrefix, HarmonyPatch(typeof(Console), nameof(Console.Use))]
+    public static bool ConsoleUsePatch(Console __instance)
+    {
+        if (AmongUsClient.Instance.GameState == InnerNetClient.GameStates.Started && ShipStatus.Instance)
+        {
+            return CustomGameModeManager.ActiveMode == null ||
+                   CustomGameModeManager.ActiveMode!.CanUseTasks(__instance);
+        }
+
+        return true;
+    }
 }
