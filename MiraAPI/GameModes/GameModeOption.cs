@@ -45,12 +45,12 @@ public static class GameModeOption
             _lastValue = value;
         }
     }
-    internal static StringOption OptionBehaviour { get; private set; } = null!;
+    internal static StringOption OptionBehaviour { get; set; } = null!;
 
-    private static int _lastValue;
-    private static readonly StringNames GamemodeName = CustomStringName.CreateAndRegister("Gamemode");
-    private static readonly StringNames CustomName = CustomStringName.CreateAndRegister("Custom");
-    private static readonly Dictionary<uint, StringNames> Values = new()
+    internal static int _lastValue;
+    internal static readonly StringNames GamemodeName = CustomStringName.CreateAndRegister("Gamemode");
+    internal static readonly StringNames CustomName = CustomStringName.CreateAndRegister("Custom");
+    internal static readonly Dictionary<uint, StringNames> Values = new()
     {
         [0] = CustomStringName.CreateAndRegister("Classic"),
     };
@@ -60,8 +60,7 @@ public static class GameModeOption
         if (!Values.ContainsKey(mode.ID))
             Values.Add(mode.ID, CustomStringName.CreateAndRegister(mode.ColoredName));
     }
-
-    [HarmonyPatch(typeof(GameOptionsMenu), nameof(GameOptionsMenu.CreateSettings))]
+    /*[HarmonyPatch(typeof(GameOptionsMenu), nameof(GameOptionsMenu.CreateSettings))]
     [HarmonyPostfix]
     private static void CreateSettingsPatch(GameOptionsMenu __instance)
     {
@@ -105,9 +104,9 @@ public static class GameModeOption
         for (var i = 1; i < Values.Count; i++)
             OptionBehaviour.Values = (Il2CppStructArray<StringNames>)OptionBehaviour.Values.Add(Values.ElementAt(i).Value);
         __instance.scrollBar.SetYBoundsMax(__instance.scrollBar.GetYBounds().max + 1);
-    }
+    }*/
 
-    private static void Set(int val)
+    internal static void Set(int val)
     {
         Value = val;
         CustomGameModeManager.GetAndSetGameMode();
@@ -125,6 +124,7 @@ public static class GameModeOption
             RpcSyncGamemode(PlayerControl.LocalPlayer, option.GetInt());
             if (GameSettingMenu.Instance && CustomGameModeManager.ActiveMode != null)
             {
+                GameOptionsMenuPatch.ToggleGamemodeOptions(CustomGameModeManager.ActiveMode, __instance);
                 GameSettingMenu.Instance.RoleSettingsButton.gameObject.SetActive(CustomGameModeManager.ActiveMode.ShowNormalRoleSettings);
             }
             return false;

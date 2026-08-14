@@ -3,6 +3,9 @@ using System.Collections;
 using System.Linq;
 using BepInEx.Unity.IL2CPP.Utils.Collections;
 using HarmonyLib;
+using Il2CppInterop.Runtime.InteropTypes.Arrays;
+using Il2CppSystem.Collections.Generic;
+using MiraAPI.GameModes;
 using MiraAPI.GameOptions;
 using MiraAPI.Modifiers;
 using MiraAPI.Presets;
@@ -13,6 +16,7 @@ using Reactor.Utilities.Extensions;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Events;
+using UnityEngine.ProBuilder;
 using UnityEngine.UI;
 using Object = UnityEngine.Object;
 
@@ -21,6 +25,11 @@ namespace MiraAPI.Patches.Options;
 [HarmonyPatch(typeof(GameOptionsMenu))]
 internal static class GameOptionsMenuPatch
 {
+    private static List<CategoryHeaderMasked> _vanillaHeaders = new();
+    private static List<OptionBehaviour> _vanillaOptions = new();
+    private static List<OptionBehaviour> _mainOptions = new();
+    private static Dictionary<AbstractGameMode, OptionBehaviour> _gameModeOptions = new();
+    private static Dictionary<AbstractGameMode, CategoryHeaderMasked> _gameModeHeaders = new();
     [HarmonyPrefix]
     [HarmonyPatch(nameof(GameOptionsMenu.Initialize))]
     // ReSharper disable once InconsistentNaming
@@ -41,15 +50,10 @@ internal static class GameOptionsMenuPatch
                 var mapNameSetting = GameManager.Instance.GameSettingsList.MapNameSetting;
                 __instance.MapPicker.SetUpFromData(mapNameSetting, 20);
                 __instance.Children.Add(__instance.MapPicker);
-                __instance.CreateSettings();
-                foreach (var optionBehaviour in __instance.Children)
+                CreateSettings(__instance, container);
+                if (CustomGameModeManager.ActiveMode != null)
                 {
-                    if (AmongUsClient.Instance && !AmongUsClient.Instance.AmHost)
-                    {
-                        optionBehaviour.SetAsPlayer();
-                    }
-
-                    optionBehaviour.OnValueChanged = new Action<OptionBehaviour>(__instance.ValueChanged);
+                    ToggleGamemodeOptions(CustomGameModeManager.ActiveMode, __instance);
                 }
             }
             else
@@ -67,6 +71,188 @@ internal static class GameOptionsMenuPatch
         }
 
         return false;
+    }
+
+    internal static void ToggleGamemodeOptions(AbstractGameMode gameMode, GameOptionsMenu instance)
+    {
+        float num = -1.217f;
+        instance.Children.Clear();
+        foreach (var opt in _mainOptions)
+        {
+            instance.Children.Add(opt);
+        }
+        if (gameMode.ShowNormalGameSettings)
+        {
+            foreach (var opt in _vanillaHeaders)
+            {
+                num -= 0.63f;
+                opt.gameObject.SetActive(true);
+            }
+            foreach (var opt in _vanillaOptions)
+            {
+                opt.gameObject.SetActive(true);
+                instance.Children.Add(opt);
+                num -= 0.45f;
+            }
+        }
+        else
+        {
+            foreach (var opt in _vanillaHeaders)
+            {
+                opt.gameObject.SetActive(false);
+            }
+            foreach (var opt in _vanillaOptions)
+            {
+                opt.gameObject.SetActive(false);
+            }
+        }
+        instance.ControllerSelectable.Clear();
+        foreach (var obj in instance.scrollBar.GetComponentsInChildren<UiElement>())
+        {
+            if (obj.gameObject.activeSelf)
+            {
+                instance.ControllerSelectable.Add(obj);
+            }
+        }
+        instance.scrollBar.SetYBoundsMax(-num - 1.65f);
+    }
+    private static void CreateSettings(GameOptionsMenu instance, Transform container)
+    {
+        float num = 0.713f;
+        _vanillaHeaders.Clear();
+        _vanillaOptions.Clear();
+        _mainOptions.Clear();
+        _gameModeHeaders.Clear();
+        _gameModeOptions.Clear();
+
+        CategoryHeaderMasked gmCategory = Object.Instantiate(instance.categoryHeaderOrigin, Vector3.zero, Quaternion.identity, container);
+        gmCategory.SetHeader(GameModeOption.CustomName, 20);
+        gmCategory.transform.localScale = Vector3.one * 0.63f;
+        gmCategory.transform.localPosition = new Vector3(-0.903f, num, -2f);
+        GameModeOption.OptionBehaviour = Object.Instantiate(
+            instance.stringOptionOrigin,
+            Vector3.zero,
+            Quaternion.identity,
+            container);
+        num -= 0.63f;
+        GameModeOption.OptionBehaviour.transform.localPosition = new Vector3(0.952f, num, -2f);
+        GameModeOption.OptionBehaviour.SetClickMask(instance.ButtonClickMask);
+        StringGameSetting setting = ScriptableObject.CreateInstance<StringGameSetting>();
+        setting.Type = OptionTypes.MultipleChoice;
+        setting.Title = GameModeOption.GamemodeName;
+        setting.Index = GameModeOption._lastValue;
+        setting.Values = new Il2CppStructArray<StringNames>([GameModeOption.Values[0]]);
+        GameModeOption.OptionBehaviour.SetUpFromData(setting, 20);
+        GameModeOption.Set(GameModeOption._lastValue);
+        GameModeOption.OptionBehaviour.TitleText.fontSize = 3;
+        instance.Children.Add(GameModeOption.OptionBehaviour);
+        foreach (var optionBehaviour in instance.Children)
+        {
+            _mainOptions.Add(optionBehaviour);
+        }
+        for (var i = 1; i < GameModeOption.Values.Count; i++)
+        {
+            GameModeOption.OptionBehaviour.Values =
+                (Il2CppStructArray<StringNames>)GameModeOption.OptionBehaviour.Values.Add(
+                    GameModeOption.Values.ElementAt(i).Value);
+        }
+
+        num -= 1.3f;
+
+        foreach (RulesCategory rulesCategory in GameManager.Instance.GameSettingsList.AllCategories)
+        {
+            CategoryHeaderMasked categoryHeaderMasked = Object.Instantiate<CategoryHeaderMasked>(
+                instance.categoryHeaderOrigin,
+                Vector3.zero,
+                Quaternion.identity,
+                container);
+            categoryHeaderMasked.SetHeader(rulesCategory.CategoryName, 20);
+            categoryHeaderMasked.transform.localScale = Vector3.one * 0.63f;
+            categoryHeaderMasked.transform.localPosition = new Vector3(-0.903f, num, -2f);
+            _vanillaHeaders.Add(categoryHeaderMasked);
+            num -= 0.63f;
+            foreach (BaseGameSetting baseGameSetting in rulesCategory.AllGameSettings)
+            {
+                switch (baseGameSetting.Type)
+                {
+                    case OptionTypes.Checkbox:
+                    {
+                        OptionBehaviour optionBehaviour = Object.Instantiate<ToggleOption>(
+                            instance.checkboxOrigin,
+                            Vector3.zero,
+                            Quaternion.identity,
+                            container);
+                        optionBehaviour.transform.localPosition = new Vector3(0.952f, num, -2f);
+                        optionBehaviour.SetClickMask(instance.ButtonClickMask);
+                        optionBehaviour.SetUpFromData(baseGameSetting, 20);
+                        _vanillaOptions.Add(optionBehaviour);
+                        break;
+                    }
+                    case OptionTypes.String:
+                    {
+                        OptionBehaviour optionBehaviour = Object.Instantiate<StringOption>(
+                            instance.stringOptionOrigin,
+                            Vector3.zero,
+                            Quaternion.identity,
+                            container);
+                        optionBehaviour.transform.localPosition = new Vector3(0.952f, num, -2f);
+                        optionBehaviour.SetClickMask(instance.ButtonClickMask);
+                        optionBehaviour.SetUpFromData(baseGameSetting, 20);
+                        _vanillaOptions.Add(optionBehaviour);
+                        break;
+                    }
+                    case OptionTypes.Float:
+                    case OptionTypes.Int:
+                    {
+                        OptionBehaviour optionBehaviour = Object.Instantiate<NumberOption>(
+                            instance.numberOptionOrigin,
+                            Vector3.zero,
+                            Quaternion.identity,
+                            container);
+                        optionBehaviour.transform.localPosition = new Vector3(0.952f, num, -2f);
+                        optionBehaviour.SetClickMask(instance.ButtonClickMask);
+                        optionBehaviour.SetUpFromData(baseGameSetting, 20);
+                        _vanillaOptions.Add(optionBehaviour);
+                        break;
+                    }
+                    case OptionTypes.Player:
+                    {
+                        OptionBehaviour optionBehaviour = Object.Instantiate<PlayerOption>(
+                            instance.playerOptionOrigin,
+                            Vector3.zero,
+                            Quaternion.identity,
+                            container);
+                        optionBehaviour.transform.localPosition = new Vector3(0.952f, num, -2f);
+                        optionBehaviour.SetClickMask(instance.ButtonClickMask);
+                        optionBehaviour.SetUpFromData(baseGameSetting, 20);
+                        _vanillaOptions.Add(optionBehaviour);
+                        break;
+                    }
+                }
+
+                num -= 0.45f;
+            }
+        }
+        foreach (var optionBehaviour in _vanillaOptions)
+        {
+            if (AmongUsClient.Instance && !AmongUsClient.Instance.AmHost)
+            {
+                optionBehaviour.SetAsPlayer();
+            }
+            instance.Children.Add(optionBehaviour);
+        }
+
+        foreach (var optionBehaviour in instance.Children)
+        {
+            optionBehaviour.OnValueChanged = new Action<OptionBehaviour>(instance.ValueChanged);
+        }
+
+        instance.ControllerSelectable.Clear();
+        foreach (var obj in instance.scrollBar.GetComponentsInChildren<UiElement>())
+        {
+            instance.ControllerSelectable.Add(obj);
+        }
+        instance.scrollBar.SetYBoundsMax(-num - 1.65f);
     }
 
     [HarmonyPostfix]
