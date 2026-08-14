@@ -253,6 +253,7 @@ internal static class GameOptionsMenuPatch
         };
         _modIcon = modIconObj.AddComponent<SpriteRenderer>();
         _modIcon.sprite = MiraAssets.BlankSprite.LoadAsset();
+        _modIcon.material = gamemodeBg.gameObject.GetComponent<SpriteRenderer>().material;
 
         var gamemodeTextObj = Object.Instantiate(GameModeOption.OptionBehaviour.transform.GetChild(1).gameObject, Vector3.zero, Quaternion.identity, modeInfoHolder);
         gamemodeTextObj.transform.localPosition = new Vector3(0.3f, 0, -0.01f);
