@@ -12,5 +12,5 @@ public class ClassicMode : AbstractGameMode
     public override string Name => "Classic";
 
     /// <inheritdoc/>
-    public override string Description => "The classic Among Us experience";
+    public override string Description => "The classic Among Us experience!\nFind the Impostors or deceive the Crew.";
 }

@@ -26,7 +26,7 @@ public class HideAndSeekMode : AbstractGameMode
     public override string Name => "Hide n Seek";
 
     /// <inheritdoc/>
-    public override string Description => "You can run, but you can't hide!";
+    public override string Description => "You can run, but you can't hide!\nOutlive the timer or eliminate the crew.";
 
     public override Color Color { get; } = new Color32(255, 88, 90, 255);
 

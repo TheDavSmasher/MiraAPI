@@ -31,6 +31,7 @@ internal static class GameOptionsMenuPatch
     private static System.Collections.Generic.Dictionary<AbstractGameMode, System.Collections.Generic.List<AbstractOptionGroup>> _gameModeGroups = new();
     private static System.Collections.Generic.Dictionary<AbstractGameMode, System.Collections.Generic.List<OptionBehaviour>> _gameModeOptions = new();
     private static System.Collections.Generic.Dictionary<AbstractGameMode, System.Collections.Generic.List<CategoryHeaderMasked>> _gameModeHeaders = new();
+    private static TextMeshPro _gamemodeDescription = null!;
     [HarmonyPrefix]
     [HarmonyPatch(nameof(GameOptionsMenu.Initialize))]
     // ReSharper disable once InconsistentNaming
@@ -83,6 +84,7 @@ internal static class GameOptionsMenuPatch
         {
             instance.Children.Add(opt);
         }
+        _gamemodeDescription.text = gameMode.Description;
         if (gameMode.ShowNormalGameSettings)
         {
             foreach (var opt in _vanillaHeaders)
@@ -195,6 +197,16 @@ internal static class GameOptionsMenuPatch
                     GameModeOption.Values.ElementAt(i).Value);
         }
 
+        var gamemodeTextObj = Object.Instantiate(GameModeOption.OptionBehaviour.transform.GetChild(1).gameObject, Vector3.zero, Quaternion.identity, container);
+        gamemodeTextObj.transform.localPosition = new Vector3(1, -0.675f, -2f);
+        gamemodeTextObj.transform.localScale = new Vector3(2.6f, 2.6f, 1);
+        _gamemodeDescription = gamemodeTextObj.GetComponentInChildren<TextMeshPro>();
+        _gamemodeDescription.fontSizeMin = 0.5f;
+        _gamemodeDescription.fontSizeMax = 1;
+
+        var gamemodeBg = Object.Instantiate(GameModeOption.OptionBehaviour.transform.GetChild(0).gameObject, Vector3.zero, Quaternion.identity, gamemodeTextObj.transform);
+        gamemodeBg.transform.localPosition = new Vector3(0, 0, 0.01f);
+        gamemodeBg.transform.localScale = new Vector3(0.61f, 0.375f, 1);
         num -= 1.3f;
         AdditionalVanillaScrollNum = 0f;
         foreach (RulesCategory rulesCategory in GameManager.Instance.GameSettingsList.AllCategories)
