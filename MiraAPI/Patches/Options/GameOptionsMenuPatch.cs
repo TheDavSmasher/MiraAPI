@@ -87,21 +87,24 @@ internal static class GameOptionsMenuPatch
             instance.Children.Add(opt);
         }
 
-        var mod = CustomGameModeManager.FindParentMod(gameMode);
-        if (mod is { MiraPlugin.ModIcon: not null })
+        var icon = gameMode.Icon;
+        if (icon != null)
         {
             _modIcon.gameObject.SetActive(true);
             _gamemodeDescription.transform.localPosition = new Vector3(0.3f, 0, -0.01f);
             _gamemodeDescription.horizontalAlignment = HorizontalAlignmentOptions.Left;
-            var texture = mod.MiraPlugin.ModIcon.LoadAsset().texture;
+            var texture = icon.LoadAsset().texture;
+            var scale = Mathf.Min(128f / texture.width, 128f / texture.height);
+
             var newSprite = Sprite.Create(
                 texture,
-                new Rect(0, 0, 128, 128),
+                new Rect(0, 0, texture.width, texture.height),
                 Vector2.one / 2,
-                100
+                100f / scale
             );
+
             _modIcon.sprite = newSprite;
-            _modIcon.drawMode = SpriteDrawMode.Sliced;
+            _modIcon.drawMode = SpriteDrawMode.Simple;
         }
         else
         {
@@ -247,7 +250,7 @@ internal static class GameOptionsMenuPatch
             {
                 parent = modeInfoHolder,
                 localPosition = new Vector3(-1.75f, 0, -0.1f),
-                localScale = new Vector3(0.4f, 0.4f, 1),
+                localScale = new Vector3(0.45f, 0.45f, 1),
             },
             layer = gamemodeBg.layer,
         };

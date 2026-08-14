@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using AmongUs.GameOptions;
 using MiraAPI.GameOptions;
 using MiraAPI.PluginLoading;
+using MiraAPI.Utilities.Assets;
 using Reactor.Utilities.Extensions;
 using UnityEngine;
 
@@ -28,6 +29,11 @@ public abstract class AbstractGameMode : IOptionable
     /// Gets the game mode description.
     /// </summary>
     public virtual Color Color { get; } = Color.white;
+
+    /// <summary>
+    /// Gets the icon of the gamemode. Will be shown in options menu underneath the gamemode option.
+    /// </summary>
+    public virtual LoadableAsset<Sprite>? Icon => null;
 
     /// <summary>
     /// Gets the colored game mode name, using the color and name properties.

@@ -11,6 +11,7 @@ using MiraAPI.HnsReimplemented.Options;
 using MiraAPI.PluginLoading;
 using MiraAPI.Roles;
 using MiraAPI.Utilities;
+using MiraAPI.Utilities.Assets;
 using PowerTools;
 using UnityEngine;
 
@@ -29,7 +30,7 @@ public class HideAndSeekMode : AbstractGameMode
     public override string Description => "You can run, but you can't hide!\nOutlive the timer or eliminate the crew.";
 
     public override Color Color { get; } = new Color32(255, 88, 90, 255);
-
+    public override LoadableAsset<Sprite>? Icon => MiraAssets.HnSGamemodeIcon;
     public override bool CanReport(DeadBody body) => false;
     public override bool ShouldShowSabotageMap(MapBehaviour map) => false;
     public override bool ShowGameModeIntroCutscene => true;

@@ -55,11 +55,6 @@ public interface IMiraPlugin
     public virtual string CustomOptionMenuTwoDescription => "Apply game settings for this mod!";
 
     /// <summary>
-    /// Gets the icon of the mod.
-    /// </summary>
-    public virtual LoadableAsset<Sprite>? ModIcon => null;
-
-    /// <summary>
     /// Gets the <see cref="ConfigFile"/> for the plugin.
     /// </summary>
     /// <returns>The <see cref="ConfigFile"/> for the plugin.</returns>

@@ -20,7 +20,7 @@ public partial class ExamplePlugin : BasePlugin, IMiraPlugin
 {
     public Harmony Harmony { get; } = new(Id);
     public string OptionsTitleText => "Mira API\nExample Mod";
-    public LoadableAsset<Sprite>? ModIcon => ExampleAssets.ExampleButton;
+    public string CustomOptionMenuNameTwo => "angxl's Options";
     public ConfigFile GetConfigFile() => Config;
     public override void Load()
     {

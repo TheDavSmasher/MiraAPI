@@ -1,4 +1,6 @@
 ﻿using MiraAPI.PluginLoading;
+using MiraAPI.Utilities.Assets;
+using UnityEngine;
 
 namespace MiraAPI.GameModes;
 
@@ -13,4 +15,6 @@ public class ClassicMode : AbstractGameMode
 
     /// <inheritdoc/>
     public override string Description => "The classic Among Us experience!\nFind the Impostors or deceive the Crew.";
+
+    public override LoadableAsset<Sprite>? Icon => MiraAssets.ClassicGamemodeIcon;
 }
