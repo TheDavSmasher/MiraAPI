@@ -126,7 +126,7 @@ internal static class GameOptionsMenuPatch
 
     private static void UpdateGroup(AbstractOptionGroup? group, ref float num)
     {
-        if (group is null || !group.Ready || group.Options.Count == 0 || group.Header is null)
+        if (group is null || !group.Ready || group.Options.Count == 0 || group.Header == null)
         {
             return;
         }
