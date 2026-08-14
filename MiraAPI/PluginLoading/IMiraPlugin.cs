@@ -1,5 +1,7 @@
 ﻿using System.Linq;
 using BepInEx.Configuration;
+using MiraAPI.Utilities.Assets;
+using UnityEngine;
 
 namespace MiraAPI.PluginLoading;
 
@@ -51,6 +53,11 @@ public interface IMiraPlugin
     /// Gets the description for the second custom category in the game options menu, if any.
     /// </summary>
     public virtual string CustomOptionMenuTwoDescription => "Apply game settings for this mod!";
+
+    /// <summary>
+    /// Gets the icon of the mod.
+    /// </summary>
+    public virtual LoadableAsset<Sprite>? ModIcon => null;
 
     /// <summary>
     /// Gets the <see cref="ConfigFile"/> for the plugin.

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using MiraAPI.PluginLoading;
 using Reactor.Utilities;
 
@@ -75,6 +76,16 @@ public static class CustomGameModeManager
     /// <param name="id">The ID of the gamemode to fetch.</param>
     /// <returns>The gamemode matching that ID.</returns>
     public static AbstractGameMode GetMode(uint id) => IdToModeMap[id];
+
+    /// <summary>
+    /// Finds the parent mod of a custom gamemode.
+    /// </summary>
+    /// <param name="gameMode">The <see cref="AbstractGameMode"/> object.</param>
+    /// <returns>A <see cref="MiraPluginInfo"/> object representing the parent mod of the gamemode.</returns>
+    public static MiraPluginInfo? FindParentMod(AbstractGameMode gameMode)
+    {
+        return MiraPluginManager.Instance.RegisteredPlugins.FirstOrDefault(plugin => plugin.GameModes.ContainsValue(gameMode));
+    }
 
     internal static void RegisterDefaultMode()
     {

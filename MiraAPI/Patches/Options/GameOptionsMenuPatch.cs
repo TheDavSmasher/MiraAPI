@@ -32,6 +32,8 @@ internal static class GameOptionsMenuPatch
     private static System.Collections.Generic.Dictionary<AbstractGameMode, System.Collections.Generic.List<OptionBehaviour>> _gameModeOptions = new();
     private static System.Collections.Generic.Dictionary<AbstractGameMode, System.Collections.Generic.List<CategoryHeaderMasked>> _gameModeHeaders = new();
     private static TextMeshPro _gamemodeDescription = null!;
+    private static SpriteRenderer _modIcon = null!;
+
     [HarmonyPrefix]
     [HarmonyPatch(nameof(GameOptionsMenu.Initialize))]
     // ReSharper disable once InconsistentNaming
@@ -84,6 +86,30 @@ internal static class GameOptionsMenuPatch
         {
             instance.Children.Add(opt);
         }
+
+        var mod = CustomGameModeManager.FindParentMod(gameMode);
+        if (mod is { MiraPlugin.ModIcon: not null })
+        {
+            _modIcon.gameObject.SetActive(true);
+            _gamemodeDescription.transform.localPosition = new Vector3(0.3f, 0, -0.01f);
+            _gamemodeDescription.horizontalAlignment = HorizontalAlignmentOptions.Left;
+            var texture = mod.MiraPlugin.ModIcon.LoadAsset().texture;
+            var newSprite = Sprite.Create(
+                texture,
+                new Rect(0, 0, 128, 128),
+                Vector2.one / 2,
+                100
+            );
+            _modIcon.sprite = newSprite;
+            _modIcon.drawMode = SpriteDrawMode.Sliced;
+        }
+        else
+        {
+            _gamemodeDescription.transform.localPosition = new Vector3(0f, 0, -0.01f);
+            _gamemodeDescription.horizontalAlignment = HorizontalAlignmentOptions.Center;
+            _modIcon.gameObject.SetActive(false);
+        }
+
         _gamemodeDescription.text = gameMode.Description;
         if (gameMode.ShowNormalGameSettings)
         {
@@ -155,6 +181,8 @@ internal static class GameOptionsMenuPatch
         }
         instance.scrollBar.SetYBoundsMax(-num - 1.65f);
     }
+    
+
     private static void CreateSettings(GameOptionsMenu instance, Transform container)
     {
         float num = 0.713f;
@@ -197,16 +225,43 @@ internal static class GameOptionsMenuPatch
                     GameModeOption.Values.ElementAt(i).Value);
         }
 
-        var gamemodeTextObj = Object.Instantiate(GameModeOption.OptionBehaviour.transform.GetChild(1).gameObject, Vector3.zero, Quaternion.identity, container);
-        gamemodeTextObj.transform.localPosition = new Vector3(1, -0.675f, -2f);
-        gamemodeTextObj.transform.localScale = new Vector3(2.6f, 2.6f, 1);
-        _gamemodeDescription = gamemodeTextObj.GetComponentInChildren<TextMeshPro>();
-        _gamemodeDescription.fontSizeMin = 0.5f;
-        _gamemodeDescription.fontSizeMax = 1;
+        var modeInfoHolder = new GameObject("GamemodeInfo")
+        {
+            transform =
+            {
+                parent = container,
+                localPosition = new Vector3(1.2f, -0.675f, 1),
+                localScale = Vector3.one,
+            },
+            layer = container.gameObject.layer,
+        }.transform;
 
-        var gamemodeBg = Object.Instantiate(GameModeOption.OptionBehaviour.transform.GetChild(0).gameObject, Vector3.zero, Quaternion.identity, gamemodeTextObj.transform);
-        gamemodeBg.transform.localPosition = new Vector3(0, 0, 0.01f);
-        gamemodeBg.transform.localScale = new Vector3(0.61f, 0.375f, 1);
+        var gamemodeBg = Object.Instantiate(GameModeOption.OptionBehaviour.transform.GetChild(0).gameObject, Vector3.zero, Quaternion.identity, modeInfoHolder);
+        gamemodeBg.transform.localPosition = Vector3.zero;
+        gamemodeBg.transform.localScale = new Vector3(1.35f, 0.85f, 1);
+        gamemodeBg.name = "Background";
+
+        var modIconObj = new GameObject("ModIcon")
+        {
+            transform =
+            {
+                parent = modeInfoHolder,
+                localPosition = new Vector3(-1.75f, 0, -0.1f),
+                localScale = new Vector3(0.4f, 0.4f, 1),
+            },
+            layer = gamemodeBg.layer,
+        };
+        _modIcon = modIconObj.AddComponent<SpriteRenderer>();
+        _modIcon.sprite = MiraAssets.BlankSprite.LoadAsset();
+
+        var gamemodeTextObj = Object.Instantiate(GameModeOption.OptionBehaviour.transform.GetChild(1).gameObject, Vector3.zero, Quaternion.identity, modeInfoHolder);
+        gamemodeTextObj.transform.localPosition = new Vector3(0.3f, 0, -0.01f);
+        gamemodeTextObj.transform.localScale = new Vector3(2.12f, 2.12f, 1);
+        _gamemodeDescription = gamemodeTextObj.GetComponentInChildren<TextMeshPro>();
+        _gamemodeDescription.fontSizeMin = 0.65f;
+        _gamemodeDescription.fontSizeMax = 0.9f;
+        _gamemodeDescription.alignment = TextAlignmentOptions.Left;
+
         num -= 1.3f;
         AdditionalVanillaScrollNum = 0f;
         foreach (RulesCategory rulesCategory in GameManager.Instance.GameSettingsList.AllCategories)
