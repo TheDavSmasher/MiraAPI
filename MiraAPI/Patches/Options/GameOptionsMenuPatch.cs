@@ -28,8 +28,9 @@ internal static class GameOptionsMenuPatch
     private static List<CategoryHeaderMasked> _vanillaHeaders = new();
     private static List<OptionBehaviour> _vanillaOptions = new();
     private static List<OptionBehaviour> _mainOptions = new();
-    private static Dictionary<AbstractGameMode, OptionBehaviour> _gameModeOptions = new();
-    private static Dictionary<AbstractGameMode, CategoryHeaderMasked> _gameModeHeaders = new();
+    private static System.Collections.Generic.Dictionary<AbstractGameMode, System.Collections.Generic.List<AbstractOptionGroup>> _gameModeGroups = new();
+    private static System.Collections.Generic.Dictionary<AbstractGameMode, System.Collections.Generic.List<OptionBehaviour>> _gameModeOptions = new();
+    private static System.Collections.Generic.Dictionary<AbstractGameMode, System.Collections.Generic.List<CategoryHeaderMasked>> _gameModeHeaders = new();
     [HarmonyPrefix]
     [HarmonyPatch(nameof(GameOptionsMenu.Initialize))]
     // ReSharper disable once InconsistentNaming
@@ -73,6 +74,7 @@ internal static class GameOptionsMenuPatch
         return false;
     }
 
+    public static float AdditionalVanillaScrollNum;
     internal static void ToggleGamemodeOptions(AbstractGameMode gameMode, GameOptionsMenu instance)
     {
         float num = -1.217f;
@@ -106,6 +108,41 @@ internal static class GameOptionsMenuPatch
                 opt.gameObject.SetActive(false);
             }
         }
+
+        foreach (var pair in _gameModeGroups)
+        {
+            if (pair.Value.Count != 0)
+            {
+                if (gameMode == pair.Key)
+                {
+                    foreach (var opt in _gameModeHeaders[gameMode])
+                    {
+                        num -= 0.63f;
+                        opt.gameObject.SetActive(true);
+                    }
+
+                    foreach (var opt in _gameModeOptions[gameMode])
+                    {
+                        opt.gameObject.SetActive(true);
+                        instance.Children.Add(opt);
+                        num -= 0.45f;
+                    }
+                }
+                else
+                {
+                    foreach (var opt in _gameModeHeaders[pair.Key])
+                    {
+                        opt.gameObject.SetActive(false);
+                    }
+
+                    foreach (var opt in _gameModeOptions[pair.Key])
+                    {
+                        opt.gameObject.SetActive(false);
+                    }
+                }
+            }
+        }
+
         instance.ControllerSelectable.Clear();
         foreach (var obj in instance.scrollBar.GetComponentsInChildren<UiElement>())
         {
@@ -124,6 +161,7 @@ internal static class GameOptionsMenuPatch
         _mainOptions.Clear();
         _gameModeHeaders.Clear();
         _gameModeOptions.Clear();
+        _gameModeGroups.Clear();
 
         CategoryHeaderMasked gmCategory = Object.Instantiate(instance.categoryHeaderOrigin, Vector3.zero, Quaternion.identity, container);
         gmCategory.SetHeader(GameModeOption.CustomName, 20);
@@ -158,7 +196,7 @@ internal static class GameOptionsMenuPatch
         }
 
         num -= 1.3f;
-
+        AdditionalVanillaScrollNum = 0f;
         foreach (RulesCategory rulesCategory in GameManager.Instance.GameSettingsList.AllCategories)
         {
             CategoryHeaderMasked categoryHeaderMasked = Object.Instantiate<CategoryHeaderMasked>(
@@ -171,6 +209,7 @@ internal static class GameOptionsMenuPatch
             categoryHeaderMasked.transform.localPosition = new Vector3(-0.903f, num, -2f);
             _vanillaHeaders.Add(categoryHeaderMasked);
             num -= 0.63f;
+            AdditionalVanillaScrollNum -= 0.63f;
             foreach (BaseGameSetting baseGameSetting in rulesCategory.AllGameSettings)
             {
                 switch (baseGameSetting.Type)
@@ -231,6 +270,7 @@ internal static class GameOptionsMenuPatch
                 }
 
                 num -= 0.45f;
+                AdditionalVanillaScrollNum -= 0.45f;
             }
         }
         foreach (var optionBehaviour in _vanillaOptions)
@@ -245,6 +285,24 @@ internal static class GameOptionsMenuPatch
         foreach (var optionBehaviour in instance.Children)
         {
             optionBehaviour.OnValueChanged = new Action<OptionBehaviour>(instance.ValueChanged);
+        }
+
+        foreach (var mode in CustomGameModeManager.IdToModeMap.Values)
+        {
+            var filteredGroups =
+                ModdedOptionsManager.GameModeOptionGroups
+                    .Where(x => x.Key == mode.GetType()).Select(y => y.Value).SelectMany(y => y) ?? [];
+            _gameModeGroups.Add(mode, filteredGroups.ToList());
+
+            var optionBehaviours = new System.Collections.Generic.List<OptionBehaviour>();
+            var categoryHeaders = new System.Collections.Generic.List<CategoryHeaderMasked>();
+            var newNum = mode.ShowNormalGameSettings ? num : num - AdditionalVanillaScrollNum;
+            foreach (var group in filteredGroups)
+            {
+                CreateGroup(instance, group, container, ref newNum, ref optionBehaviours, ref categoryHeaders);
+            }
+            _gameModeHeaders.Add(mode, categoryHeaders);
+            _gameModeOptions.Add(mode, optionBehaviours);
         }
 
         instance.ControllerSelectable.Clear();
@@ -278,7 +336,6 @@ internal static class GameOptionsMenuPatch
         {
             return;
         }
-
         var num = 2.1f;
 
         switch (MenuState.Instance.CurrentMenu)
@@ -307,6 +364,98 @@ internal static class GameOptionsMenuPatch
         }
 
         __instance.scrollBar.SetYBoundsMax(-num - 1.65f);
+    }
+    private static void CreateGroup(GameOptionsMenu menu, AbstractOptionGroup group, Transform container, ref float num, ref System.Collections.Generic.List<OptionBehaviour> optionBehaviours, ref System.Collections.Generic.List<CategoryHeaderMasked> categoryHeaders)
+    {
+        var categoryHeaderMasked = Object.Instantiate(
+            menu.categoryHeaderOrigin,
+            Vector3.zero,
+            Quaternion.identity,
+            container);
+        categoryHeaderMasked.transform.localPosition = new Vector3(-0.903f, num + 1, -2f);
+        categoryHeaderMasked.transform.localScale = Vector3.one * 0.63f;
+        categoryHeaders.Add(categoryHeaderMasked);
+
+        num -= 0.58f;
+
+        categoryHeaderMasked.SetHeader(CustomStringName.CreateAndRegister(group.GroupName), 20);
+        categoryHeaderMasked.Background.color = group.GroupColor;
+        categoryHeaderMasked.Divider.color = group.GroupColor;
+        categoryHeaderMasked.Title.color = group.GroupColor.Equals(MiraApiPlugin.DefaultHeaderColor)
+            ? Color.white
+            : group.GroupColor.FindAlternateColor();
+
+        categoryHeaderMasked.Background.sprite = MiraAssets.CategoryHeader.LoadAsset();
+        categoryHeaderMasked.Background.sprite.texture.filterMode = FilterMode.Bilinear;
+        categoryHeaderMasked.Background.sprite.texture.wrapMode = TextureWrapMode.Clamp;
+
+        categoryHeaderMasked.Background.transform.localPosition = new Vector3(0.5f, -0.1833f, 0);
+        categoryHeaderMasked.Background.size = new Vector2(
+            categoryHeaderMasked.Background.size.x + 1.5f,
+            categoryHeaderMasked.Background.size.y);
+
+        categoryHeaderMasked.gameObject.SetActive(true);
+        group.Header = categoryHeaderMasked;
+        categoryHeaderMasked.transform.localPosition += Vector3.down;
+
+        var options = group.Options.Select(opt => opt.CreateOption(
+            menu.checkboxOrigin,
+            menu.numberOptionOrigin,
+            menu.stringOptionOrigin,
+            menu.playerOptionOrigin,
+            container));
+
+        foreach (var newOpt in options)
+        {
+            newOpt.SetClickMask(menu.ButtonClickMask);
+            SpriteRenderer[] componentsInChildren = newOpt.GetComponentsInChildren<SpriteRenderer>(true);
+            foreach (var renderer in componentsInChildren)
+            {
+                if (group.GroupColor != MiraApiPlugin.DefaultHeaderColor)
+                {
+                    renderer.color = group.GroupColor.FindAlternateColor();
+                    if (renderer.transform.parent.TryGetComponent<GameOptionButton>(out var btn))
+                    {
+                        btn.interactableColor = group.GroupColor.FindAlternateColor();
+                        btn.interactableHoveredColor = Color.white;
+                    }
+                }
+
+                renderer.material.SetInt(PlayerMaterial.MaskLayer, 20);
+            }
+
+            foreach (var textMeshPro in newOpt.GetComponentsInChildren<TextMeshPro>(true))
+            {
+                if (group.GroupColor != MiraApiPlugin.DefaultHeaderColor)
+                {
+                    textMeshPro.color = group.GroupColor;
+                }
+
+                textMeshPro.fontMaterial.SetFloat(ShaderID.StencilComp, 3f);
+                textMeshPro.fontMaterial.SetFloat(ShaderID.Stencil, 20);
+            }
+
+            if (newOpt is ToggleOption toggle)
+            {
+                toggle.CheckMark.sprite = MiraAssets.Checkmark.LoadAsset();
+                toggle.CheckMark.color = group.GroupColor != MiraApiPlugin.DefaultHeaderColor
+                    ? group.GroupColor
+                    : MiraAssets.AcceptedTeal;
+                var rend = toggle.CheckMark.transform.parent.FindChild("ActiveSprite")
+                    .GetComponent<SpriteRenderer>();
+                rend.sprite = MiraAssets.CheckmarkBox.LoadAsset();
+                rend.color = group.GroupColor != MiraApiPlugin.DefaultHeaderColor
+                    ? group.GroupColor
+                    : MiraAssets.AcceptedTeal;
+            }
+
+            optionBehaviours.Add(newOpt);
+            newOpt.transform.localPosition = new Vector3(0.952f, num, -2f);
+            num -= 0.45f;
+
+            newOpt.Initialize();
+            newOpt.gameObject.SetActive(true);
+        }
     }
 
     internal static void UpdateGroup(AbstractOptionGroup? group, ref float num)
