@@ -24,80 +24,80 @@ public static class ShaderID
     }
 
     // For player shader
-    public static readonly int BodyColor = Shader.PropertyToID("_BodyColor");
-    public static readonly int BackColor = Shader.PropertyToID("_BackColor");
-    public static readonly int VisorColor = Shader.PropertyToID("_VisorColor");
+    public static readonly int BodyColor = Get("_BodyColor");
+    public static readonly int BackColor = Get("_BackColor");
+    public static readonly int VisorColor = Get("_VisorColor");
 
     // Main texture, very obviously used in any shader with a texture
-    public static readonly int MainTex = Shader.PropertyToID("_MainTex");
+    public static readonly int MainTex = Get("_MainTex");
 
     // Any masking stuff, like MeetingHud bubbles
-    public static readonly int Mask = Shader.PropertyToID("_Mask");
-    public static readonly int MaskComp = Shader.PropertyToID("_MaskComp");
-    public static readonly int MaskLayer = Shader.PropertyToID("_MaskLayer");
-    public static readonly int Stencil = Shader.PropertyToID("_Stencil");
-    public static readonly int StencilComp = Shader.PropertyToID("_StencilComp");
+    public static readonly int Mask = Get("_Mask");
+    public static readonly int MaskComp = Get("_MaskComp");
+    public static readonly int MaskLayer = Get("_MaskLayer");
+    public static readonly int Stencil = Get("_Stencil");
+    public static readonly int StencilComp = Get("_StencilComp");
 
     // Used in many tasks
-    public static readonly int Color = Shader.PropertyToID("_Color");
+    public static readonly int Color = Get("_Color");
 
     // Has 2 uses in the game, provided for convenience
-    public static readonly int Opacity = Shader.PropertyToID("_Opacity");
+    public static readonly int Opacity = Get("_Opacity");
 
     // Used once in CooldownHelpers, once in PowerBarMining
-    public static readonly int NormalizedUvs = Shader.PropertyToID("_NormalizedUvs");
+    public static readonly int NormalizedUvs = Get("_NormalizedUvs");
 
     // Used in many consoles
-    public static readonly int Outline = Shader.PropertyToID("_Outline");
-    public static readonly int OutlineColor = Shader.PropertyToID("_OutlineColor");
+    public static readonly int Outline = Get("_Outline");
+    public static readonly int OutlineColor = Get("_OutlineColor");
 
     // Used in some consoles
-    public static readonly int AddColor = Shader.PropertyToID("_AddColor");
+    public static readonly int AddColor = Get("_AddColor");
 
     // Has some uses in various locations
-    public static readonly int Percent = Shader.PropertyToID("_Percent");
-    public static readonly int PercentY = Shader.PropertyToID("_PercentY");
-    public static readonly int Desat = Shader.PropertyToID("_Desat");
+    public static readonly int Percent = Get("_Percent");
+    public static readonly int PercentY = Get("_PercentY");
+    public static readonly int Desat = Get("_Desat");
 
     // Used in LightSource
-    public static readonly int PlayerRadius = Shader.PropertyToID("_PlayerRadius");
-    public static readonly int LightRadius = Shader.PropertyToID("_LightRadius");
-    public static readonly int LightOffset = Shader.PropertyToID("_LightOffset");
-    public static readonly int FlashlightSize = Shader.PropertyToID("_FlashlightSize");
-    public static readonly int FlashlightAngle = Shader.PropertyToID("_FlashlightAngle");
+    public static readonly int PlayerRadius = Get("_PlayerRadius");
+    public static readonly int LightRadius = Get("_LightRadius");
+    public static readonly int LightOffset = Get("_LightOffset");
+    public static readonly int FlashlightSize = Get("_FlashlightSize");
+    public static readonly int FlashlightAngle = Get("_FlashlightAngle");
 
     // Used once for LightSourceGpuRenderer
-    public static readonly int DepthCompressionValue = Shader.PropertyToID("_DepthCompressionValue");
+    public static readonly int DepthCompressionValue = Get("_DepthCompressionValue");
 
     // Used in ProgressTracker
-    public static readonly int Buckets = Shader.PropertyToID("_Buckets");
-    public static readonly int FullBuckets = Shader.PropertyToID("_FullBuckets");
+    public static readonly int Buckets = Get("_Buckets");
+    public static readonly int FullBuckets = Get("_FullBuckets");
 
     // Used once in IntroCutscene and EndGameManager
-    public static readonly int Rad = Shader.PropertyToID("_Rad");
+    public static readonly int Rad = Get("_Rad");
 
     // Used only once for Quick Chat
-    public static readonly int FaceColor = Shader.PropertyToID("_FaceColor");
+    public static readonly int FaceColor = Get("_FaceColor");
 
     // Used for NavigationMinigame
-    public static readonly int CrossHair = Shader.PropertyToID("_CrossHair");
-    public static readonly int CrossColor = Shader.PropertyToID("_CrossColor");
+    public static readonly int CrossHair = Get("_CrossHair");
+    public static readonly int CrossColor = Get("_CrossColor");
 
     // Used for both SurveillanceMinigame (Planet and Normal)
-    public static readonly int Center = Shader.PropertyToID("_Center");
-    public static readonly int Color2 = Shader.PropertyToID("_Color2");
+    public static readonly int Center = Get("_Center");
+    public static readonly int Color2 = Get("_Color2");
 
     // Used in ReactorShipRoom
-    public static readonly int Speed = Shader.PropertyToID("_Speed");
+    public static readonly int Speed = Get("_Speed");
 
     // Used only once in CourseMinigame
-    public static readonly int AltTex = Shader.PropertyToID("_AltTex");
-    public static readonly int Perc = Shader.PropertyToID("_Perc");
+    public static readonly int AltTex = Get("_AltTex");
+    public static readonly int Perc = Get("_Perc");
 
     // Used once in TextMarquee
-    public static readonly int VertexOffsetX = Shader.PropertyToID("_VertexOffsetX");
-    public static readonly int VertexOffsetY = Shader.PropertyToID("_VertexOffsetY");
+    public static readonly int VertexOffsetX = Get("_VertexOffsetX");
+    public static readonly int VertexOffsetY = Get("_VertexOffsetY");
 
     // Used in VertLineBehaviour
-    public static readonly int Fade = Shader.PropertyToID("_Fade");
+    public static readonly int Fade = Get("_Fade");
 }
