@@ -550,7 +550,6 @@ public static class RoleSettingMenuPatches
                 new Rect(0, 0, 370, 230),
                 Vector2.one / 2,
                 100);
-            __instance.roleScreenshot.drawMode = SpriteDrawMode.Sliced;
         }
 
         __instance.roleHeaderSprite.color = customRole.OptionsMenuColor;
