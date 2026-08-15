@@ -309,12 +309,7 @@ public class HideAndSeekMode : AbstractGameMode
         __instance.HideAndSeekPanels.SetActive(false);
         __instance.CrewmateRules.SetActive(false);
         __instance.ImpostorRules.SetActive(false);
-        /*LogicOptionsHnS logicOptionsHnS = GameManager.Instance.LogicOptions as LogicOptionsHnS;
-        LogicHnSMusic logicHnSMusic = GameManager.Instance.GetLogicComponent<LogicHnSMusic>() as LogicHnSMusic;
-        if (logicHnSMusic != null)
-        {
-            logicHnSMusic.StartMusicWithIntro();
-        }*/
+        HnsMusicHandler.Instance.StartMusicWithIntro();
         var hideTimer = 10f;
 
         if (PlayerControl.LocalPlayer.Data.Role.IsImpostor)
@@ -373,7 +368,7 @@ public class HideAndSeekMode : AbstractGameMode
         }
         else
         {
-            ShipStatus.Instance.HideCountdown = hideTimer;
+            HideAndSeekHudHelper.Instance.HideCountdown = hideTimer;
             if (AprilFoolsMode.ShouldHorseAround())
             {
                 if (impostor != null)
@@ -395,6 +390,8 @@ public class HideAndSeekMode : AbstractGameMode
             }
         }
         ShipStatus.Instance.StartSFX();
+        HnsMusicHandler.Instance.OnGameStart();
+        HnsDangerMeter.Instance.OnGameStart();
         UnityEngine.Object.Destroy(__instance.gameObject);
     }
     public override void Initialize()
@@ -404,7 +401,9 @@ public class HideAndSeekMode : AbstractGameMode
         PlayerControl.LocalPlayer.SetKillTimer(0.01f);
         if (HudManager.InstanceExists)
         {
+            HudManager.Instance.gameObject.AddComponent<HnsMusicHandler>();
             HudManager.Instance.gameObject.AddComponent<HideAndSeekHudHelper>();
+            HudManager.Instance.gameObject.AddComponent<HnsDangerMeter>();
         }
     }
     public override MapOptions GetMapOptions()

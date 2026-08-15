@@ -118,7 +118,65 @@ public sealed class HideAndSeekHudHelper(nint cppPtr) : MonoBehaviour(cppPtr)
 
         beepCoroutine = null!;
     }
+    private float taskDirtyTimer;
+    public float HideCountdown { get; set; }
 
+    public void LateUpdate()
+    {
+        if (!HudManager.InstanceExists)
+        {
+            return;
+        }
+        if (HideCountdown > 0f && taskDirtyTimer > 0.25f)
+        {
+            float num = taskDirtyTimer;
+            taskDirtyTimer = 0f;
+            if (!PlayerControl.LocalPlayer)
+            {
+                HudManager.Instance.TaskPanel.SetTaskText(string.Empty);
+                return;
+            }
+            NetworkedPlayerInfo data = PlayerControl.LocalPlayer.Data;
+            if (data == null)
+            {
+                return;
+            }
+            bool flag = data.Role != null && data.Role.IsImpostor;
+            HudManager.Instance.tasksString.Clear();
+            if (PlayerControl.LocalPlayer.myTasks == null || PlayerControl.LocalPlayer.myTasks.Count == 0)
+            {
+                HudManager.Instance.tasksString.Append("None");
+            }
+            else
+            {
+                for (int i = 0; i < PlayerControl.LocalPlayer.myTasks.Count; i++)
+                {
+                    PlayerTask playerTask = PlayerControl.LocalPlayer.myTasks[i];
+                    if (playerTask)
+                    {
+                        if (playerTask.TaskType == TaskTypes.FixComms && !flag)
+                        {
+                            HudManager.Instance.tasksString.Clear();
+                            playerTask.AppendTaskText(HudManager.Instance.tasksString);
+                            break;
+                        }
+                        playerTask.AppendTaskText(HudManager.Instance.tasksString);
+                    }
+                }
+                if (data.Role != null)
+                {
+                    data.Role.AppendTaskHint(HudManager.Instance.tasksString);
+                }
+                if (HideCountdown > 0f)
+                {
+                    HideCountdown -= num;
+                    HudManager.Instance.tasksString.Append("\n\n" + ((int)HideCountdown));
+                }
+                HudManager.Instance.tasksString.TrimEnd();
+            }
+            HudManager.Instance.TaskPanel.SetTaskText(HudManager.Instance.tasksString.ToString());
+        }
+    }
     public void FixedUpdate()
     {
         secondsSinceLastSetDirty += Time.fixedDeltaTime;
