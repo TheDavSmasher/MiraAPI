@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using MiraAPI.PluginLoading;
+using MiraAPI.Utilities.Assets;
 using Reactor.Utilities;
 
 namespace MiraAPI.GameModes;

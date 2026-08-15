@@ -111,6 +111,14 @@ public static class GameModeOption
         Value = val;
         CustomGameModeManager.GetAndSetGameMode();
         HudPatches.SetGameModeText(CustomGameModeManager.GetMode(Values.ElementAt(_lastValue).Key).ColoredName);
+        var gm = CustomGameModeManager.ActiveMode!;
+        ModdedOptionsManager.AddSettingsChangeMessage(
+            HudManager.Instance.Notifier,
+            GamemodeName,
+            gm.ColoredName,
+            new Color(0.7333f, 0.7333f, 0.7333f, 1),
+            gm.TmpIcon,
+            true);
         // could make Values a dict of AbstractGameMode too
     }
 

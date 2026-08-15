@@ -38,7 +38,7 @@ public static class ModdedOptionsManager
 
     public static void AddSettingsChangeMessage(NotificationPopper notif, StringNames key, string value, Color textColor, TMP_SpriteAsset? sprite, bool playSound = true)
     {
-        var item = string.Empty;
+        string item;
         var text = textColor.ToTextColor();
         if (sprite != null)
         {

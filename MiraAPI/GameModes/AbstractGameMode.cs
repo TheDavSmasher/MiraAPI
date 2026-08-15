@@ -5,6 +5,7 @@ using MiraAPI.GameOptions;
 using MiraAPI.PluginLoading;
 using MiraAPI.Utilities.Assets;
 using Reactor.Utilities.Extensions;
+using TMPro;
 using UnityEngine;
 
 namespace MiraAPI.GameModes;
@@ -34,6 +35,11 @@ public abstract class AbstractGameMode : IOptionable
     /// Gets the icon of the gamemode. Will be shown in options menu underneath the gamemode option.
     /// </summary>
     public virtual LoadableAsset<Sprite>? Icon => null;
+
+    /// <summary>
+    /// Gets the icon of the gamemode for use on the options pop-up.
+    /// </summary>
+    public TMP_SpriteAsset TmpIcon { get; set; } = null!;
 
     /// <summary>
     /// Gets the colored game mode name, using the color and name properties.
