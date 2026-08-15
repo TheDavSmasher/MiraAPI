@@ -7,6 +7,7 @@ using AmongUs.GameOptions;
 using HarmonyLib;
 using InnerNet;
 using MiraAPI.GameOptions;
+using MiraAPI.HnsReimplemented;
 using MiraAPI.HnsReimplemented.Options;
 using MiraAPI.PluginLoading;
 using MiraAPI.Roles;
@@ -39,6 +40,7 @@ public class HideAndSeekMode : AbstractGameMode
     public override bool ShowNormalRoleSettings => false;
     public override float DefaultImpostorKillCooldown => 1f;
 
+    public override bool ShowTaskBar => false;
     public static int ImpostorPlayerID()
     {
         return OptionGroupSingleton<HnsImpostorOptions>.Instance.SelectedSeeker.Value;
@@ -73,7 +75,7 @@ public class HideAndSeekMode : AbstractGameMode
         }
         IGameOptions currentGameOptions = GameOptionsManager.Instance.CurrentGameOptions;
         int adjustedNumImpostors = GameOptionsManager.Instance.CurrentGameOptions.GetAdjustedNumImpostors(list2.Count);
-        AssignRolesForTeam(list2, currentGameOptions, RoleTeamTypes.Impostor, adjustedNumImpostors, RoleTypes.Impostor);
+        AssignRolesForTeam(list2, currentGameOptions, RoleTeamTypes.Impostor, Math.Max(adjustedNumImpostors, 1), RoleTypes.Impostor);
         AssignRolesForTeam(list2, currentGameOptions, RoleTeamTypes.Crewmate, int.MaxValue, RoleTypes.Engineer);
     }
 
@@ -84,7 +86,7 @@ public class HideAndSeekMode : AbstractGameMode
         int teamMax,
         RoleTypes defaultRole)
     {
-        Error($"MiraAPI.Patches.Roles.LogicRoleSelectionHnsPatch - AssignRolesForTeam: Team: {team}, Max: {teamMax}, Players: {players.Count}, DefaultRole: {defaultRole}");
+        Error($"Hide And Seek Mode - AssignRolesForTeam: Team: {team}, Max: {teamMax}, Players: {players.Count}, DefaultRole: {defaultRole}");
         int num = 0;
         IRoleOptionsCollection roleOptions = opts.RoleOptions;
         var source = RoleManager.Instance.AllRoles.ToArray()
@@ -400,6 +402,25 @@ public class HideAndSeekMode : AbstractGameMode
         deadPlayerCount = 0;
         ShipStatus.Instance.BreakEmergencyButton();
         PlayerControl.LocalPlayer.SetKillTimer(0.01f);
+        if (HudManager.InstanceExists)
+        {
+            HudManager.Instance.gameObject.AddComponent<HideAndSeekHudHelper>();
+        }
+    }
+    public override MapOptions GetMapOptions()
+    {
+        MapOptions mapOptions = new MapOptions
+        {
+            Mode = MapOptions.Modes.Normal,
+        };
+        if (PlayerControl.LocalPlayer.Data.Role.IsImpostor && HideAndSeekHudHelper.Instance.SeekerAdminMapEnabled(PlayerControl.LocalPlayer))
+        {
+            mapOptions.Mode = MapOptions.Modes.CountOverlay;
+            mapOptions.AllowMovementWhileMapOpen = true;
+            mapOptions.IncludeDeadBodies = false;
+            mapOptions.ShowLivePlayerPosition = false;
+        }
+        return mapOptions;
     }
 
     public override void CheckGameEnd(out bool runOriginal, LogicGameFlowNormal instance)
@@ -411,10 +432,10 @@ public class HideAndSeekMode : AbstractGameMode
         }
         if (Helpers.GetAlivePlayers().Count(x => !x.Data.Role.IsImpostor) != 0)
         {
-            /*if (instance.AllTimersExpired())
+            if (HideAndSeekHudHelper.Instance.AllTimersExpired())
             {
                 instance.Manager.RpcEndGame(GameOverReason.HideAndSeek_CrewmatesByTimer, !DataManager.Player.Ads.HasPurchasedAdRemoval);
-            }*/
+            }
             return;
         }
         instance.Manager.RpcEndGame(GameOverReason.HideAndSeek_ImpostorsByKills, !DataManager.Player.Ads.HasPurchasedAdRemoval);
@@ -458,6 +479,45 @@ public class HideAndSeekMode : AbstractGameMode
             }
             return PlayerBodyTypes.Normal;
         }
+    }
+    public override void UpdateTaskPanel(TaskPanelBehaviour instance)
+    {
+        instance.background.transform.localScale = (instance.taskText.textBounds.size.x > 0f)
+            ? new Vector3(instance.taskText.textBounds.size.x + 0.2f, instance.taskText.textBounds.size.y + 0.2f, 1f)
+            : Vector3.zero;
+        Vector3 vector = instance.background.sprite.bounds.extents;
+        vector.y = -vector.y;
+        vector = vector.Mul(instance.background.transform.localScale);
+        instance.background.transform.localPosition = vector;
+        Vector3 vector2 = instance.tab.sprite.bounds.extents;
+        vector2 = vector2.Mul(instance.tab.transform.localScale);
+        vector2.y = -vector2.y;
+        vector2.x += vector.x * 2f;
+        instance.tab.transform.localPosition = vector2;
+        if (GameManager.Instance == null)
+        {
+            return;
+        }
+
+        var yPos = 1.6f;
+        var xPos = -instance.background.sprite.bounds.size.x * instance.background.transform.localScale.x;
+        instance.closedPosition = new Vector3(xPos, yPos, instance.closedPosition.z);
+        instance.openPosition = new Vector3(instance.openPosition.x, yPos, instance.openPosition.z);
+        if (instance.open)
+        {
+            instance.timer = Mathf.Min(1f, instance.timer + Time.deltaTime / instance.animationTimeSeconds);
+        }
+        else
+        {
+            instance.timer = Mathf.Max(0f, instance.timer - Time.deltaTime / instance.animationTimeSeconds);
+        }
+
+        Vector3 relativePos = new(
+            Mathf.SmoothStep(instance.closedPosition.x, instance.openPosition.x, instance.timer),
+            yPos,
+            instance.openPosition.z);
+        instance.transform.localPosition =
+            AspectPosition.ComputePosition(AspectPosition.EdgeAlignments.LeftTop, relativePos);
     }
     private int deadPlayerCount;
     public override void OnPlayerDeath(PlayerControl player, bool assignGhostRole)

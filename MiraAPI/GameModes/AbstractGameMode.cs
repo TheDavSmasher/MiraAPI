@@ -219,12 +219,72 @@ public abstract class AbstractGameMode : IOptionable
     public virtual bool ShouldShowSabotageMap(MapBehaviour map) => true;
 
     /// <summary>
+    /// Gets the <see cref="MapOptions"/> to display on the map.
+    /// </summary>
+    /// <returns>The <see cref="MapOptions"/> for the gamemode.</returns>
+    public virtual MapOptions GetMapOptions()
+    {
+        return new MapOptions
+        {
+            Mode = PlayerControl.LocalPlayer.Data.Role.IsImpostor && !MeetingHud.Instance
+                ? MapOptions.Modes.Sabotage
+                : MapOptions.Modes.Normal,
+        };
+    }
+
+    /// <summary>
     /// Can a player vent in this gamemode.
     /// </summary>
     /// <param name="vent">Target vent.</param>
     /// <param name="playerInfo">Player attempting to vent.</param>
     /// <returns>True if venting is enabled in this mode.</returns>
     public virtual bool CanVent(Vent vent, NetworkedPlayerInfo playerInfo) => true;
+
+    /// <summary>
+    /// Does the task bar appear in the gamemode.
+    /// </summary>
+    /// <returns>True if the task bar is enabled in this mode.</returns>
+    public virtual bool ShowTaskBar => true;
+
+    public virtual void UpdateTaskPanel(TaskPanelBehaviour instance)
+    {
+        instance.background.transform.localScale = (instance.taskText.textBounds.size.x > 0f)
+            ? new Vector3(instance.taskText.textBounds.size.x + 0.2f, instance.taskText.textBounds.size.y + 0.2f, 1f)
+            : Vector3.zero;
+        Vector3 vector = instance.background.sprite.bounds.extents;
+        vector.y = -vector.y;
+        vector = vector.Mul(instance.background.transform.localScale);
+        instance.background.transform.localPosition = vector;
+        Vector3 vector2 = instance.tab.sprite.bounds.extents;
+        vector2 = vector2.Mul(instance.tab.transform.localScale);
+        vector2.y = -vector2.y;
+        vector2.x += vector.x * 2f;
+        instance.tab.transform.localPosition = vector2;
+        if (GameManager.Instance == null)
+        {
+            return;
+        }
+
+        var yPos = 0.6f;
+        var xPos = -instance.background.sprite.bounds.size.x * instance.background.transform.localScale.x;
+        instance.closedPosition = new Vector3(xPos, yPos, instance.closedPosition.z);
+        instance.openPosition = new Vector3(instance.openPosition.x, yPos, instance.openPosition.z);
+        if (instance.open)
+        {
+            instance.timer = Mathf.Min(1f, instance.timer + Time.deltaTime / instance.animationTimeSeconds);
+        }
+        else
+        {
+            instance.timer = Mathf.Max(0f, instance.timer - Time.deltaTime / instance.animationTimeSeconds);
+        }
+
+        Vector3 relativePos = new(
+            Mathf.SmoothStep(instance.closedPosition.x, instance.openPosition.x, instance.timer),
+            yPos,
+            instance.openPosition.z);
+        instance.transform.localPosition =
+            AspectPosition.ComputePosition(AspectPosition.EdgeAlignments.LeftTop, relativePos);
+    }
 
     /// <inheritdoc/>
     public override string ToString() => Name;

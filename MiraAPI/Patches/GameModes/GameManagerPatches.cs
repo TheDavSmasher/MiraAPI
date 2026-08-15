@@ -28,4 +28,29 @@ internal static class GameManagerPatches
 
         return true;
     }
+    [HarmonyPatch(typeof(NormalGameManager), nameof(NormalGameManager.GetMapOptions))]
+    [HarmonyPrefix]
+    public static bool GetMapOptions(ref MapOptions __result)
+    {
+        if (CustomGameModeManager.ActiveMode == null)
+        {
+            return true;
+        }
+
+        __result = CustomGameModeManager.ActiveMode.GetMapOptions();
+        return false;
+    }
+}
+
+[HarmonyPatch(typeof(GameStartManager))]
+internal static class GameStartManagerPatches
+{
+    [HarmonyPrefix, HarmonyPatch(nameof(GameStartManager.Start))]
+    public static void StartPatch(GameStartManager __instance)
+    {
+        if (MiraApiPlugin.IsDevBuild)
+        {
+            __instance.MinPlayers = 1;
+        }
+    }
 }
