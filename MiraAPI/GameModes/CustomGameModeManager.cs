@@ -94,11 +94,15 @@ public static class CustomGameModeManager
         // no need to add to game mode option as it already contains it
         // because we cannot have the option be created with no values
         defaultMode.ID = 0;
-        var hnsMode = new HideAndSeekMode();
-        IdToModeMap.Add(1, hnsMode);
-        hnsMode.ID = 1;
-        GameModeOption.AddOption(hnsMode);
-        LastId++;
+        // TODO: Once Hide n Seek port is ready for release, we will remove this case.
+        if (MiraApiPlugin.IsDevBuild)
+        {
+            var hnsMode = new HideAndSeekMode();
+            IdToModeMap.Add(1, hnsMode);
+            hnsMode.ID = 1;
+            GameModeOption.AddOption(hnsMode);
+            LastId++;
+        }
     }
 
     internal static void GetAndSetGameMode()
