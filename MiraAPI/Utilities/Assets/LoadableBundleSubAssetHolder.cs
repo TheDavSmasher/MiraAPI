@@ -37,7 +37,7 @@ public class LoadableBundleSubAssetHolder
     internal AssetBundle Bundle;
     public Sprite[] SubSprites = [];
 
-    public virtual void TryInit()
+    public void TryInit()
     {
         if (SubSprites.Length == 0)
         {
