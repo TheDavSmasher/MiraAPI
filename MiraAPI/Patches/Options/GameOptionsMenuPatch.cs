@@ -371,6 +371,7 @@ internal static class GameOptionsMenuPatch
             foreach (var group in filteredGroups)
             {
                 CreateGroup(instance, group, container, ref newNum, ref optionBehaviours, ref categoryHeaders);
+                group.Ready = true;
             }
             _gameModeHeaders.Add(mode, categoryHeaders);
             _gameModeOptions.Add(mode, optionBehaviours);
@@ -403,14 +404,14 @@ internal static class GameOptionsMenuPatch
     // ReSharper disable once InconsistentNaming
     public static void UpdatePatch(GameOptionsMenu __instance)
     {
-        if (MenuState.Instance.CurrentModIdx == 0)
-        {
-            return;
-        }
-        var num = 2.1f;
+        if (MenuState.Instance.CurrentModIdx == 0 && _gameModeGroups.Count <= 0) return;
+        var num = MenuState.Instance.CurrentMenu == MenuCategory.Game ? -1.217f : 2.1f;
 
         switch (MenuState.Instance.CurrentMenu)
         {
+            case MenuCategory.Game:
+                GamemodeOptionsUpdate(ref num);
+                break;
             case MenuCategory.Modifiers:
                 ModifiersUpdate(ref num);
                 break;
@@ -587,6 +588,26 @@ internal static class GameOptionsMenuPatch
         }
     }
 
+    private static void GamemodeOptionsUpdate(ref float num)
+    {
+        var mode = CustomGameModeManager.ActiveMode;
+        if (mode == null) return;
+
+        if (mode.ShowNormalGameSettings)
+        {
+            num += AdditionalVanillaScrollNum;
+        }
+
+        if (!_gameModeGroups.TryGetValue(mode, out var groups) || groups.Count == 0)
+        {
+            return;
+        }
+
+        foreach (var group in groups)
+        {
+            UpdateGroup(group, ref num);
+        }
+    }
     private static void CustomMenuOneUpdate(ref float num)
     {
         var groups = MenuState.Instance.CurrentMod.InternalOptionGroups
