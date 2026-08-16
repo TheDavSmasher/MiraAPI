@@ -24,7 +24,7 @@ public static class LobbyViewPanePatches
 {
     private static int SelectedModIdx { get; set; }
 
-    private static MiraPluginInfo[] Plugins => MiraPluginManager.Instance.PluginsWithOptionsOrGameModes;
+    private static MiraPluginInfo[] Plugins => MiraPluginManager.Instance.RegisteredPluginsWithOptions;
 
     private static MiraPluginInfo? SelectedMod => SelectedModIdx == 0
         ? null
@@ -33,6 +33,41 @@ public static class LobbyViewPanePatches
     private static PassiveButton? ModifiersTabButton { get; set; }
 
     private static StringNames ModifiersTabName { get; } = CustomStringName.CreateAndRegister("ModifiersTab");
+
+    private static AbstractGameMode? GetCustomGamemode()
+    {
+        if (!CustomGameModeManager.IsClassic() && !CustomGameModeManager.IsHideNSeek())
+        {
+            return CustomGameModeManager.ActiveMode;
+        }
+
+        return null;
+    }
+
+    private static IEnumerable<AbstractOptionGroup>? GetCustomGamemodeOptions()
+    {
+        if (CustomGameModeManager.ActiveMode == null)
+        {
+            return null;
+        }
+
+        if (!CustomGameModeManager.IsClassic() && !CustomGameModeManager.IsHideNSeek())
+        {
+            var plugin = CustomGameModeManager.FindParentMod(CustomGameModeManager.ActiveMode);
+
+            return plugin?.InternalOptionGroups
+                .Where(x => x.OptionableType?.IsAssignableTo(typeof(AbstractGameMode)) == true && x.GroupVisible());
+        }
+
+        return null;
+    }
+
+    [HarmonyPostfix]
+    [HarmonyPatch(typeof(LobbyViewSettingsPane), nameof(LobbyViewSettingsPane.OnEnable))]
+    public static void OnEnable(LobbyViewSettingsPane __instance)
+    {
+        Refresh(__instance);
+    }
 
     [HarmonyPostfix]
     [HarmonyPatch(nameof(LobbyViewSettingsPane.Awake))]
@@ -113,8 +148,10 @@ public static class LobbyViewPanePatches
     {
         if (SelectedMod == null)
         {
+            var cgm = GetCustomGamemode();
             ModifiersTabButton?.gameObject.SetActive(false);
-            menu.rolesTabButton.gameObject.SetActive(true);
+            menu.rolesTabButton.gameObject.SetActive(cgm is null or { ShowNormalRoleSettings: true });
+            menu.gameModeText.text = cgm is null ? "Main" : cgm.ColoredName;
         }
         else
         {
@@ -125,9 +162,9 @@ public static class LobbyViewPanePatches
 
             ModifiersTabButton?.gameObject.SetActive(showModifierButton);
             menu.rolesTabButton.gameObject.SetActive(showRolesButton);
+            menu.gameModeText.text = SelectedMod.PluginInfo.Metadata.Name;
         }
 
-        menu.gameModeText.text = SelectedMod?.PluginInfo.Metadata.Name ?? "Main";
         menu.RefreshTab();
         menu.scrollBar.ScrollToTop();
     }
@@ -159,8 +196,15 @@ public static class LobbyViewPanePatches
     [HarmonyPatch(nameof(LobbyViewSettingsPane.DrawNormalTab))]
     public static bool DrawNormalTabPatch(LobbyViewSettingsPane __instance)
     {
-        if ((CustomGameModeManager.IsClassic() || CustomGameModeManager.IsHideNSeek()) && (SelectedModIdx == 0 || SelectedMod == null))
+        if (SelectedMod == null)
         {
+            var gamemodeOpts = GetCustomGamemodeOptions();
+            if (gamemodeOpts != null)
+            {
+                DrawOptions(__instance, gamemodeOpts);
+                return false;
+            }
+
             return true;
         }
 
@@ -170,9 +214,7 @@ public static class LobbyViewPanePatches
         }
 
         var filteredGroups = SelectedMod.InternalOptionGroups
-            .Where(x => (x is { ParentMenu: not MenuCategory.Modifiers, OptionableType: null }
-                        || x.OptionableType?.IsAssignableTo(typeof(AbstractGameMode)) == true)
-                        && x.GroupVisible());
+            .Where(x => x is { ParentMenu: not MenuCategory.Modifiers, OptionableType: null } && x.GroupVisible());
 
         DrawOptions(__instance, filteredGroups);
         return false;
