@@ -6,7 +6,7 @@ namespace MiraAPI.Events.Mira;
 /// Button click event for <see cref="CustomActionButton"/>s only. Do not use for vanilla <see cref="AbilityButton"/>s.
 /// </summary>
 /// <typeparam name="T">The <see cref="CustomActionButton"/> type.</typeparam>
-public sealed class MiraButtonClickEvent<T> : MiraCancelableEvent where T : CustomActionButton
+public class MiraButtonClickEvent<T> : MiraCancelableEvent where T : CustomActionButton
 {
     /// <summary>
     /// Gets the <see cref="CustomActionButton"/> that was clicked.
@@ -33,7 +33,7 @@ public sealed class MiraButtonClickEvent<T> : MiraCancelableEvent where T : Cust
 /// <summary>
 /// Button click event for <see cref="CustomActionButton"/>s only. Do not use for vanilla <see cref="AbilityButton"/>s.
 /// </summary>
-public sealed class MiraButtonClickEvent : MiraCancelableEvent
+public class MiraButtonClickEvent : MiraCancelableEvent
 {
     /// <summary>
     /// Gets the <see cref="CustomActionButton"/> that was clicked.
