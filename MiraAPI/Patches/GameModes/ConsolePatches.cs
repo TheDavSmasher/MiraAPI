@@ -12,7 +12,7 @@ internal static class ConsolePatches
     {
         if (AmongUsClient.Instance.GameState == InnerNetClient.GameStates.Started && ShipStatus.Instance)
         {
-            if (CustomGameModeManager.ActiveMode != null && CustomGameModeManager.ActiveMode.CanUseTasks(__instance))
+            if (CustomGameModeManager.ActiveMode == null || CustomGameModeManager.ActiveMode.CanUseTasks(__instance))
             {
                 var task = __instance.FindTask(pc.Object);
 
@@ -40,9 +40,10 @@ internal static class ConsolePatches
     {
         if (AmongUsClient.Instance.GameState == InnerNetClient.GameStates.Started && ShipStatus.Instance)
         {
-            if (CustomGameModeManager.ActiveMode != null && CustomGameModeManager.ActiveMode.CanUseSystemConsole(__instance))
+            if (CustomGameModeManager.ActiveMode == null || CustomGameModeManager.ActiveMode.CanUseSystemConsole(__instance))
             {
-                return canUse = couldUse = true;
+                canUse = couldUse = true;
+                return true;
             }
 
             canUse = couldUse = false;
@@ -58,9 +59,10 @@ internal static class ConsolePatches
     {
         if (AmongUsClient.Instance.GameState == InnerNetClient.GameStates.Started && ShipStatus.Instance)
         {
-            if (CustomGameModeManager.ActiveMode != null && CustomGameModeManager.ActiveMode.CanUseMapConsole(__instance))
+            if (CustomGameModeManager.ActiveMode == null || CustomGameModeManager.ActiveMode.CanUseMapConsole(__instance))
             {
-                return canUse = couldUse = true;
+                canUse = couldUse = true;
+                return true;
             }
 
             canUse = couldUse = false;
@@ -77,7 +79,7 @@ internal static class ConsolePatches
         if (AmongUsClient.Instance.GameState == InnerNetClient.GameStates.Started && ShipStatus.Instance)
         {
             return CustomGameModeManager.ActiveMode == null ||
-                   CustomGameModeManager.ActiveMode!.CanUseMapConsole(__instance);
+                   CustomGameModeManager.ActiveMode.CanUseMapConsole(__instance);
         }
 
         return true;
@@ -89,7 +91,7 @@ internal static class ConsolePatches
         if (AmongUsClient.Instance.GameState == InnerNetClient.GameStates.Started && ShipStatus.Instance)
         {
             return CustomGameModeManager.ActiveMode == null ||
-                   CustomGameModeManager.ActiveMode!.CanUseSystemConsole(__instance);
+                   CustomGameModeManager.ActiveMode.CanUseSystemConsole(__instance);
         }
 
         return true;
@@ -101,7 +103,7 @@ internal static class ConsolePatches
         if (AmongUsClient.Instance.GameState == InnerNetClient.GameStates.Started && ShipStatus.Instance)
         {
             return CustomGameModeManager.ActiveMode == null ||
-                   CustomGameModeManager.ActiveMode!.CanUseTasks(__instance);
+                   CustomGameModeManager.ActiveMode.CanUseTasks(__instance);
         }
 
         return true;
