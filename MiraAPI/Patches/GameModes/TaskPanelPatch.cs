@@ -7,7 +7,7 @@ internal static class TaskPanelPatch
 {
     public static bool Prefix(TaskPanelBehaviour __instance)
     {
-        if (CustomGameModeManager.ActiveMode != null)
+        if (__instance != Roles.HudManagerPatches.RoleTab && CustomGameModeManager.ActiveMode != null)
         {
             CustomGameModeManager.ActiveMode.UpdateTaskPanel(__instance);
             return false;
