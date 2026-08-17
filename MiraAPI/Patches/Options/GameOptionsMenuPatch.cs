@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections;
 using System.Linq;
 using BepInEx.Unity.IL2CPP.Utils.Collections;
@@ -404,14 +404,14 @@ internal static class GameOptionsMenuPatch
     // ReSharper disable once InconsistentNaming
     public static void UpdatePatch(GameOptionsMenu __instance)
     {
-        if (MenuState.Instance.CurrentModIdx == 0 && _gameModeGroups.Count <= 0) return;
-        var num = MenuState.Instance.CurrentMenu == MenuCategory.Game ? -1.217f : 2.1f;
+        if (MenuState.Instance.CurrentModIdx == 0 && _gameModeGroups.Count <= 0)
+        {
+            return;
+        }
+        var num = 2.1f;
 
         switch (MenuState.Instance.CurrentMenu)
         {
-            case MenuCategory.Game:
-                GamemodeOptionsUpdate(ref num);
-                break;
             case MenuCategory.Modifiers:
                 ModifiersUpdate(ref num);
                 break;
@@ -422,9 +422,15 @@ internal static class GameOptionsMenuPatch
                 CustomMenuTwoUpdate(ref num);
                 break;
             default:
+                if (MenuState.Instance.CurrentModIdx == 0)
+                {
+                    num = -1.217f;
+                    GamemodeOptionsUpdate(ref num);
+                    break;
+                }
                 var filteredGroups =
                     MenuState.Instance.CurrentMod.InternalOptionGroups
-                        .Where(x => x.OptionableType == null &&
+                        .Where(x => (x.OptionableType == null || CustomGameModeManager.ActiveMode!.GetType().IsAssignableTo(x.OptionableType)) &&
                                     x.ParentMenu == MenuCategory.Game) ?? [];
 
                 foreach (var group in filteredGroups)
