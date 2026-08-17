@@ -171,6 +171,17 @@ public static class RoleSettingMenuPatches
                 ScrollerNum = 0.522f;
 
                 var num4 = 0;
+                var roleOptionSettings = roleMenu.scrollBar.Inner.GetComponentsInChildren<RoleOptionSetting>(false);
+                var headers = roleMenu.scrollBar.Inner.GetComponentsInChildren<CategoryHeaderMasked>(false);
+                foreach (var child in roleOptionSettings)
+                {
+                    Object.Destroy(child.gameObject);
+                }
+                foreach (var child in headers)
+                {
+                    Object.Destroy(child.gameObject);
+                }
+                yield return new WaitForEndOfFrame();
 
                 var roleGroups = MenuState.Instance.CurrentMod.InternalRoles.Values.OfType<ICustomRole>()
                     .ToLookup(x => x.RoleOptionsGroup);
