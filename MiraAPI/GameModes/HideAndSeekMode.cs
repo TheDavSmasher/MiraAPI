@@ -30,6 +30,9 @@ public class HideAndSeekMode : AbstractGameMode
     /// <inheritdoc/>
     public override string Description => "You can run, but you can't hide!\nOutlive the timer or eliminate the crew.";
 
+    // TODO: Once the Hide n Seek port is ready for release, we will remove this.
+    public override bool HideMode => !MiraApiPlugin.IsDevBuild;
+
     public override Color Color { get; } = new Color32(255, 88, 90, 255);
     public override LoadableAsset<Sprite>? Icon => MiraAssets.HnSGamemodeIcon;
     public override bool CanReport(DeadBody body) => false;

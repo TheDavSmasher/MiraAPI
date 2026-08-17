@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using MiraAPI.PluginLoading;
-using MiraAPI.Utilities.Assets;
 using Reactor.Utilities;
 
 namespace MiraAPI.GameModes;
@@ -40,10 +39,13 @@ public static class CustomGameModeManager
             return false;
         }
 
-        IdToModeMap.Add(GetNextId(), mode);
-        pluginInfo.GameModes.Add(LastId, mode);
-        mode.ID = LastId;
-        GameModeOption.AddOption(mode);
+        if (!mode.HideMode)
+        {
+            IdToModeMap.Add(GetNextId(), mode);
+            pluginInfo.GameModes.Add(LastId, mode);
+            mode.ID = LastId;
+            GameModeOption.AddOption(mode);
+        }
         return true;
     }
 
@@ -95,10 +97,9 @@ public static class CustomGameModeManager
         // no need to add to game mode option as it already contains it
         // because we cannot have the option be created with no values
         defaultMode.ID = 0;
-        // TODO: Once Hide n Seek port is ready for release, we will remove this case.
-        if (MiraApiPlugin.IsDevBuild)
+        var hnsMode = new HideAndSeekMode();
+        if (!hnsMode.HideMode)
         {
-            var hnsMode = new HideAndSeekMode();
             IdToModeMap.Add(1, hnsMode);
             hnsMode.ID = 1;
             GameModeOption.AddOption(hnsMode);

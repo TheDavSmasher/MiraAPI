@@ -22,6 +22,11 @@ public abstract class AbstractGameMode : IOptionable
     public abstract string Name { get; }
 
     /// <summary>
+    /// Gets a value indicating whether the mode is visible in the menu. Only checked at startup.
+    /// </summary>
+    public virtual bool HideMode => false;
+
+    /// <summary>
     /// Gets the game mode description.
     /// </summary>
     public abstract string Description { get; }
