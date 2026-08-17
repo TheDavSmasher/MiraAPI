@@ -75,7 +75,24 @@ public static class RoleSettingMenuPatches
             dividerImage.gameObject.SetActive(false);
         }
 
-        if (MenuState.Instance.FinishedRoleMenus.TryGetValue(MenuState.Instance.CurrentModIdx, out var finished) && finished)
+        var queuedRefresh = false;
+        if (MenuState.Instance.QueuedRoleMenuRefresh.TryGetValue(MenuState.Instance.CurrentModIdx, out var queued) && queued)
+        {
+            queuedRefresh = true;
+            var roleOptionSettings = roleMenu.scrollBar.Inner.GetComponentsInChildren<RoleOptionSetting>(true);
+            var headers = roleMenu.scrollBar.Inner.GetComponentsInChildren<CategoryHeaderMasked>(true);
+            foreach (var child in roleOptionSettings)
+            {
+                Object.Destroy(child.gameObject);
+            }
+            foreach (var child in headers)
+            {
+                Object.Destroy(child.gameObject);
+            }
+            yield return new WaitForEndOfFrame();
+            MenuState.Instance.QueuedRoleMenuRefresh[MenuState.Instance.CurrentModIdx] = false;
+        }
+        if (!queuedRefresh && MenuState.Instance.FinishedRoleMenus.TryGetValue(MenuState.Instance.CurrentModIdx, out var finished) && finished)
         {
             var roleOptionSettings = roleMenu.scrollBar.Inner.GetComponentsInChildren<RoleOptionSetting>(true);
             foreach (var r in roleOptionSettings)
@@ -308,6 +325,7 @@ public static class RoleSettingMenuPatches
                                     RoleGroupHidden[group] = !groupHidden;
                                 }
 
+                                MenuState.Instance.QueuedRoleMenuRefresh[MenuState.Instance.CurrentModIdx] = false;
                                 MenuState.Instance.FinishedRoleMenus[MenuState.Instance.CurrentModIdx] = false;
 
                                 foreach (var child in roleMenu.RoleChancesSettings.transform)
@@ -327,6 +345,7 @@ public static class RoleSettingMenuPatches
                     }
                 }
             }
+            MenuState.Instance.QueuedRoleMenuRefresh[MenuState.Instance.CurrentModIdx] = false;
             MenuState.Instance.FinishedRoleMenus[MenuState.Instance.CurrentModIdx] = true;
         }
 

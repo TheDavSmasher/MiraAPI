@@ -63,6 +63,8 @@ public class MenuState(IntPtr cppPtr) : MonoBehaviour(cppPtr)
 
     [HideFromIl2Cpp]
     internal Dictionary<int, bool> FinishedRoleMenus { get; } = [];
+    [HideFromIl2Cpp]
+    internal Dictionary<int, bool> QueuedRoleMenuRefresh { get; } = [];
 
     public void Awake()
     {
