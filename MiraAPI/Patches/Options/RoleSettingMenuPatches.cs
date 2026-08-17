@@ -547,6 +547,26 @@ public static class RoleSettingMenuPatches
         CurrentRoleOptions = filteredOptions;
     }
 
+    [HarmonyPrefix]
+    [HarmonyPatch(nameof(RolesSettingsMenu.ChangeTab))]
+    public static void ChangeTabPatch(RolesSettingsMenu __instance)
+    {
+        var categoryHeaderMasked = __instance.AdvancedRolesSettings.transform.Find("CategoryHeaderMasked").GetComponent<CategoryHeaderMasked>();
+        categoryHeaderMasked.Title.text = TranslationController.Instance.GetString(StringNames.RoleSettingsLabel);
+        var labelBg = __instance.AdvancedRolesSettings.transform.FindChild("InfoLabelBackground");
+        var imgBg = __instance.AdvancedRolesSettings.transform.FindChild("Imagebackground");
+        imgBg.gameObject.SetActive(true);
+        __instance.roleScreenshot.gameObject.SetActive(true);
+        __instance.roleDescriptionText.transform.parent.localPosition = new Vector3(2.5176f, -0.2731f, -1f);
+        __instance.roleDescriptionText.transform.parent.localScale = new Vector3(0.0675f, 0.1494f, 0.5687f);
+        labelBg.transform.localPosition = new Vector3(1.082f, 0.1054f, -2.5f);
+        __instance.roleScreenshot.drawMode = SpriteDrawMode.Simple;
+        foreach (var optBehaviour in __instance.AdvancedRolesSettings.GetComponentsInChildren<OptionBehaviour>())
+        {
+            optBehaviour.gameObject.Destroy();
+        }
+    }
+
     private static void ChangeTab(RoleBehaviour role, RolesSettingsMenu __instance)
     {
         if (role is not ICustomRole customRole)
