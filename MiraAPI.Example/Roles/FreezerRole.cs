@@ -6,9 +6,7 @@ namespace MiraAPI.Example.Roles;
 
 public class FreezerRole : ImpostorRole, ICustomRole
 {
-    public string RoleName => "freezer.name";
-    public string RoleLongDescription => "freezer.description";
-    public string RoleDescription => RoleLongDescription;
+    public string IdPart => "freezer";
     public Color RoleColor => Palette.Blue;
     public ModdedRoleTeams Team => ModdedRoleTeams.Impostor;
 

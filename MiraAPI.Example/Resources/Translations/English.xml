@@ -1,15 +1,15 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <resources>
-  <string name="teleporter.name">Teleporter</string>
-  <string name="teleporter.description">Zoom out and teleport across the map!</string>
-  <string name="freezer.name">Freezer</string>
-  <string name="freezer.description">Freeze another player for a duration of time.</string>
-  <string name="mayor.name">Mayor</string>
-  <string name="mayor.description">You get extra votes!</string>
-  <string name="chamelon.name">Chamelon</string>
-  <string name="chamelon.description">Stay invisible while not moving.</string>
-  <string name="outcastKiller.name">Outcast Killer</string>
-  <string name="outcastKiller.description">Outcast who can kill.</string>
+  <string name="teleporterrole.name">Teleporter</string>
+  <string name="teleporterrole.description">Zoom out and teleport across the map!</string>
+  <string name="freezerrole.name">Freezer</string>
+  <string name="freezerrole.description">Freeze another player for a duration of time.</string>
+  <string name="mayorrole.name">Mayor</string>
+  <string name="mayorrole.description">You get extra votes!</string>
+  <string name="chamelonrole.name">Chamelon</string>
+  <string name="chamelonrole.description">Stay invisible while not moving.</string>
+  <string name="outcastkillerrole.name">Outcast Killer</string>
+  <string name="outcastkillerrole.description">Outcast who can kill.</string>
   <string name="outcast.name">Outcast</string>
   <string name="outcast.roleTitle">OUTCAST</string>
   <string name="outcast.teamIntroDescription">You are an Outcast. You do not have a team.</string>

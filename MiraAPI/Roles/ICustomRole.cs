@@ -15,19 +15,24 @@ namespace MiraAPI.Roles;
 public interface ICustomRole : IOptionable
 {
     /// <summary>
+    /// Gets the id part used to build the role's translation keys.
+    /// </summary>
+    string IdPart => GetType().Name.ToLower();
+
+    /// <summary>
     /// Gets the name of the role.
     /// </summary>
-    string RoleName { get; }
+    string RoleName => TranslationManager.BuildTranslationId(IdPart, "name");
 
     /// <summary>
     /// Gets the description of the role. Used in the Intro Cutscene.
     /// </summary>
-    string RoleDescription { get; }
+    string RoleDescription => TranslationManager.BuildTranslationId(IdPart, "description");
 
     /// <summary>
     /// Gets the long description of the role. Used in the Role Tab and Role Options.
     /// </summary>
-    string RoleLongDescription { get; }
+    string RoleLongDescription => TranslationManager.BuildTranslationId(IdPart, "description");
 
     /// <summary>
     /// Gets the <see cref="Color"/> of the role.

@@ -1,15 +1,15 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <resources>
-  <string name="teleporter.name">传送者</string>
-  <string name="teleporter.description">缩小视野并在地图上传送！</string>
-  <string name="freezer.name">冰冻者</string>
-  <string name="freezer.description">将其他玩家冰冻一段时间。</string>
-  <string name="mayor.name">市长</string>
-  <string name="mayor.description">你拥有额外投票权！</string>
-  <string name="chamelon.name">变色龙</string>
-  <string name="chamelon.description">静止不动时保持隐身。</string>
-  <string name="outcastKiller.name">流放杀手</string>
-  <string name="outcastKiller.description">可以击杀的流放者。</string>
+  <string name="teleporterrole.name">传送者</string>
+  <string name="teleporterrole.description">缩小视野并在地图上传送！</string>
+  <string name="freezerrole.name">冰冻者</string>
+  <string name="freezerrole.description">将其他玩家冰冻一段时间。</string>
+  <string name="mayorrole.name">市长</string>
+  <string name="mayorrole.description">你拥有额外投票权！</string>
+  <string name="chamelonrole.name">变色龙</string>
+  <string name="chamelonrole.description">静止不动时保持隐身。</string>
+  <string name="outcastKillerrole.name">流放杀手</string>
+  <string name="outcastKillerrole.description">可以击杀的流放者。</string>
   <string name="outcast.name">流放者</string>
   <string name="outcast.roleTitle">流放者</string>
   <string name="outcast.teamIntroDescription">你是流放者，你没有队伍。</string>

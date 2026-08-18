@@ -8,9 +8,7 @@ namespace MiraAPI.Example.Roles;
 
 public class NeutralKillerRole : ImpostorRole, ICustomRole
 {
-    public string RoleName => "outcastKiller.name";
-    public string RoleDescription => "outcastKiller.description";
-    public string RoleLongDescription => RoleDescription;
+    public string IdPart => "outcastKiller";
     public Color RoleColor => Color.magenta;
     public ModdedRoleTeams Team => ModdedRoleTeams.Custom;
 

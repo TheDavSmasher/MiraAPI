@@ -119,6 +119,11 @@ public static class TranslationManager
         return key;
     }
 
+    public static string BuildTranslationId(string idPart, string suffix)
+    {
+        return idPart.StartsWith('#') ? idPart[1..] : $"{idPart}.{suffix}";
+    }
+
     private static string GetModLangDir(string modGuid)
     {
         return Path.Combine(Application.persistentDataPath, LangDirectory, modGuid);
