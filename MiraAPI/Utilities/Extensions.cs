@@ -354,10 +354,6 @@ public static class Extensions
 
         UnityEngine.Object.Destroy(go);
         yield return null;
-        if (clearGc)
-        {
-            ClearGarbageCollector();
-        }
     }
 
     /// <summary>
@@ -366,8 +362,8 @@ public static class Extensions
     public static void ClearGarbageCollector()
     {
         Resources.UnloadUnusedAssets();
-        Il2CppSystem.GC.Collect(0, Il2CppSystem.GCCollectionMode.Forced);
-        GC.Collect(0, GCCollectionMode.Forced);
+        Il2CppSystem.GC.Collect();
+        GC.Collect();
     }
 
     /// <summary>

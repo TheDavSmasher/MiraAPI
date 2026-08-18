@@ -40,6 +40,9 @@ public static class TmpSpriteUtils
             name = assetName + " Material",
         };
         material.SetTexture(ShaderUtilities.ID_MainTex, sourceTexture);
+        // TODO: Using these values, the icons will NOT clip through chatboxes. However, this breaks quite literally every other tmp text that isn't masked. Please fix this if a good solution is found.
+        /*material.SetFloat(ShaderUtilities.ID_StencilComp, 4);
+        material.SetFloat(ShaderUtilities.ID_StencilID, 1);*/
         material.SetFloat(ShaderUtilities.ID_StencilComp, 0);
         material.SetFloat(ShaderUtilities.ID_StencilID, 0);
         material.SetFloat(ShaderUtilities.ID_StencilOp, 0);
@@ -68,8 +71,8 @@ public static class TmpSpriteUtils
         {
             name = spriteName,
             hashCode = TMP_TextUtilities.GetSimpleHashCode(spriteName),
-            x = 0,
-            y = 0,
+            x = rect.x,
+            y = rect.y,
             width = rect.width,
             height = rect.height,
             xOffset = -(rect.width / 3) + (scale - 1) * (rect.width / 2),

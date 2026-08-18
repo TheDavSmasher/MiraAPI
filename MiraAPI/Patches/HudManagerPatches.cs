@@ -150,7 +150,6 @@ public static class HudManagerPatches
         {
             t.gameObject.Destroy();
         }
-        Utilities.Extensions.ClearGarbageCollector();
 
         var gridArrange = BottomLeft.GetComponent<GridArrange>();
         var aspectPosition = BottomLeft.GetComponent<AspectPosition>();

@@ -136,7 +136,10 @@ public static class ModifierManager
             var validPlayers = plrs.Where(x => IsGameModifierValid(x, modifier, modifier.TypeId)).ToList();
             if (validPlayers.Count == 0)
             {
-                Warning($"No valid players for modifier {modifier.ModifierName}");
+                if (MiraApiPlugin.IsDevBuild)
+                {
+                    Warning($"No valid players for modifier {modifier.ModifierName}");
+                }
                 continue;
             }
 
@@ -152,20 +155,28 @@ public static class ModifierManager
                 }
 
                 var candidates = availablePlayers
-                    .Where(x => IsGameModifierValid(x, modifier, modifier.TypeId))
+                    .Where(x => IsGameModifierPostCheck(x, modifier, modifier.TypeId))
                     .ToList();
 
                 if (candidates.Count == 0)
                 {
-                    Warning(
-                        $"No available players for modifier {modifier.ModifierName} at assignment {i + 1}");
+                    if (MiraApiPlugin.IsDevBuild)
+                    {
+                        Warning(
+                            $"No available players for modifier {modifier.ModifierName} at assignment {i + 1}");
+                    }
+
                     break;
                 }
 
                 var plr = candidates.Random();
                 if (plr == null)
                 {
-                    Warning($"Valid player for modifier {modifier.ModifierName} disappeared");
+                    if (MiraApiPlugin.IsDevBuild)
+                    {
+                        Warning($"Valid player for modifier {modifier.ModifierName} disappeared");
+                    }
+
                     continue;
                 }
 
@@ -178,7 +189,12 @@ public static class ModifierManager
     private static bool IsGameModifierValid(PlayerControl player, GameModifier modifier, uint modifierId)
     {
         return (player.Data.Role is not ICustomRole role || role.IsModifierApplicable(modifier)) &&
-               modifier.IsModifierValidOn(player.Data.Role) && !player.HasModifier(modifierId) &&
+               !player.HasModifier(modifierId) && modifier.IsModifierValidOn(player.Data.Role) &&
                modifier.CanSpawnOnCurrentMode();
+    }
+    private static bool IsGameModifierPostCheck(PlayerControl player, GameModifier modifier, uint modifierId)
+    {
+        return (player.Data.Role is not ICustomRole role || role.IsModifierApplicable(modifier)) &&
+               !player.HasModifier(modifierId) && modifier.IsModifierValidOnPostCheck(player.Data.Role);
     }
 }

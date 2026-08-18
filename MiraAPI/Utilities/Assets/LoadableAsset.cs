@@ -1,4 +1,6 @@
-﻿namespace MiraAPI.Utilities.Assets;
+﻿using Reactor.Utilities.Extensions;
+
+namespace MiraAPI.Utilities.Assets;
 
 /// <summary>
 /// An abstract class that provides a simple pattern for loading assets.
@@ -18,4 +20,20 @@ public abstract class LoadableAsset<T> where T : UnityEngine.Object
     /// </summary>
     /// <returns>The loaded asset.</returns>
     public abstract T LoadAsset();
+
+    /// <summary>
+    /// Unloads an asset.
+    /// </summary>
+    /// <returns>True if the asset was unloaded, false otherwise.</returns>
+    public virtual bool UnloadAsset()
+    {
+        if (LoadedAsset == null || !LoadedAsset)
+        {
+            return false;
+        }
+
+        LoadedAsset.DestroyImmediate();
+        LoadedAsset = null;
+        return true;
+    }
 }

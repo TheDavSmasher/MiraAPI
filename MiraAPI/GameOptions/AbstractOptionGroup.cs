@@ -69,7 +69,7 @@ public abstract class AbstractOptionGroup
 
     internal CategoryHeaderMasked? Header { get; set; }
 
-    internal Coroutine? CreationCoroutine { get; set; }
+    internal bool Ready { get; set; }
 }
 
 /// <summary>
@@ -132,6 +132,11 @@ public abstract class AbstractRoleOptionGroup<T>() : AbstractOptionGroup<T> wher
 /// </summary>
 public enum MenuCategory
 {
+    /// <summary>
+    /// Placeholder for indexing purposes. Options don't exist in the presset tab.
+    /// </summary>
+    Preset,
+
     /// <summary>
     /// Determines the option group is in the game settings tab.
     /// </summary>

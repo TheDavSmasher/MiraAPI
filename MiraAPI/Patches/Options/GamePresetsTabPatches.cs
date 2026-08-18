@@ -3,6 +3,7 @@ using System.IO;
 using System.Linq;
 using BepInEx.Configuration;
 using HarmonyLib;
+using MiraAPI.GameOptions;
 using MiraAPI.PluginLoading;
 using MiraAPI.Presets;
 using MiraAPI.Roles;
@@ -23,8 +24,6 @@ internal static class GamePresetsTabPatches
     private static GameObject _refreshButton = null!;
     private static GameObject _folderButton = null!;
     private static GameObject _newDivider = null!;
-    private static GameObject _presetHolder = null!;
-    private static GridArrange _arrange = null!;
 
     private static readonly object Lock = new();
 
@@ -41,10 +40,10 @@ internal static class GamePresetsTabPatches
 
             CreatePresetMenu(__instance);
 
-            __instance.StandardPresetButton.gameObject.SetActive(GameSettingMenuPatches.SelectedModIdx == 0);
-            __instance.SecondPresetButton.gameObject.SetActive(GameSettingMenuPatches.SelectedModIdx == 0);
+            __instance.StandardPresetButton.gameObject.SetActive(MenuState.Instance.CurrentModIdx == 0);
+            __instance.SecondPresetButton.gameObject.SetActive(MenuState.Instance.CurrentModIdx == 0);
 
-            if (GameSettingMenuPatches.SelectedModIdx != 0)
+            if (MenuState.Instance.CurrentModIdx != 0)
             {
                 __instance.PresetDescriptionText.text = "Select or create an options preset for this mod";
             }
@@ -56,26 +55,41 @@ internal static class GamePresetsTabPatches
             // Show the save and refresh buttons
             if (_saveButton)
             {
-                _saveButton.SetActive(GameSettingMenuPatches.SelectedModIdx != 0);
+                _saveButton.SetActive(MenuState.Instance.CurrentModIdx != 0);
             }
             if (_refreshButton)
             {
-                _refreshButton.SetActive(GameSettingMenuPatches.SelectedModIdx != 0);
+                _refreshButton.SetActive(MenuState.Instance.CurrentModIdx != 0);
             }
             if (_folderButton)
             {
-                _folderButton.SetActive(GameSettingMenuPatches.SelectedModIdx != 0);
+                _folderButton.SetActive(MenuState.Instance.CurrentModIdx != 0);
             }
             if (_newDivider)
             {
-                _newDivider.SetActive(GameSettingMenuPatches.SelectedModIdx != 0);
+                _newDivider.SetActive(MenuState.Instance.CurrentModIdx != 0);
+            }
+
+            if (MenuState.Instance.CurrentModIdx == 0)
+            {
+                return;
             }
 
             var prefab = GameSettingMenu.Instance.GameSettingsButton;
 
-            foreach (var preset in MiraPluginManager.Instance.RegisteredPlugins.SelectMany(x => x.InternalPresets))
+            var presetHolder = MenuState.Instance.CurrentContainer;
+            var arrange = presetHolder.GetComponent<GridArrange>();
+            presetHolder.SetActive(true);
+
+            foreach (var preset in MenuState.Instance.CurrentMod.InternalPresets)
             {
-                var button = Object.Instantiate(prefab, _presetHolder.transform);
+                if (preset.PresetButton != null && preset.PresetButton)
+                {
+                    preset.PresetButton.SetActive(true);
+                    continue;
+                }
+
+                var button = Object.Instantiate(prefab, presetHolder.transform);
                 button.buttonText.text = preset.Name;
                 if (button.buttonText.TryGetComponent<TextTranslatorTMP>(out var tmp))
                 {
@@ -90,23 +104,12 @@ internal static class GamePresetsTabPatches
                     {
                         preset.LoadPreset();
                     }));
-                button.gameObject.SetActive(false);
+                button.gameObject.SetActive(true);
                 preset.PresetButton = button.gameObject;
             }
 
-            foreach (var mod in MiraPluginManager.Instance.RegisteredPlugins)
-            {
-                foreach (var button in mod.InternalPresets.Select(x => x.PresetButton))
-                {
-                    if (button != null)
-                    {
-                        button.SetActive(mod == GameSettingMenuPatches.SelectedMod);
-                    }
-                }
-            }
-
-            _arrange.Start();
-            _arrange.ArrangeChilds();
+            arrange.Start();
+            arrange.ArrangeChilds();
         }
     }
 
@@ -116,8 +119,6 @@ internal static class GamePresetsTabPatches
         // ReSharper disable once InconsistentNaming
         public static void Postfix()
         {
-            Error("OnDisable called");
-
             if (_saveButton)
             {
                 _saveButton.SetActive(false);
@@ -197,7 +198,7 @@ internal static class GamePresetsTabPatches
             saveButton.OnClick.AddListener(
                 (UnityAction)(() =>
                 {
-                    if (GameSettingMenuPatches.SelectedModIdx == 0)
+                    if (MenuState.Instance.CurrentModIdx == 0)
                     {
                         return;
                     }
@@ -205,7 +206,7 @@ internal static class GamePresetsTabPatches
                     SavePresetPopup.CreatePopup(
                         name =>
                         {
-                            if (GameSettingMenuPatches.SelectedMod == null)
+                            if (MenuState.Instance.CurrentModIdx == 0)
                             {
                                 return;
                             }
@@ -218,19 +219,19 @@ internal static class GamePresetsTabPatches
                             var presetFile = new ConfigFile(
                                 Path.Combine(
                                     PresetManager.PresetDirectory,
-                                    GameSettingMenuPatches.SelectedMod.PluginId,
+                                    MenuState.Instance.CurrentMod.PluginId,
                                     $"{name}.cfg"),
                                 false)
                             {
                                 SaveOnConfigSet = false,
                             };
 
-                            foreach (var option in GameSettingMenuPatches.SelectedMod.InternalOptions.Where(x => x.IncludeInPreset))
+                            foreach (var option in MenuState.Instance.CurrentMod.InternalOptions.Where(x => x.IncludeInPreset))
                             {
                                 option.SaveToPreset(presetFile);
                             }
 
-                            foreach (var role in GameSettingMenuPatches.SelectedMod.InternalRoles.Values.OfType<ICustomRole>().Where(x=>!x.Configuration.HideSettings))
+                            foreach (var role in MenuState.Instance.CurrentMod.InternalRoles.Values.OfType<ICustomRole>().Where(x=>!x.Configuration.HideSettings))
                             {
                                 role.SaveToPreset(presetFile);
                             }
@@ -285,7 +286,7 @@ internal static class GamePresetsTabPatches
                 {
                     var directory = Path.Combine(
                         PresetManager.PresetDirectory,
-                        GameSettingMenuPatches.SelectedMod?.PluginId ?? string.Empty);
+                        MenuState.Instance.CurrentMod.PluginId);
                     Directory.CreateDirectory(directory);
                     Process.Start(
                         new ProcessStartInfo
@@ -301,31 +302,20 @@ internal static class GamePresetsTabPatches
         _refreshButton.SetActive(false);
         _folderButton.SetActive(false);
         _newDivider.SetActive(false);
-
-        if (!_presetHolder)
-        {
-            _presetHolder = new GameObject("PresetHolder");
-            _presetHolder.transform.SetParent(presetTab.transform, false);
-            _presetHolder.transform.localScale = new Vector3(0.9f, 0.9f, 1);
-            _presetHolder.transform.localPosition = new Vector3(-1.9f, 1.7f, 0);
-            _arrange = _presetHolder.AddComponent<GridArrange>();
-            _arrange.Alignment = GridArrange.StartAlign.Right;
-            _arrange.CellSize = new Vector2(2.15f, -.55f);
-            _arrange.MaxColumns = 2;
-        }
     }
 
     private static void Refresh()
     {
-        Error("Refreshing presets");
-        if (GameSettingMenuPatches.SelectedMod == null)
+        Info("Refreshing presets");
+        if (MenuState.Instance.CurrentModIdx == 0)
         {
-            Error("Selected mod is null, cannot refresh presets");
+            Error("Current page is vanilla, cannot refresh presets");
             return;
         }
+
         lock (Lock)
         {
-            PresetManager.LoadPresets(GameSettingMenuPatches.SelectedMod);
+            PresetManager.LoadPresets(MenuState.Instance.CurrentMod);
         }
         GameSettingMenu.Instance.ChangeTab(0, false); // refresh the tab
     }

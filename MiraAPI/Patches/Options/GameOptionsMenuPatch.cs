@@ -21,6 +21,54 @@ namespace MiraAPI.Patches.Options;
 [HarmonyPatch(typeof(GameOptionsMenu))]
 internal static class GameOptionsMenuPatch
 {
+    [HarmonyPrefix]
+    [HarmonyPatch(nameof(GameOptionsMenu.Initialize))]
+    // ReSharper disable once InconsistentNaming
+    public static bool InitPatch(GameOptionsMenu __instance)
+    {
+        __instance.Children ??= new Il2CppSystem.Collections.Generic.List<OptionBehaviour>();
+        __instance.Children.Clear();
+
+        if (MenuState.Instance.CurrentModIdx == 0)
+        {
+            __instance.MapPicker.gameObject.SetActive(true);
+            __instance.cachedData = GameOptionsManager.Instance.CurrentGameOptions;
+            var container = MenuState.Instance.CurrentContainer.transform;
+
+            if (container.childCount == 1)
+            {
+                __instance.MapPicker.Initialize(20);
+                var mapNameSetting = GameManager.Instance.GameSettingsList.MapNameSetting;
+                __instance.MapPicker.SetUpFromData(mapNameSetting, 20);
+                __instance.Children.Add(__instance.MapPicker);
+                __instance.CreateSettings();
+                foreach (var optionBehaviour in __instance.Children)
+                {
+                    if (AmongUsClient.Instance && !AmongUsClient.Instance.AmHost)
+                    {
+                        optionBehaviour.SetAsPlayer();
+                    }
+
+                    optionBehaviour.OnValueChanged = new Action<OptionBehaviour>(__instance.ValueChanged);
+                }
+            }
+            else
+            {
+                foreach (var child in container.GetComponentsInChildren<OptionBehaviour>(true))
+                {
+                    __instance.Children.Add(child);
+                }
+            }
+        }
+        else
+        {
+            __instance.MapPicker.gameObject.SetActive(false);
+            CustomCreateSettings(__instance);
+        }
+
+        return false;
+    }
+
     [HarmonyPostfix]
     [HarmonyPatch(nameof(GameOptionsMenu.OnEnable))]
     public static void OpenPatch(GameOptionsMenu __instance)
@@ -36,46 +84,40 @@ internal static class GameOptionsMenuPatch
     }
 
     [HarmonyPostfix]
-    [HarmonyPatch(nameof(GameOptionsMenu.CloseMenu))]
-    public static void FullMenuClosePatch(GameOptionsMenu __instance)
-    {
-        Utilities.Extensions.ClearGarbageCollector();
-    }
-
-    [HarmonyPostfix]
     [HarmonyPatch(nameof(GameOptionsMenu.Update))]
     // ReSharper disable once InconsistentNaming
     public static void UpdatePatch(GameOptionsMenu __instance)
     {
-        if (GameSettingMenuPatches.SelectedModIdx == 0)
+        if (MenuState.Instance.CurrentModIdx == 0)
         {
             return;
         }
 
         var num = 2.1f;
-        if (__instance.name == "MODIFIERS TAB")
-        {
-            ModifiersUpdate(ref num);
-        }
-        else if (__instance.name == "CUSTOM TAB 1")
-        {
-            CustomMenuOneUpdate(ref num);
-        }
-        else if (__instance.name == "CUSTOM TAB 2")
-        {
-            CustomMenuTwoUpdate(ref num);
-        }
-        else
-        {
-            var filteredGroups =
-                GameSettingMenuPatches.SelectedMod?.InternalOptionGroups
-                    .Where(x => x.OptionableType == null &&
-                                x.ParentMenu == MenuCategory.Game) ?? [];
 
-            foreach (var group in filteredGroups)
-            {
-                UpdateGroup(group, ref num);
-            }
+        switch (MenuState.Instance.CurrentMenu)
+        {
+            case MenuCategory.Modifiers:
+                ModifiersUpdate(ref num);
+                break;
+            case MenuCategory.CustomOne:
+                CustomMenuOneUpdate(ref num);
+                break;
+            case MenuCategory.CustomTwo:
+                CustomMenuTwoUpdate(ref num);
+                break;
+            default:
+                var filteredGroups =
+                    MenuState.Instance.CurrentMod.InternalOptionGroups
+                        .Where(x => x.OptionableType == null &&
+                                    x.ParentMenu == MenuCategory.Game) ?? [];
+
+                foreach (var group in filteredGroups)
+                {
+                    UpdateGroup(group, ref num);
+                }
+
+                break;
         }
 
         __instance.scrollBar.SetYBoundsMax(-num - 1.65f);
@@ -83,7 +125,7 @@ internal static class GameOptionsMenuPatch
 
     private static void UpdateGroup(AbstractOptionGroup? group, ref float num)
     {
-        if (group is null || group.Options.Count == 0 || group.Header is null || group.CreationCoroutine is not null)
+        if (group is null || !group.Ready || group.Options.Count == 0 || group.Header is null)
         {
             return;
         }
@@ -135,51 +177,31 @@ internal static class GameOptionsMenuPatch
 
     private static void CustomMenuOneUpdate(ref float num)
     {
-        var groups = GameSettingMenuPatches.SelectedMod?.InternalOptionGroups
-            .Where(x => x.ParentMenu == MenuCategory.CustomOne) ?? [];
+        var groups = MenuState.Instance.CurrentMod.InternalOptionGroups
+            .Where(x => x.ParentMenu == MenuCategory.CustomOne);
 
         foreach (var modGroup in groups)
         {
             UpdateGroup(modGroup, ref num);
-        }
-    }
-
-    private static void CustomMenuOneCreate(GameOptionsMenu menu)
-    {
-        var groups = GameSettingMenuPatches.SelectedMod?.InternalOptionGroups
-            .Where(x => x.ParentMenu == MenuCategory.CustomOne) ?? [];
-        foreach (var group in groups)
-        {
-            CreateGroup(menu, group);
         }
     }
 
     private static void CustomMenuTwoUpdate(ref float num)
     {
-        var groups = GameSettingMenuPatches.SelectedMod?.InternalOptionGroups
-            .Where(x => x.ParentMenu == MenuCategory.CustomTwo) ?? [];
+        var groups = MenuState.Instance.CurrentMod.InternalOptionGroups
+            .Where(x => x.ParentMenu == MenuCategory.CustomTwo);
 
         foreach (var modGroup in groups)
         {
             UpdateGroup(modGroup, ref num);
-        }
-    }
-
-    private static void CustomMenuTwoCreate(GameOptionsMenu menu)
-    {
-        var groups = GameSettingMenuPatches.SelectedMod?.InternalOptionGroups
-            .Where(x => x.ParentMenu == MenuCategory.CustomTwo) ?? [];
-        foreach (var group in groups)
-        {
-            CreateGroup(menu, group);
         }
     }
 
     private static void ModifiersUpdate(ref float num)
     {
-        var groups = GameSettingMenuPatches.SelectedMod?.InternalOptionGroups
+        var groups = MenuState.Instance.CurrentMod.InternalOptionGroups
             .Where(x => x.ParentMenu is MenuCategory.Modifiers ||
-                        x.OptionableType?.IsAssignableTo(typeof(BaseModifier)) == true) ?? [];
+                        x.OptionableType?.IsAssignableTo(typeof(BaseModifier)) == true);
 
         foreach (var modGroup in groups)
         {
@@ -187,132 +209,109 @@ internal static class GameOptionsMenuPatch
         }
     }
 
-    private static void ModifiersCreate(GameOptionsMenu menu)
+    private static Coroutine? _creationCoroutine;
+
+    public static void CustomCreateSettings(GameOptionsMenu menu)
     {
-        var groups = GameSettingMenuPatches.SelectedMod?.InternalOptionGroups
-            .Where(x => x.ParentMenu is MenuCategory.Modifiers ||
-                        x.OptionableType?.IsAssignableTo(typeof(BaseModifier)) == true) ?? [];
-        foreach (var group in groups)
-        {
-            CreateGroup(menu, group);
-        }
-    }
+        menu.MapPicker.gameObject.SetActive(false);
+        var mod = MenuState.Instance.CurrentMod;
 
-    [HarmonyPrefix]
-    [HarmonyPatch(nameof(GameOptionsMenu.CreateSettings))]
-    // ReSharper disable once InconsistentNaming
-    public static bool SettingsPatch(GameOptionsMenu __instance)
-    {
-        if (GameSettingMenuPatches.SelectedModIdx == 0)
+        var filteredGroups = MenuState.Instance.CurrentMenu switch
         {
-            return true;
-        }
+            MenuCategory.Game => mod.InternalOptionGroups.Where(x =>
+                x.OptionableType == null && x.ParentMenu == MenuCategory.Game),
+            MenuCategory.Modifiers => mod.InternalOptionGroups.Where(x =>
+                x.ParentMenu is MenuCategory.Modifiers ||
+                x.OptionableType?.IsAssignableTo(typeof(BaseModifier)) == true),
+            MenuCategory.CustomOne => mod.InternalOptionGroups.Where(x => x.ParentMenu == MenuCategory.CustomOne),
+            MenuCategory.CustomTwo => mod.InternalOptionGroups.Where(x => x.ParentMenu == MenuCategory.CustomTwo),
+            _ => [],
+        };
 
-        __instance.MapPicker.gameObject.SetActive(false);
-
-        switch (__instance.name)
+        if (_creationCoroutine != null)
         {
-            case "MODIFIERS TAB":
-                ModifiersCreate(__instance);
-                return false;
-            case "CUSTOM TAB 1":
-                CustomMenuOneCreate(__instance);
-                return false;
-            case "CUSTOM TAB 2":
-                CustomMenuTwoCreate(__instance);
-                return false;
+            GameSettingMenu.Instance.StopCoroutine(_creationCoroutine);
         }
 
-        var filteredGroups = GameSettingMenuPatches.SelectedMod?.InternalOptionGroups
-            .Where(x => x.OptionableType == null && x.ParentMenu == MenuCategory.Game) ?? [];
+        _creationCoroutine = GameSettingMenu.Instance.StartCoroutine(CreateGroups().WrapToIl2Cpp());
 
-        foreach (var group in filteredGroups)
+        IEnumerator CreateGroups()
         {
-            CreateGroup(__instance, group);
-        }
-
-        return false;
-    }
-
-    [HarmonyPrefix]
-    [HarmonyPatch(nameof(GameOptionsMenu.Initialize))]
-    // ReSharper disable once InconsistentNaming
-    public static bool InitPatch(GameOptionsMenu __instance)
-    {
-        if (__instance.Children != null && __instance.Children.Count != 0)
-        {
-            return false;
-        }
-
-        __instance.MapPicker.gameObject.SetActive(true);
-        __instance.MapPicker.Initialize(20);
-        var mapNameSetting = GameManager.Instance.GameSettingsList.MapNameSetting;
-        __instance.MapPicker.SetUpFromData(mapNameSetting, 20);
-        __instance.Children = new Il2CppSystem.Collections.Generic.List<OptionBehaviour>();
-        __instance.Children.Add(__instance.MapPicker);
-        __instance.CreateSettings();
-        __instance.cachedData = GameOptionsManager.Instance.CurrentGameOptions;
-        foreach (var optionBehaviour in __instance.Children)
-        {
-            if (AmongUsClient.Instance && !AmongUsClient.Instance.AmHost)
+            foreach (var group in filteredGroups)
             {
-                optionBehaviour.SetAsPlayer();
+                yield return CoCreateGroup(menu, group);
             }
-
-            if (optionBehaviour.IsCustom())
-            {
-                continue;
-            }
-
-            optionBehaviour.OnValueChanged = new Action<OptionBehaviour>(__instance.ValueChanged);
         }
-
-        return false;
     }
 
     private static IEnumerator CoCreateGroup(GameOptionsMenu menu, AbstractOptionGroup group)
     {
-        var categoryHeaderMasked = Object.Instantiate(
-            menu.categoryHeaderOrigin,
-            Vector3.zero,
-            Quaternion.identity,
-            menu.settingsContainer);
+        var container = MenuState.Instance.CurrentContainer.transform;
 
-        categoryHeaderMasked.SetHeader(CustomStringName.CreateAndRegister(group.GroupName), 20);
-        categoryHeaderMasked.Background.color = group.GroupColor;
-        categoryHeaderMasked.Divider.color = group.GroupColor;
-        categoryHeaderMasked.Title.color = group.GroupColor.Equals(MiraApiPlugin.DefaultHeaderColor)
-            ? Color.white
-            : group.GroupColor.FindAlternateColor();
+        group.Ready = false;
+        if (group.Header == null || !group.Header)
+        {
+            var categoryHeaderMasked = Object.Instantiate(
+                menu.categoryHeaderOrigin,
+                Vector3.zero,
+                Quaternion.identity,
+                container);
 
-        categoryHeaderMasked.Background.sprite = MiraAssets.CategoryHeader.LoadAsset();
-        categoryHeaderMasked.Background.sprite.texture.filterMode = FilterMode.Bilinear;
-        categoryHeaderMasked.Background.sprite.texture.wrapMode = TextureWrapMode.Clamp;
+            categoryHeaderMasked.SetHeader(CustomStringName.CreateAndRegister(group.GroupName), 20);
+            categoryHeaderMasked.Background.color = group.GroupColor;
+            categoryHeaderMasked.Divider.color = group.GroupColor;
+            categoryHeaderMasked.Title.color = group.GroupColor.Equals(MiraApiPlugin.DefaultHeaderColor)
+                ? Color.white
+                : group.GroupColor.FindAlternateColor();
 
-        categoryHeaderMasked.Background.transform.localPosition = new Vector3(0.5f, -0.1833f, 0);
-        categoryHeaderMasked.Background.size = new Vector2(
-            categoryHeaderMasked.Background.size.x + 1.5f,
-            categoryHeaderMasked.Background.size.y);
+            categoryHeaderMasked.Background.sprite = MiraAssets.CategoryHeader.LoadAsset();
+            categoryHeaderMasked.Background.sprite.texture.filterMode = FilterMode.Bilinear;
+            categoryHeaderMasked.Background.sprite.texture.wrapMode = TextureWrapMode.Clamp;
 
-        categoryHeaderMasked.gameObject.SetActive(false);
-        group.Header = categoryHeaderMasked;
+            categoryHeaderMasked.Background.transform.localPosition = new Vector3(0.5f, -0.1833f, 0);
+            categoryHeaderMasked.Background.size = new Vector2(
+                categoryHeaderMasked.Background.size.x + 1.5f,
+                categoryHeaderMasked.Background.size.y);
 
-        var newText = Object.Instantiate(categoryHeaderMasked.Title, categoryHeaderMasked.transform);
-        newText.text = "<size=70%>(Click to close)</size>";
-        newText.transform.localPosition = new Vector3(2.6249f, -0.165f, 0f);
-        newText.gameObject.GetComponent<TextTranslatorTMP>().Destroy();
+            categoryHeaderMasked.gameObject.SetActive(false);
 
-        var options = group.Options.Select(opt => opt.CreateOption(
+            var newText = Object.Instantiate(categoryHeaderMasked.Title, categoryHeaderMasked.transform);
+            newText.text = "<size=70%>(Click to close)</size>";
+            newText.transform.localPosition = new Vector3(2.6249f, -0.165f, 0f);
+            newText.gameObject.GetComponent<TextTranslatorTMP>().Destroy();
+
+            var boxCol = categoryHeaderMasked.gameObject.AddComponent<BoxCollider2D>();
+            boxCol.size = new Vector2(7, 0.7f);
+            boxCol.offset = new Vector2(1.5f, -0.3f);
+
+            var headerBtn = categoryHeaderMasked.gameObject.AddComponent<PassiveButton>();
+            headerBtn.ClickSound = menu.BackButton.GetComponent<PassiveButton>().ClickSound;
+            headerBtn.OnMouseOver = new UnityEvent();
+            headerBtn.OnMouseOut = new UnityEvent();
+            headerBtn.OnClick.AddListener(
+                (UnityAction)(() =>
+                {
+                    group.AllOptionsHidden = !group.AllOptionsHidden;
+                    newText.text = group.AllOptionsHidden
+                        ? "<size=70%>(Click to open)</size>"
+                        : "<size=70%>(Click to close)</size>";
+                }));
+            headerBtn.SetButtonEnableState(true);
+
+            group.Header = categoryHeaderMasked;
+        }
+
+        var options = group.Options.Where(opt => opt.OptionBehaviour == null || !opt.OptionBehaviour
+        ).Select(opt => opt.CreateOption(
             menu.checkboxOrigin,
             menu.numberOptionOrigin,
             menu.stringOptionOrigin,
             menu.playerOptionOrigin,
-            menu.settingsContainer));
+            container)
+        );
 
         OptionPreset? defaultPreset = null;
-        if (GameSettingMenuPatches.SelectedMod != null && PresetManager.DefaultPresets.TryGetValue(
-                GameSettingMenuPatches.SelectedMod,
-                out var preset))
+        if (PresetManager.DefaultPresets.TryGetValue(MenuState.Instance.CurrentMod, out var preset))
         {
             defaultPreset = preset;
         }
@@ -428,36 +427,12 @@ internal static class GameOptionsMenuPatch
 
             newOpt.Initialize();
             newOpt.gameObject.SetActive(false);
-        }).WrapToIl2Cpp();
 
-        var boxCol = categoryHeaderMasked.gameObject.AddComponent<BoxCollider2D>();
-        boxCol.size = new Vector2(7, 0.7f);
-        boxCol.offset = new Vector2(1.5f, -0.3f);
-
-        var headerBtn = categoryHeaderMasked.gameObject.AddComponent<PassiveButton>();
-        headerBtn.ClickSound = menu.BackButton.GetComponent<PassiveButton>().ClickSound;
-        headerBtn.OnMouseOver = new UnityEvent();
-        headerBtn.OnMouseOut = new UnityEvent();
-        headerBtn.OnClick.AddListener(
-            (UnityAction)(() =>
+            if (AmongUsClient.Instance && !AmongUsClient.Instance.AmHost)
             {
-                group.AllOptionsHidden = !group.AllOptionsHidden;
-                newText.text = group.AllOptionsHidden
-                    ? "<size=70%>(Click to open)</size>"
-                    : "<size=70%>(Click to close)</size>";
-            }));
-        headerBtn.SetButtonEnableState(true);
-
-        group.CreationCoroutine = null;
-    }
-
-    private static void CreateGroup(GameOptionsMenu menu, AbstractOptionGroup group)
-    {
-        if (group.CreationCoroutine != null)
-        {
-            GameSettingMenu.Instance.StopCoroutine(group.CreationCoroutine);
-        }
-
-        group.CreationCoroutine = GameSettingMenu.Instance.StartCoroutine(CoCreateGroup(menu, group).WrapToIl2Cpp());
+                newOpt.SetAsPlayer();
+            }
+        }).WrapToIl2Cpp();
+        group.Ready = true;
     }
 }

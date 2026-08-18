@@ -254,12 +254,6 @@ public static class TaskAdderPatches
         .ToArray()
         .Any(x => x.FolderName == child.FolderName);
 
-    [HarmonyPostfix]
-    [HarmonyPatch(nameof(TaskAdderGame.OnDisable))]
-    public static void ClosePatch()
-    {
-        Utilities.Extensions.ClearGarbageCollector();
-    }
     // yes it might be crazy patching the entire method, but i tried so many other methods and only this works :cry:
     // true -chip
     [HarmonyPrefix]
