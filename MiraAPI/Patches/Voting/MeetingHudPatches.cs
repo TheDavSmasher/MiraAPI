@@ -77,7 +77,7 @@ internal static class MeetingHudPatches
     [HarmonyPatch(nameof(MeetingHud.Update))]
     public static void ForceSkipPatch(MeetingHud __instance)
     {
-        if (__instance.state is not (MeetingHud.VoteStates.NotVoted or MeetingHud.VoteStates.Voted))
+        if (__instance.state is not (MeetingHud.MeetingStates.NotVoted or MeetingHud.MeetingStates.Voted))
         {
             return;
         }
@@ -127,13 +127,13 @@ internal static class MeetingHudPatches
             return false;
         }
 
-        var playerVoteArea = __instance.playerStates.First(pv => pv.TargetPlayerId == pc.PlayerId);
+        var playerVoteArea = __instance.playerStates.First(pv => pv.PlayerId == pc.PlayerId);
         playerVoteArea.AmDead = true;
         playerVoteArea.Overlay.gameObject.SetActive(true);
 
         foreach (var player in Helpers.GetAlivePlayers())
         {
-            var pva = __instance.playerStates.First(pv => pv.TargetPlayerId == player.PlayerId);
+            var pva = __instance.playerStates.First(pv => pv.PlayerId == player.PlayerId);
             var voteData = player.GetVoteData();
 
             if (pva.AmDead || !voteData.VotedFor(pc.PlayerId))
@@ -150,7 +150,7 @@ internal static class MeetingHudPatches
         __instance.SetDirtyBit(1U);
         __instance.CheckForEndVoting();
 
-        if (__instance.state == MeetingHud.VoteStates.Results)
+        if (__instance.state == MeetingHud.MeetingStates.Results)
         {
             __instance.SetupProceedButton();
         }
@@ -199,7 +199,7 @@ internal static class MeetingHudPatches
             })
         ]);
 
-        __instance.RpcVotingComplete(voterStates, exiled, isTie);
+        __instance.RpcVotingComplete(voterStates, exiled, isTie, @event.OverruledVote, @event.OverruledNonce);
         return false;
     }
 

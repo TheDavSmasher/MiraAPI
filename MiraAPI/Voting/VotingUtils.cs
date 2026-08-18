@@ -75,14 +75,14 @@ public static class VotingUtils
     {
         if (!source.IsHost()) return;
 
-        MeetingHud.Instance.playerStates.First(state => state.TargetPlayerId == voterId).UnsetVote();
+        MeetingHud.Instance.playerStates.First(state => state.PlayerId == voterId).UnsetVote();
 
         if (PlayerControl.LocalPlayer.PlayerId != voterId)
         {
             return;
         }
 
-        MeetingHud.Instance.playerStates.First(state => state.TargetPlayerId == votedFor).ThumbsDown.enabled = false;
+        MeetingHud.Instance.playerStates.First(state => state.PlayerId == votedFor).ThumbsDown.enabled = false;
 
         if (!AmongUsClient.Instance.AmHost)
         {
@@ -93,10 +93,10 @@ public static class VotingUtils
 
         foreach (var t in MeetingHud.Instance.playerStates)
         {
-            t.voteComplete = false;
+            t.VoteComplete = false;
         }
 
-        MeetingHud.Instance.SkipVoteButton.voteComplete = false;
+        MeetingHud.Instance.SkipVoteButton.VoteComplete = false;
         MeetingHud.Instance.SkipVoteButton.gameObject.SetActive(true);
     }
 
@@ -137,7 +137,7 @@ public static class VotingUtils
             var localVoteData = PlayerControl.LocalPlayer.GetVoteData();
             if (!localVoteData || localVoteData.VotesRemaining != 0) return;
 
-            MeetingHud.Instance.SkipVoteButton.voteComplete = true;
+            MeetingHud.Instance.SkipVoteButton.VoteComplete = true;
             MeetingHud.Instance.SkipVoteButton.gameObject.SetActive(false);
         }
 
@@ -146,7 +146,7 @@ public static class VotingUtils
         // If player has no more votes, then make it show that the player has used all their votes.
         if (voteData.VotesRemaining == 0)
         {
-            MeetingHud.Instance.playerStates.First(x => x.TargetPlayerId == srcPlayerId).SetVote(suspectPlayerId);
+            MeetingHud.Instance.playerStates.First(x => x.PlayerId == srcPlayerId).SetVote(suspectPlayerId);
         }
 
         // If host, then check end voting, and set votes/send chat if applicable
@@ -233,7 +233,7 @@ public static class VotingUtils
                     MeetingHud.Instance.BloopAVoteIcon(playerById, num, MeetingHud.Instance.SkippedVoting.transform);
                     num++;
                 }
-                else if (vote.Suspect == playerVoteArea.TargetPlayerId)
+                else if (vote.Suspect == playerVoteArea.PlayerId)
                 {
                     if (!delays.TryAdd(vote.Suspect, 0))
                     {
