@@ -5,7 +5,6 @@ using MiraAPI.Events.Vanilla.Meeting.Voting;
 using MiraAPI.Networking;
 using MiraAPI.Utilities;
 using Reactor.Networking.Attributes;
-using Reactor.Utilities;
 
 namespace MiraAPI.Voting;
 

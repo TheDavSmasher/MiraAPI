@@ -1,11 +1,9 @@
 ﻿using System;
 using BepInEx.Configuration;
-using Il2CppInterop.Runtime.Attributes;
 using MiraAPI.Networking;
 using MiraAPI.PluginLoading;
 using Reactor.Localization.Utilities;
 using Reactor.Networking.Rpc;
-using TMPro;
 using UnityEngine;
 
 namespace MiraAPI.GameOptions.OptionTypes;

@@ -10,6 +10,8 @@ public class ExampleOptions2 : AbstractOptionGroup
 
     public override uint GroupPriority => 0; // This group will be displayed first. The default value is uint.MaxValue.
 
+    public override MenuCategory ParentMenu => MenuCategory.CustomTwo;
+
     public ModdedPlayerOption PlayerOption2 { get; } = new("YOU MUST CHOSE A PLAYER", false);
     public ModdedPlayerOption PlayerOption { get; } = new("Eh whatever");
     public ModdedToggleOption ToggleOpt1 { get; } = new("Toggle Option 1", false);

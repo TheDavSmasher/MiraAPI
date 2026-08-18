@@ -1,5 +1,4 @@
 ﻿using System.Globalization;
-using Rewired;
 
 namespace MiraAPI.Keybinds;
 

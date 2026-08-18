@@ -4,7 +4,6 @@ using System.Collections.ObjectModel;
 using System.Reflection;
 using MiraAPI.Events.Mira;
 using MiraAPI.PluginLoading;
-using UnityEngine;
 
 namespace MiraAPI.Hud;
 
@@ -17,6 +16,20 @@ public static class CustomButtonManager
     /// Gets a list of all registered custom <see cref="CustomActionButton"/>s.
     /// </summary>
     public static ReadOnlyCollection<CustomActionButton> Buttons { get; internal set; } = new([]);
+
+    /// <summary>
+    /// Gets a list of all registered button-specific <see cref="MiraButtonClickEvent"/>s.
+    /// </summary>
+    public static ReadOnlyDictionary<Type, Type> EventTypes { get; internal set; } = new(
+        new Dictionary<Type, Type>
+            { });
+
+    /// <summary>
+    /// Gets a list of all registered button-specific <see cref="MiraButtonCancelledEvent"/>s.
+    /// </summary>
+    public static ReadOnlyDictionary<Type, Type> CancelledEventTypes { get; internal set; } = new(
+        new Dictionary<Type, Type>
+            { });
 
     internal static readonly List<CustomActionButton> CustomButtons = [];
     internal static readonly Dictionary<Type, Type> ButtonEventTypes = [];

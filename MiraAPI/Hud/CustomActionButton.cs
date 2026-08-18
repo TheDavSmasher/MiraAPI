@@ -7,7 +7,6 @@ using MiraAPI.LocalSettings;
 using MiraAPI.Patches;
 using MiraAPI.Utilities;
 using MiraAPI.Utilities.Assets;
-using Reactor.Utilities;
 using Rewired;
 using TMPro;
 using UnityEngine;

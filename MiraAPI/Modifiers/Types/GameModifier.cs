@@ -34,6 +34,13 @@ public abstract class GameModifier : BaseModifier
     public virtual bool IsModifierValidOn(RoleBehaviour role) => true;
 
     /// <summary>
+    /// Determines whether the modifier is valid on a role, which runs after players are determined but before the modifiers are given.
+    /// </summary>
+    /// <param name="role">The role to be checked.</param>
+    /// <returns><see langword="true"/> if the modifier is valid on the role, otherwise <see langword="false"/>.</returns>
+    public virtual bool IsModifierValidOnPostCheck(RoleBehaviour role) => IsModifierValidOn(role);
+
+    /// <summary>
     /// Determines whether the player won the game with this modifier. The modifier with the highest priority will override other modifiers.
     /// </summary>
     /// <param name="reason">The reason why the game ended.</param>

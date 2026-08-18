@@ -2,10 +2,8 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
-using Il2CppInterop.Runtime.Attributes;
 using MiraAPI.Modifiers;
 using MiraAPI.Roles;
-using TMPro;
 using UnityEngine;
 
 namespace MiraAPI.GameOptions;
@@ -70,6 +68,8 @@ public abstract class AbstractOptionGroup
     internal bool AllOptionsHidden { get; set; }
 
     internal CategoryHeaderMasked? Header { get; set; }
+
+    internal bool Ready { get; set; }
 }
 
 /// <summary>
@@ -132,6 +132,11 @@ public abstract class AbstractRoleOptionGroup<T>() : AbstractOptionGroup<T> wher
 /// </summary>
 public enum MenuCategory
 {
+    /// <summary>
+    /// Placeholder for indexing purposes. Options don't exist in the presset tab.
+    /// </summary>
+    Preset,
+
     /// <summary>
     /// Determines the option group is in the game settings tab.
     /// </summary>

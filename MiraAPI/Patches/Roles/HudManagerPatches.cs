@@ -1,9 +1,7 @@
 ﻿using HarmonyLib;
 using InnerNet;
 using MiraAPI.Roles;
-using MiraAPI.Utilities;
 using Reactor.Utilities.Extensions;
-using UnityEngine;
 
 namespace MiraAPI.Patches.Roles;
 
@@ -73,7 +71,7 @@ public static class HudManagerPatches
         }
         else if (RoleTab != null)
         {
-            RoleTab.gameObject.DeepDestroy();
+            RoleTab.gameObject.Destroy();
             RoleTab = null;
         }
     }

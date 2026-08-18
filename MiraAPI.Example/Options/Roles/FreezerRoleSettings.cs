@@ -3,8 +3,6 @@ using MiraAPI.GameOptions;
 using MiraAPI.GameOptions.Attributes;
 using MiraAPI.Utilities;
 using MiraAPI.Utilities.Assets;
-using TMPro;
-using UnityEngine;
 
 namespace MiraAPI.Example.Options.Roles;
 

@@ -3,7 +3,6 @@ using System.Linq;
 using HarmonyLib;
 using MiraAPI.LocalSettings;
 using MiraAPI.Utilities.Assets;
-using Reactor.Utilities;
 using Reactor.Utilities.Extensions;
 using UnityEngine;
 using UnityEngine.Events;
@@ -70,7 +69,7 @@ public static class OptionsMenuPatches
         int i = 0;
         int tabIdx = 0;
         int page = 1;
-        foreach (var settings in LocalSettingsManager.Tabs)
+        foreach (var settings in LocalSettingsManager.AvailableTabs)
         {
             var tab = settings.CreateTab(__instance);
             if (settings.ShouldCreateButton)
@@ -165,12 +164,12 @@ public static class OptionsMenuPatches
     public static bool OpenTabGroupPrefix(OptionsMenuBehaviour __instance, ref int index)
     {
         __instance.Tabs.ToList().ForEach(x => x.Close()); // Close all vanilla tabs
-        LocalSettingsManager.Tabs.ForEach(CustomClose); // Close all mod tabs
+        LocalSettingsManager.AvailableTabs.ForEach(CustomClose); // Close all mod tabs
 
         // Tabs with index 10 and above are the mod settings tabs
         if (index >= 10)
         {
-            CustomOpen(LocalSettingsManager.Tabs[index - 10]);
+            CustomOpen(LocalSettingsManager.AvailableTabs[index - 10]);
             return false;
         }
 
@@ -184,7 +183,7 @@ public static class OptionsMenuPatches
     [HarmonyPatch(nameof(OptionsMenuBehaviour.Open))]
     public static void OpenPostfix(OptionsMenuBehaviour __instance)
     {
-        LocalSettingsManager.Tabs.ForEach(CustomClose);
+        LocalSettingsManager.AvailableTabs.ForEach(CustomClose);
         currentPage = 1;
         UpdatePages();
     }

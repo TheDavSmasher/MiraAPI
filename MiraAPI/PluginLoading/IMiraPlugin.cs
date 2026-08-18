@@ -1,4 +1,5 @@
-﻿using BepInEx.Configuration;
+﻿using System.Linq;
+using BepInEx.Configuration;
 
 namespace MiraAPI.PluginLoading;
 
@@ -8,9 +9,23 @@ namespace MiraAPI.PluginLoading;
 public interface IMiraPlugin
 {
     /// <summary>
+    /// Gets or sets a value indicating whether to display the plugin in the options menu.
+    /// </summary>
+    public virtual bool DisplayOnOptionsMenu => true;
+
+    /// <summary>
     /// Gets the name to display on the options menu.
     /// </summary>
     string OptionsTitleText { get; }
+
+    /// <summary>
+    /// Gets the abbreviated name to display for other mods to pick up.
+    /// </summary>
+    /// <returns>The <see cref="string"/> text for the plugin.</returns>
+    public virtual string GetAbbreviatedModName()
+    {
+        return new(OptionsTitleText.Where(c => !char.IsLower(c) && !char.IsWhiteSpace(c)).ToArray());
+    }
 
     /// <summary>
     /// Gets the name for the first custom category in the game options menu, if any.
