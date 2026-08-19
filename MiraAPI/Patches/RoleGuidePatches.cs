@@ -141,14 +141,14 @@ public static class RoleGuidePatches
         if (role is ICustomRole customRole)
         {
             __instance.roleName.text = customRole.RoleName;
-            __instance.roleDescription.text = customRole.RoleDescription;
+            __instance.roleDescription.text = $"<size=60%>{customRole.RoleFactionTitle}</size>\n" + customRole.RoleDescription;
             __instance.roleIcon.sprite = customRole.Configuration.Icon?.LoadAsset();
             __instance.roleCount.text += $" ({customRole.ParentMod.MiraPlugin.GetAbbreviatedModName()})";
         }
         else
         {
             __instance.roleName.text = role.NiceName;
-            __instance.roleDescription.text = role.BlurbMed;
+            __instance.roleDescription.text = $"<size=60%>{TranslationController.Instance.GetString(role.TeamType is RoleTeamTypes.Crewmate ? StringNames.Crewmate : StringNames.Impostor)}</size>\n" + role.BlurbMed;
             __instance.roleIcon.sprite = role.RoleIconColor;
             __instance.roleCount.text += " (AU)";
         }

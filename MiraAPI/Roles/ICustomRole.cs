@@ -29,6 +29,17 @@ public interface ICustomRole : IOptionable
     string RoleLongDescription { get; }
 
     /// <summary>
+    /// Gets the faction / alignment of the role. Used in the role guide.
+    /// </summary>
+    string RoleFactionTitle => Team switch
+    {
+        ModdedRoleTeams.Crewmate => TranslationController.Instance.GetString(StringNames.Crewmate),
+        ModdedRoleTeams.Impostor => TranslationController.Instance.GetString(StringNames.Impostor),
+        ModdedRoleTeams.Custom => "Neutral",
+        _ => "Other",
+    };
+
+    /// <summary>
     /// Gets the <see cref="Color"/> of the role.
     /// </summary>
     Color RoleColor { get; }
