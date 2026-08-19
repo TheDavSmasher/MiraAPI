@@ -379,6 +379,18 @@ public static class Extensions
     }
 
     /// <summary>
+    /// Gets all child objects in a parent Transform.
+    /// </summary>
+    /// <returns>An <see cref="IEnumerable"/> that contains <see cref="GameObject"/>s.</returns>
+    public static IEnumerable<GameObject> GetAllChildren(this Transform go)
+    {
+        for (var i = 0; i < go.transform.childCount; i++)
+        {
+            yield return go.transform.GetChild(i).gameObject;
+        }
+    }
+
+    /// <summary>
     /// Resizes a <see cref="SpriteRenderer"/> appropriate to the maximum pixel size without messing up ratios.
     /// </summary>
     /// <param name="sprite">The <see cref="SpriteRenderer"/> to adjust.</param>
