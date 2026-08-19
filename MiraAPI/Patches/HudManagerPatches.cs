@@ -1,9 +1,11 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.Globalization;
 using HarmonyLib;
 using MiraAPI.Hud;
 using MiraAPI.Keybinds;
 using MiraAPI.LocalSettings;
+using MiraAPI.Roles;
 using MiraAPI.Utilities;
 using Reactor.Utilities;
 using Reactor.Utilities.Extensions;
@@ -213,6 +215,33 @@ public static class HudManagerPatches
         Il2CppSystem.Collections.Generic.List<UiElement> controllerSelectable2 = __instance.ControllerSelectable;
         instance2.SetCurrentSelected(controllerSelectable2[controllerSelectable2.Count - 1]);
         __instance.SetActiveTab(0);
+        return false;
+    }
+    [HarmonyPrefix]
+    [HarmonyPriority(Priority.First)]
+    [HarmonyPatch(typeof(MatchInfoRolePanel), nameof(MatchInfoRolePanel.SetPanel))]
+    public static bool SetPanel(MatchInfoRolePanel __instance, RoleBehaviour role, int numPerGame, int chancePerGame)
+    {
+        if (role is ICustomRole customRole)
+        {
+            __instance.roleName.text = customRole.RoleName;
+            __instance.roleDescription.text = customRole.RoleDescription;
+            __instance.roleIcon.sprite = customRole.Configuration.Icon?.LoadAsset();
+        }
+        else
+        {
+            __instance.roleName.text = role.NiceName;
+            __instance.roleDescription.text = role.BlurbMed;
+            __instance.roleIcon.sprite = role.RoleIconColor;
+        }
+
+        __instance.roleIcon.SetSizeLimit(0.13f);
+        __instance.roleCount.text = string.Format(CultureInfo.InvariantCulture, "{0} at {1}%", numPerGame.ToString(CultureInfo.InvariantCulture), chancePerGame);
+        __instance.roleIcon.material.SetInt(PlayerMaterial.MaskLayer, 50);
+        __instance.roleName.fontMaterial.SetFloat(__instance.STENCIL_NAME, 50f);
+        __instance.roleDescription.fontMaterial.SetFloat(__instance.STENCIL_NAME, 50f);
+        __instance.roleCount.fontMaterial.SetFloat(__instance.STENCIL_NAME, 50f);
+        __instance.roleIcon.transform.localScale = new Vector3(4f, 4f, 1f);
         return false;
     }
 

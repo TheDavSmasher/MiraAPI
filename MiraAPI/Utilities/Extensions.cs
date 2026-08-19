@@ -379,6 +379,47 @@ public static class Extensions
     }
 
     /// <summary>
+    /// Resizes a <see cref="SpriteRenderer"/> appropriate to the maximum pixel size without messing up ratios.
+    /// </summary>
+    /// <param name="sprite">The <see cref="SpriteRenderer"/> to adjust.</param>
+    /// <param name="pixelSize">The scale for the sprite to be adjusted to.</param>
+    public static void SetSizeLimit(this SpriteRenderer sprite, float pixelSize)
+    {
+        sprite.drawMode = SpriteDrawMode.Sliced;
+        if (!sprite.sprite)
+        {
+            return;
+        }
+
+        float spriteWidth = sprite.sprite.rect.width;
+        float spriteHeight = sprite.sprite.rect.height;
+
+        if (spriteWidth < spriteHeight)
+        {
+            sprite.size = new Vector2(pixelSize * spriteWidth / spriteHeight, pixelSize);
+        }
+        else
+        {
+            sprite.size = new Vector2(pixelSize, pixelSize * spriteHeight / spriteWidth);
+        }
+    }
+
+    /// <summary>
+    /// Resizes a <see cref="SpriteRenderer"/> appropriate to the maximum pixel size without messing up ratios.
+    /// </summary>
+    /// <param name="spriteObj">The <see cref="GameObject"/> to adjust.</param>
+    /// <param name="pixelSize">The scale for the sprite to be adjusted to.</param>
+    public static void SetSizeLimit(this GameObject spriteObj, float pixelSize)
+    {
+        if (!spriteObj.TryGetComponent<SpriteRenderer>(out var sprite))
+        {
+            return;
+        }
+
+        sprite.SetSizeLimit(pixelSize);
+    }
+
+    /// <summary>
     /// Gets a cache of <see cref="PlayerControl"/>'s <see cref="PlayerVoteData"/> to improve performance.
     /// </summary>
     public static Dictionary<PlayerControl, PlayerVoteData> VoteDataComponents { get; } = [];
