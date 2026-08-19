@@ -5,6 +5,7 @@ using BepInEx.Configuration;
 using BepInEx.Unity.IL2CPP;
 using HarmonyLib;
 using MiraAPI.PluginLoading;
+using MiraAPI.VanillaEvents;
 using Reactor;
 using Reactor.Networking;
 using Reactor.Networking.Attributes;
@@ -62,6 +63,7 @@ public partial class MiraApiPlugin : BasePlugin, IMiraPlugin
     public override void Load()
     {
         Harmony.PatchAll();
+        JudgeEvents.Initialize();
 
         ReactorCredits.Register("Mira API", Version, IsDevBuild, ReactorCredits.AlwaysShow);
 

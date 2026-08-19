@@ -76,6 +76,11 @@ public enum MiraRpc : uint
     CastVote,
 
     /// <summary>
+    /// Custom RPC to replace Among Us QueueOverruleVotes.
+    /// </summary>
+    QueueOverruleVotes,
+
+    /// <summary>
     /// Custom RPC to sync the Gamemode option.
     /// </summary>
     SyncGamemodeOption,

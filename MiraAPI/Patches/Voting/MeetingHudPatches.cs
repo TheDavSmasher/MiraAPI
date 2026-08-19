@@ -2,6 +2,7 @@
 using System.Linq;
 using HarmonyLib;
 using Il2CppInterop.Runtime.InteropTypes.Arrays;
+using InnerNet;
 using MiraAPI.Events;
 using MiraAPI.Events.Vanilla.Meeting;
 using MiraAPI.Events.Vanilla.Meeting.Voting;
@@ -77,7 +78,7 @@ internal static class MeetingHudPatches
     [HarmonyPatch(nameof(MeetingHud.Update))]
     public static void ForceSkipPatch(MeetingHud __instance)
     {
-        if (__instance.state is not (MeetingHud.VoteStates.NotVoted or MeetingHud.VoteStates.Voted))
+        if (__instance.state is not (MeetingHud.MeetingStates.NotVoted or MeetingHud.MeetingStates.Voted))
         {
             return;
         }
@@ -127,13 +128,13 @@ internal static class MeetingHudPatches
             return false;
         }
 
-        var playerVoteArea = __instance.playerStates.First(pv => pv.TargetPlayerId == pc.PlayerId);
+        var playerVoteArea = __instance.playerStates.First(pv => pv.PlayerId == pc.PlayerId);
         playerVoteArea.AmDead = true;
         playerVoteArea.Overlay.gameObject.SetActive(true);
 
         foreach (var player in Helpers.GetAlivePlayers())
         {
-            var pva = __instance.playerStates.First(pv => pv.TargetPlayerId == player.PlayerId);
+            var pva = __instance.playerStates.First(pv => pv.PlayerId == player.PlayerId);
             var voteData = player.GetVoteData();
 
             if (pva.AmDead || !voteData.VotedFor(pc.PlayerId))
@@ -150,7 +151,7 @@ internal static class MeetingHudPatches
         __instance.SetDirtyBit(1U);
         __instance.CheckForEndVoting();
 
-        if (__instance.state == MeetingHud.VoteStates.Results)
+        if (__instance.state == MeetingHud.MeetingStates.Results)
         {
             __instance.SetupProceedButton();
         }
@@ -199,7 +200,7 @@ internal static class MeetingHudPatches
             })
         ]);
 
-        __instance.RpcVotingComplete(voterStates, exiled, isTie);
+        __instance.RpcVotingComplete(voterStates, exiled, isTie, @event.OverruledVote, @event.OverruledNonce);
         return false;
     }
 
@@ -220,6 +221,16 @@ internal static class MeetingHudPatches
     public static bool CmdCastVoteOverridePatch(MeetingHud __instance, byte playerId, byte suspectIdx)
     {
         VotingUtils.RpcCastVote(PlayerControl.LocalPlayer, playerId, suspectIdx);
+        return false;
+    }
+
+    // TODO: figure out a way to do host-authorization since right now any player can send RpcQueueOverruleVotes
+    [HarmonyPrefix]
+    [HarmonyPatch(nameof(MeetingHud.CmdQueueOverruleVotes))]
+    // Although this method is inlined in MeetingHud.Confirm, the next patch fixes that.
+    public static bool CmdQueueOverruleVotesPatch(MeetingHud __instance, PlayerId judgePlayerId, PlayerId targetPlayerId, ushort overruleNonce)
+    {
+        VotingUtils.RpcQueueOverruleVotes(PlayerControl.LocalPlayer, judgePlayerId.Value, targetPlayerId.Value, overruleNonce);
         return false;
     }
 
