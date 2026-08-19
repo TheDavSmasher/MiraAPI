@@ -19,7 +19,6 @@ namespace MiraAPI;
 [BepInAutoPlugin("mira.api", "MiraAPI")]
 [BepInProcess("Among Us.exe")]
 [BepInDependency(ReactorPlugin.Id)]
-[BepInDependency(ModCompatibility.SubmergedId, BepInDependency.DependencyFlags.SoftDependency)]
 [ReactorModFlags(ModFlags.RequireOnAllClients)]
 public partial class MiraApiPlugin : BasePlugin
 {
@@ -56,5 +55,9 @@ public partial class MiraApiPlugin : BasePlugin
 
         PluginManager = new MiraPluginManager();
         PluginManager.Initialize();
+
+        IL2CPPChainloader.Instance.Finished +=
+            ModCompatibility
+                .Initialize; // Initialise AFTER the mods are loaded to ensure maximum parity (no need for the soft dependency either then)
     }
 }

@@ -135,5 +135,20 @@ public static class MiraAssets
     /// </summary>
     public static LoadableResourceAsset TimedModifierFile { get; } = new("MiraAPI.Resources.TimedModifierFile.png");
 
+    /// <summary>
+    /// Gets the sprite used for the new chat button while hovering.
+    /// </summary>
+    public static LoadableResourceAsset ChatHoverSprite { get; } = new("MiraAPI.Resources.NormalChatHover.png");
+
+    /// <summary>
+    /// Gets the sprite used for the new chat button while hovering.
+    /// </summary>
+    public static LoadableResourceAsset ChatIdleSprite { get; } = new("MiraAPI.Resources.NormalChatIdle.png");
+
+    /// <summary>
+    /// Gets the sprite used for the new chat button while hovering.
+    /// </summary>
+    public static LoadableResourceAsset ChatOpenSprite { get; } = new("MiraAPI.Resources.NormalChatOpen.png");
+
     internal static LoadableResourceAsset BlankSprite { get; } = new("MiraAPI.Resources.BlankSprite.png");
 }

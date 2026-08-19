@@ -123,6 +123,99 @@ public static class HudManagerPatches
         CustomGameModeManager.ActiveMode?.HudStart(__instance);
     }*/
 
+    [HarmonyPrefix]
+    [HarmonyPriority(Priority.First)]
+    [HarmonyPatch(typeof(FriendsListManager), nameof(FriendsListManager.SetFriendButtonColor))]
+    public static bool SetFriendButtonColor(FriendsListManager __instance, bool isGrayedOut)
+    {
+        __instance.FriendsListButton?.SetGlyphColor(isGrayedOut);
+        return false;
+    }
+
+    [HarmonyPrefix]
+    [HarmonyPriority(Priority.First)]
+    [HarmonyPatch(typeof(ChatController), nameof(ChatController.Toggle))]
+    [HarmonyPatch(typeof(ChatController), nameof(ChatController.Close))]
+    public static void TogglePrefix(ChatController __instance)
+    {
+        if (!MiraHudHelper.ClonedChatButton)
+        {
+            return;
+        }
+        __instance.chatButton.transform.localPosition = MiraHudHelper.ClonedChatButton.transform.localPosition + new Vector3(-0.3f, 0);
+    }
+
+    [HarmonyPostfix]
+    [HarmonyPriority(Priority.First)]
+    [HarmonyPatch(typeof(ChatController), nameof(ChatController.Toggle))]
+    [HarmonyPatch(typeof(ChatController), nameof(ChatController.Close))]
+    public static void TogglePostfix(ChatController __instance)
+    {
+        MiraHudHelper.UiGrid.ArrangeChilds();
+    }
+
+    [HarmonyPrefix]
+    [HarmonyPriority(Priority.First)]
+    [HarmonyPatch(typeof(ChatController), nameof(ChatController.AddChatNote))]
+    [HarmonyPatch(typeof(ChatController), nameof(ChatController.AddChat))]
+    [HarmonyPatch(typeof(ChatController), nameof(ChatController.AddChatWarning))]
+    public static void ChatBubbleUpdatePrefix(ChatController __instance)
+    {
+        __instance.chatNotifyDot.transform.localPosition = new Vector3(-0.34f, 0.373f, -1f);
+    }
+    [HarmonyPrefix]
+    [HarmonyPriority(Priority.First)]
+    [HarmonyPatch(typeof(MatchInfoGuide), nameof(MatchInfoGuide.Open))]
+    public static bool Open(MatchInfoGuide __instance)
+    {
+        if (HudManager.Instance.GameMenu.IsOpen || HudManager.Instance.Chat.IsOpenOrOpening)
+        {
+            return false;
+        }
+        if (Minigame.Instance != null)
+        {
+            Minigame.Instance.Close();
+        }
+        if (MapBehaviour.Instance)
+        {
+            MapBehaviour.Instance.Close();
+        }
+        if (HudManager.InstanceExists)
+        {
+            ConsoleJoystick.SetMode_MenuAdditive();
+        }
+        ControllerManager.Instance.OpenOverlayMenu("MatchInfoGuide", __instance.closeButton);
+        bool enabled = ActiveInputManager.currentControlType == ActiveInputManager.InputType.Joystick;
+        __instance.glyphL.enabled = enabled;
+        __instance.glyphR.enabled = enabled;
+        if (GameManager.Instance.TryCast<NormalGameManager>() != null)
+        {
+            if (__instance.NormalModeSettings.Count == 0)
+            {
+                __instance.numOfTabs = 3;
+                __instance.TabButtons[0].SelectButton(true);
+                __instance.CreateNormalModeSettings();
+            }
+        }
+        else if (__instance.HnSModeSettings.Count == 0)
+        {
+            __instance.numOfTabs = 2;
+            __instance.TabButtons[0].SelectButton(true);
+            __instance.CreateHnSModeSettings();
+        }
+        PlayerControl.LocalPlayer.NetTransform.Halt();
+        __instance.MatchInfoParent.SetActive(true);
+        ControllerManager instance = ControllerManager.Instance;
+        ControllerUiElementsState currentUiState = ControllerManager.Instance.CurrentUiState;
+        Il2CppSystem.Collections.Generic.List<UiElement> controllerSelectable = __instance.ControllerSelectable;
+        instance.SetUpSelectables(currentUiState, controllerSelectable[controllerSelectable.Count - 1], __instance.ControllerSelectable);
+        ControllerManager instance2 = ControllerManager.Instance;
+        Il2CppSystem.Collections.Generic.List<UiElement> controllerSelectable2 = __instance.ControllerSelectable;
+        instance2.SetCurrentSelected(controllerSelectable2[controllerSelectable2.Count - 1]);
+        __instance.SetActiveTab(0);
+        return false;
+    }
+
     /// <summary>
     /// Create custom buttons and arrange them on the hud.
     /// </summary>
@@ -131,6 +224,7 @@ public static class HudManagerPatches
     [HarmonyPatch(nameof(HudManager.Start))]
     public static void StartPostfix(HudManager __instance)
     {
+        __instance.gameObject.AddComponent<MiraHudHelper>();
         if (Buttons == null)
         {
             Buttons = __instance.transform.Find("Buttons");

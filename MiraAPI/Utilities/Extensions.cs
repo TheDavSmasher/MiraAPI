@@ -367,6 +367,18 @@ public static class Extensions
     }
 
     /// <summary>
+    /// Gets all child objects in a parent object.
+    /// </summary>
+    /// <returns>An <see cref="IEnumerable"/> that contains <see cref="GameObject"/>s.</returns>
+    public static IEnumerable<GameObject> GetAllChildren(this GameObject go)
+    {
+        for (var i = 0; i < go.transform.childCount; i++)
+        {
+            yield return go.transform.GetChild(i).gameObject;
+        }
+    }
+
+    /// <summary>
     /// Gets a cache of <see cref="PlayerControl"/>'s <see cref="PlayerVoteData"/> to improve performance.
     /// </summary>
     public static Dictionary<PlayerControl, PlayerVoteData> VoteDataComponents { get; } = [];
