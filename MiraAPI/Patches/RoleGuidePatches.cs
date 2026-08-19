@@ -1,6 +1,7 @@
 ﻿using System.Globalization;
 using System.Linq;
 using HarmonyLib;
+using Innersloth.Assets;
 using MiraAPI.Roles;
 using MiraAPI.Utilities;
 using UnityEngine;
@@ -95,6 +96,40 @@ public static class RoleGuidePatches
         Il2CppSystem.Collections.Generic.List<UiElement> controllerSelectable2 = __instance.ControllerSelectable;
         instance2.SetCurrentSelected(controllerSelectable2[controllerSelectable2.Count - 1]);
         __instance.SetActiveTab(0);
+        return false;
+    }
+    [HarmonyPrefix]
+    [HarmonyPriority(Priority.First)]
+    [HarmonyPatch(typeof(MatchInfoGuide), nameof(MatchInfoGuide.CreatePlayerEntries))]
+    private static bool CreatePlayerEntries(MatchInfoGuide __instance)
+    {
+        __instance.PlayerPool.ReclaimAll();
+        int num = 51;
+        foreach (NetworkedPlayerInfo networkedPlayerInfo in GameData.Instance.AllPlayers)
+        {
+            PlayerIdentifierButton component =
+                __instance.PlayerPool.Get<PoolableBehavior>().GetComponent<PlayerIdentifierButton>();
+            component.transform.localPosition = new Vector3(0f, 0f, -1f);
+            component.Populate(networkedPlayerInfo);
+            __instance.ControllerSelectable.Add(component.Button);
+            component.SetTextStencil(num++);
+            component.PlatformIdentifier.transform.localPosition = new Vector3(0.314f, 0.088f, -2.78f);
+            component.NameText.transform.localPosition = new Vector3(0.3563f, 0, -2.98f);
+            component.NameText.text += $"\n<size=75%>{networkedPlayerInfo.GetPlayerColorString()}</size>";
+            var namePlate = HatManager.Instance.GetNamePlateById(networkedPlayerInfo.DefaultOutfit.NamePlateId);
+            var x = (NamePlateViewData viewdata) =>
+            {
+                component.buttonSprite.sprite = viewdata?.Image;
+                component.buttonSprite.transform.localScale = new Vector3(0.7f, 1.075f, 1);
+                component.buttonSprite.transform.localPosition = new Vector3(-0.395f, 0, 0.1f);
+            };
+            __instance.StartCoroutine(
+                AddressableAssetExtensions.CoLoadAssetAsync<NamePlateViewData>(
+                    __instance,
+                    namePlate.GetAssetReference(),
+                    x));
+        }
+
         return false;
     }
     [HarmonyPrefix]
