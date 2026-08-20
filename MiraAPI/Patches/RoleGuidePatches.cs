@@ -141,7 +141,7 @@ public static class RoleGuidePatches
         if (role is ICustomRole customRole)
         {
             __instance.roleName.text = customRole.RoleName;
-            __instance.roleDescription.text = $"<size=60%>{customRole.RoleFactionTitle}</size>\n" + customRole.RoleDescription;
+            __instance.roleDescription.text = $"<size=60%>{customRole.RoleFactionTitle}</size>\n" + customRole.RoleMedDescription;
             __instance.roleIcon.sprite = customRole.Configuration.Icon?.LoadAsset();
             __instance.roleCount.text += $" ({customRole.ParentMod.MiraPlugin.GetAbbreviatedModName()})";
         }

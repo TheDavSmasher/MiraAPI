@@ -24,6 +24,11 @@ public interface ICustomRole : IOptionable
     string RoleDescription { get; }
 
     /// <summary>
+    /// Gets the medium description of the role. Used in the role guide.
+    /// </summary>
+    string RoleMedDescription => RoleDescription;
+
+    /// <summary>
     /// Gets the long description of the role. Used in the Role Tab and Role Options.
     /// </summary>
     string RoleLongDescription { get; }
