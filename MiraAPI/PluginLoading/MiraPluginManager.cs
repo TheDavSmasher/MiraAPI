@@ -16,6 +16,7 @@ using MiraAPI.Hud;
 using MiraAPI.Keybinds;
 using MiraAPI.LocalSettings;
 using MiraAPI.LocalSettings.Attributes;
+using MiraAPI.MeetingAbilities;
 using MiraAPI.Modifiers;
 using MiraAPI.Patches.Options;
 using MiraAPI.Presets;
@@ -114,6 +115,11 @@ public sealed class MiraPluginManager
                 }
 
                 if (RegisterGameOver(type))
+                {
+                    continue;
+                }
+                
+                if (RegisterMeetingAbility(type, info))
                 {
                     continue;
                 }
@@ -441,6 +447,19 @@ public sealed class MiraPluginManager
         catch (Exception e)
         {
             Error($"Failed to register keybind class {type.Name}: {e}");
+        }
+    }
+
+    private static bool RegisterMeetingAbility(Type type, MiraPluginInfo info)
+    {
+        try
+        {
+            return TargetedMeetingAbilityManager.RegisterMeetingAbility(type, info);
+        }
+        catch (Exception e)
+        {
+            Error($"Failed to register meeting ability {type.Name}: {e}");
+            return false;
         }
     }
 }

@@ -1,8 +1,10 @@
-﻿using System.Reflection;
+﻿using System.Linq;
+using System.Reflection;
 using HarmonyLib;
 using Il2CppInterop.Runtime.InteropTypes;
 using MiraAPI.Events;
 using MiraAPI.Events.Vanilla.Gameplay;
+using MiraAPI.MeetingAbilities;
 using MiraAPI.Roles;
 using MiraAPI.Utilities;
 
@@ -127,6 +129,11 @@ public static class IntroCutscenePatches
 
             var @event = new BeforeRoundStartEvent(true);
             MiraEventManager.InvokeEvent(@event);
+
+            foreach (var ability in TargetedMeetingAbilityManager.Buttons.Where(x => x.ButtonUsesMode == MeetingButtonUsesMode.PerGame))
+            {
+                ability.UsesRemaining = ability.MaxUses;
+            }
 
             if (@event.IsCancelled) return;
             MiraEventManager.InvokeEvent(new RoundStartEvent(true));

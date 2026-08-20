@@ -5,6 +5,7 @@ using BepInEx.Configuration;
 using MiraAPI.GameModes;
 using MiraAPI.GameOptions;
 using MiraAPI.Hud;
+using MiraAPI.MeetingAbilities;
 using MiraAPI.Modifiers;
 using MiraAPI.Presets;
 
@@ -77,6 +78,8 @@ public class MiraPluginInfo
     internal Dictionary<int, CustomGameMode> InternalGameModes { get; } = [];
 
     internal List<CustomActionButton> InternalButtons { get; } = [];
+
+    internal List<TargetedMeetingButton?> InternalMeetingAbilities { get; } = [];
 
     /// <summary>
     /// Gets the plugin's ID, as defined in the plugin's BepInEx metadata.
