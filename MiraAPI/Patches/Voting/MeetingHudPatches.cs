@@ -106,9 +106,10 @@ internal static class MeetingHudPatches
             }
         }
 
-        foreach (var ability in TargetedMeetingButtonManager.Buttons.Where(x => x.ButtonUsesMode == MeetingButtonUsesMode.PerMeeting))
+        foreach (var ability in TargetedMeetingButtonManager.Buttons)
         {
-            ability.UsesRemaining = ability.MaxUses;
+            if (ability.ButtonUsesMode == MeetingButtonUsesMode.PerMeeting) ability.UsesRemaining = ability.MaxUses;
+            if (ability is MultiTargetMeetingButton multiAbility) multiAbility.Targets = new();
         }
         var @event = new StartMeetingEvent(__instance);
         MiraEventManager.InvokeEvent(@event);

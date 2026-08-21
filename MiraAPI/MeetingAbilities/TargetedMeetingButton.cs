@@ -6,7 +6,7 @@ using UnityEngine.UI;
 namespace MiraAPI.MeetingAbilities;
 
 /// <summary>
-/// Abstract class for creating custom meeting abilities.
+/// Abstract class for creating targeted meeting abilities.
 /// </summary>
 public abstract class TargetedMeetingButton
 {
@@ -101,9 +101,9 @@ public abstract class TargetedMeetingButton
         btn.transform.GetChild(0).GetComponent<SpriteRenderer>().color = OutlineColor;
 
         btn.OnClick = new Button.ButtonClickedEvent();
-        btn.OnClick.AddListener(new System.Action(() => ClickHandler(playerVoteArea)));
         var abilityBehaviour = btn.gameObject.AddComponent<MeetingAbilityBehaviour>();
         abilityBehaviour.Initialize(this, playerVoteArea);
+        btn.OnClick.AddListener(new System.Action(() => ClickHandler(abilityBehaviour, playerVoteArea)));
         Timer = InitialCooldown;
 
         return abilityBehaviour;
@@ -131,8 +131,9 @@ public abstract class TargetedMeetingButton
     /// Called when the button is clicked
     /// Handles increasing cooldown and decreasing uses remaining.
     /// </summary>
+    /// <param name="button">The <see cref="MeetingAbilityBehaviour"/> instance.</param>
     /// <param name="playerVoteArea">The target <see cref="PlayerVoteArea"/>.</param>
-    public virtual void ClickHandler(PlayerVoteArea playerVoteArea)
+    public virtual void ClickHandler(MeetingAbilityBehaviour button, PlayerVoteArea playerVoteArea)
     {
         if (UsesRemaining <= 0 && LimitedUses) return;
         if (Timer > 0) return;
