@@ -133,7 +133,7 @@ internal static class MeetingHudPatches
     [HarmonyPatch(nameof(MeetingHud.Update))]
     public static void ForceSkipPatch(MeetingHud __instance)
     {
-        foreach (var targetedMeetingAbility in TargetedMeetingAbilityManager.Buttons)
+        foreach (var targetedMeetingAbility in TargetedMeetingAbilityManager.Buttons.Where(x => x.Enabled(PlayerControl.LocalPlayer.Data.Role)))
         {
             targetedMeetingAbility.UpdateHandler();
         }

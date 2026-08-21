@@ -58,6 +58,11 @@ public abstract class TargetedMeetingButton
     public abstract LoadableAsset<Sprite> Sprite { get; }
 
     /// <summary>
+    /// Gets the button's outline color.
+    /// </summary>
+    public abstract Color OutlineColor { get; }
+
+    /// <summary>
     /// Gets the <see cref="MeetingButtonUsesMode"/> for this button.
     /// </summary>
     public virtual MeetingButtonUsesMode ButtonUsesMode { get; } = MeetingButtonUsesMode.PerGame;
@@ -93,11 +98,14 @@ public abstract class TargetedMeetingButton
         spriteRenderer.SetCooldownNormalizedUvs();
         btn.gameObject.SetActive(true);
 
+        btn.transform.GetChild(0).GetComponent<SpriteRenderer>().color = OutlineColor;
+
         btn.OnClick = new Button.ButtonClickedEvent();
         btn.OnClick.AddListener(new System.Action(() => ClickHandler(playerVoteArea)));
         var abilityBehaviour = btn.gameObject.AddComponent<MeetingAbilityBehaviour>();
         abilityBehaviour.Initialize(this, playerVoteArea);
         Timer = InitialCooldown;
+
         return abilityBehaviour;
     }
 

@@ -7,16 +7,52 @@ using UnityEngine;
 
 namespace MiraAPI.MeetingAbilities;
 
+/// <summary>
+/// A component for handling targeted meeting buttons.
+/// </summary>
 [RegisterInIl2Cpp]
-public class MeetingAbilityBehaviour(IntPtr cppPtr) : MonoBehaviour(cppPtr)
+public class MeetingAbilityBehaviour : MonoBehaviour
 {
-    private bool _init = false;
+    /// <summary>
+    /// Gets or sets whether the component has been initialized.
+    /// </summary>
+    private bool _init;
+
+    /// <summary>
+    /// The <see cref="TargetedMeetingButton"/> attached to this component.
+    /// </summary>
     private TargetedMeetingButton _button = null!;
+
+    /// <summary>
+    /// The <see cref="PassiveButton"/> of this component.
+    /// </summary>
     public PassiveButton Button;
+
+    /// <summary>
+    /// The parent <see cref="PlayerVoteArea"/>.
+    /// </summary>
     public PlayerVoteArea VoteArea;
+
+    /// <summary>
+    /// The button's <see cref="SpriteRenderer"/> component.
+    /// </summary>
     public SpriteRenderer Renderer;
+
+    /// <summary>
+    /// The <see cref="TextMeshPro"/> label used for showing the ability's cooldown.
+    /// </summary>
     public TextMeshPro CooldownText;
+
+    /// <summary>
+    /// The <see cref="TextMeshPro"/> label used for showing the ability's remaining uses.
+    /// </summary>
     public TextMeshPro UsesText;
+
+    /// <summary>
+    /// Initializes the various properties of this component.
+    /// </summary>
+    /// <param name="button">The <see cref="TargetedMeetingButton"/> to initialize this component for.</param>
+    /// <param name="voteArea">The parent <see cref="PlayerVoteArea"/>.</param>
     public void Initialize(TargetedMeetingButton button, PlayerVoteArea voteArea)
     {
         if (_init) return;
@@ -38,6 +74,9 @@ public class MeetingAbilityBehaviour(IntPtr cppPtr) : MonoBehaviour(cppPtr)
         UsesText = Instantiate(CooldownText, transform);
         UsesText.transform.localPosition = new Vector3(0.25f, 0.25f, -10);
         UsesText.transform.localScale = Vector3.one * 0.7f;
+
+        CooldownText.gameObject.SetActive(true);
+        UsesText.gameObject.SetActive(true);
     }
 
     private void OnEnable()
@@ -50,7 +89,7 @@ public class MeetingAbilityBehaviour(IntPtr cppPtr) : MonoBehaviour(cppPtr)
         Renderer.enabled = false;
     }
 
-    public void Update()
+    private void Update()
     {
         if (!_init) return;
         if (_button.Timer < 0.01f)

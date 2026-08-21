@@ -8,17 +8,17 @@ namespace MiraAPI.Example.MeetingAbilities;
 
 public class ShootButton : TargetedMeetingButton
 {
-    public override string Name => "Shooooooot";
+    public override string Name => "Shoot";
 
-    public override int MaxUses => 0;
+    public override int MaxUses => 3;
 
-    public override float InitialCooldown => 99;
+    public override float InitialCooldown => 5;
 
-    public override float Cooldown => 10;
+    public override float Cooldown => 3;
 
     public override LoadableAsset<Sprite> Sprite => ExampleAssets.SharpshootButton;
 
-    public override MeetingButtonUsesMode ButtonUsesMode => MeetingButtonUsesMode.PerGame;
+    public override Color OutlineColor => Color.red;
 
     public override bool Enabled(RoleBehaviour r)
     {

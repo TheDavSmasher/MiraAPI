@@ -8,6 +8,9 @@ using UnityEngine;
 
 namespace MiraAPI.MeetingAbilities;
 
+/// <summary>
+/// Class for managing all registered meeting abilities.
+/// </summary>
 public static class TargetedMeetingAbilityManager
 {
     /// <summary>
