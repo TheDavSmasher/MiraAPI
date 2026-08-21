@@ -130,7 +130,7 @@ public static class IntroCutscenePatches
             var @event = new BeforeRoundStartEvent(true);
             MiraEventManager.InvokeEvent(@event);
 
-            foreach (var ability in TargetedMeetingAbilityManager.Buttons.Where(x => x.ButtonUsesMode == MeetingButtonUsesMode.PerGame))
+            foreach (var ability in TargetedMeetingButtonManager.Buttons.Where(x => x.ButtonUsesMode == MeetingButtonUsesMode.PerGame))
             {
                 ability.UsesRemaining = ability.MaxUses;
             }

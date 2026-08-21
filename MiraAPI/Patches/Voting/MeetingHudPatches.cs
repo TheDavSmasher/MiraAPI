@@ -41,7 +41,7 @@ internal static class MeetingHudPatches
     [HarmonyPatch(typeof(PlayerVoteArea), nameof(PlayerVoteArea.Start))]
     public static void VoteAreaStartPostfix(PlayerVoteArea __instance)
     {
-        foreach (var targetedMeetingAbility in TargetedMeetingAbilityManager.Buttons)
+        foreach (var targetedMeetingAbility in TargetedMeetingButtonManager.Buttons)
         {
             var btn = targetedMeetingAbility.CreateButton(__instance);
             btn.transform.SetParent(__instance.Buttons.transform);
@@ -106,7 +106,7 @@ internal static class MeetingHudPatches
             }
         }
 
-        foreach (var ability in TargetedMeetingAbilityManager.Buttons.Where(x => x.ButtonUsesMode == MeetingButtonUsesMode.PerMeeting))
+        foreach (var ability in TargetedMeetingButtonManager.Buttons.Where(x => x.ButtonUsesMode == MeetingButtonUsesMode.PerMeeting))
         {
             ability.UsesRemaining = ability.MaxUses;
         }
@@ -133,7 +133,7 @@ internal static class MeetingHudPatches
     [HarmonyPatch(nameof(MeetingHud.Update))]
     public static void ForceSkipPatch(MeetingHud __instance)
     {
-        foreach (var targetedMeetingAbility in TargetedMeetingAbilityManager.Buttons.Where(x => x.Enabled(PlayerControl.LocalPlayer.Data.Role)))
+        foreach (var targetedMeetingAbility in TargetedMeetingButtonManager.Buttons.Where(x => x.Enabled(PlayerControl.LocalPlayer.Data.Role)))
         {
             targetedMeetingAbility.UpdateHandler();
         }

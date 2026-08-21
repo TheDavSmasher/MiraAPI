@@ -11,7 +11,7 @@ namespace MiraAPI.MeetingAbilities;
 /// <summary>
 /// Class for managing all registered meeting abilities.
 /// </summary>
-public static class TargetedMeetingAbilityManager
+public static class TargetedMeetingButtonManager
 {
     /// <summary>
     /// Gets a list if==of all registered <see cref="TargetedMeetingButton"/>.

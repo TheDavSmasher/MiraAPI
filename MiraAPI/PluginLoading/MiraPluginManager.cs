@@ -454,7 +454,7 @@ public sealed class MiraPluginManager
     {
         try
         {
-            return TargetedMeetingAbilityManager.RegisterMeetingAbility(type, info);
+            return TargetedMeetingButtonManager.RegisterMeetingAbility(type, info);
         }
         catch (Exception e)
         {
