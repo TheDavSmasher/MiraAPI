@@ -1,4 +1,6 @@
 using MiraAPI.MeetingAbilities;
+using MiraAPI.Networking;
+using MiraAPI.Utilities;
 using MiraAPI.Utilities.Assets;
 using UnityEngine;
 
@@ -20,11 +22,13 @@ public class ShootButton : TargetedMeetingButton
 
     public override bool Enabled(RoleBehaviour r)
     {
-        return true;
+        return r.IsImpostor;
     }
 
     protected override void OnClick(PlayerVoteArea playerVoteArea)
     {
         playerVoteArea.SetDisabled();
+        var player = playerVoteArea.GetPlayer();
+        PlayerControl.LocalPlayer.RpcCustomMurder(player);
     }
 }
