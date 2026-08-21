@@ -32,7 +32,13 @@ public abstract class TargetedMeetingButton
     public bool LimitedUses => MaxUses != 0;
 
     /// <summary>
-    /// Gets the cooldown time for this button.
+    /// Gets the cooldown time for this button upon meeting start.
+    /// Defaults to <see cref="Cooldown"/> unless overridden.
+    /// </summary>
+    public virtual float InitialCooldown => Cooldown;
+
+    /// <summary>
+    /// Gets the cooldown time for this button after being used.
     /// </summary>
     public abstract float Cooldown { get; }
 
@@ -91,7 +97,7 @@ public abstract class TargetedMeetingButton
         btn.OnClick.AddListener(new System.Action(() => ClickHandler(playerVoteArea)));
         var abilityBehaviour = btn.gameObject.AddComponent<MeetingAbilityBehaviour>();
         abilityBehaviour.Initialize(this, playerVoteArea);
-        Timer = Cooldown;
+        Timer = InitialCooldown;
         return abilityBehaviour;
     }
 

@@ -10,6 +10,8 @@ public class ShootButton : TargetedMeetingButton
 
     public override int MaxUses => 0;
 
+    public override float InitialCooldown => 99;
+
     public override float Cooldown => 10;
 
     public override LoadableAsset<Sprite> Sprite => ExampleAssets.SharpshootButton;

@@ -53,7 +53,7 @@ public class MeetingAbilityBehaviour(IntPtr cppPtr) : MonoBehaviour(cppPtr)
     public void Update()
     {
         if (!_init) return;
-        if (_button.Timer < 0)
+        if (_button.Timer < 0.01f)
         {
             Renderer.material.SetFloat("_Desat", 0.0f);
             CooldownText.text = string.Empty;
@@ -65,7 +65,7 @@ public class MeetingAbilityBehaviour(IntPtr cppPtr) : MonoBehaviour(cppPtr)
             CooldownText.text = _button.Timer.ToString(_button.CooldownTimerFormatString, NumberFormatInfo.InvariantInfo);
             UsesText.text = string.Empty;
         }
-        SetFillUp(_button.Timer, _button.Cooldown);
+        SetFillUp(_button.Timer, _button.InitialCooldown);
     }
 
     public void SetFillUp(float timer, float maxTimer)
