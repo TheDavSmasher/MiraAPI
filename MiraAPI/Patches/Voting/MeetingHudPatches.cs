@@ -58,7 +58,7 @@ internal static class MeetingHudPatches
             return false;
         JudgeRole? judgeRole = PlayerControl.LocalPlayer.Data.Role.TryCast<JudgeRole>();
         bool flag = judgeRole && PlayerControl.LocalPlayer.PlayerId != __instance.PlayerId;
-        __instance.JudgeOverruleButton.gameObject.SetActive(flag);
+        __instance.JudgeOverruleButton?.gameObject.SetActive(flag);
         if (__instance.VoteComplete || !__instance.Parent.Select((byte) __instance.PlayerId))
             return false;
         __instance.Buttons.SetActive(true);
