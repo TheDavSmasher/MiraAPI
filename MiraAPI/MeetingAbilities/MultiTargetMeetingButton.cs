@@ -30,7 +30,7 @@ public abstract class MultiTargetMeetingButton : TargetedMeetingButton
     /// <inheritdoc />
     public override void ClickHandler(MeetingAbilityBehaviour button, PlayerVoteArea playerVoteArea)
     {
-        if (UsesRemaining <= 0 && LimitedUses) return;
+        if (UsesLeft <= 0 && LimitedUses) return;
         if (Timer > 0) return;
         var toggle = !Targets.Remove(playerVoteArea);
         if (toggle) Targets.Add(playerVoteArea, button);
@@ -55,7 +55,7 @@ public abstract class MultiTargetMeetingButton : TargetedMeetingButton
             button.Renderer.sprite = Sprite.LoadAsset();
         }
         Timer = Cooldown;
-        UsesRemaining -= 1;
+        UsesLeft -= 1;
         OnFinish();
         Targets = new();
     }

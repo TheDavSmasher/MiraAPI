@@ -15,5 +15,5 @@ public static class TargetedMeetingButtonSingleton<T> where T : TargetedMeetingB
     /// Gets the instance of the <typeparamref name="T"/> button.
     /// </summary>
     [SuppressMessage("Design", "CA1000:Do not declare static members on generic types", Justification = "This is a utility class to get the instance of a targeted meeting button.")]
-    public static T Instance => _instance ??= TargetedMeetingButtonManager.Buttons.OfType<T>().Single();
+    public static T Instance => _instance ??= MeetingButtonManager.TargetedButtons.OfType<T>().Single();
 }

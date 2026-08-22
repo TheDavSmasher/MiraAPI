@@ -51,6 +51,16 @@ public class MiraPluginInfo
     public IReadOnlyCollection<CustomActionButton> Buttons { get; private set; } = null!;
 
     /// <summary>
+    /// Gets a <see cref="IReadOnlyCollection{T}"/> of this <see cref="IMiraPlugin"/>'s <see cref="TargetedMeetingButton"/>.
+    /// </summary>
+    public IReadOnlyCollection<TargetedMeetingButton> TargetedMeetingButtons { get; private set; } = null!;
+
+    /// <summary>
+    /// Gets a <see cref="IReadOnlyCollection{T}"/> of this <see cref="IMiraPlugin"/>'s <see cref="MeetingActionButton"/>.
+    /// </summary>
+    public IReadOnlyCollection<MeetingActionButton> MeetingButtons { get; private set; } = null!;
+
+    /// <summary>
     /// Gets a <see cref="ReadOnlyDictionary{TKey, TValue}"/> of this <see cref="IMiraPlugin"/>'s <see cref="OptionPreset"/>s.
     /// </summary>
     public IReadOnlyCollection<OptionPreset> Presets { get; internal set; } = null!;
@@ -63,6 +73,8 @@ public class MiraPluginInfo
         Options = [..InternalOptions];
         Roles = new ReadOnlyDictionary<ushort, RoleBehaviour>(InternalRoles);
         Buttons = [..InternalButtons];
+        MeetingButtons = [..InternalMeetingButtons];
+        TargetedMeetingButtons = [..InternalTargetedMeetingButtons];
     }
 
     internal List<OptionPreset> InternalPresets { get; } = [];
@@ -79,7 +91,9 @@ public class MiraPluginInfo
 
     internal List<CustomActionButton> InternalButtons { get; } = [];
 
-    internal List<TargetedMeetingButton?> InternalMeetingAbilities { get; } = [];
+    internal List<TargetedMeetingButton> InternalTargetedMeetingButtons { get; } = [];
+
+    internal List<MeetingActionButton> InternalMeetingButtons { get; } = [];
 
     /// <summary>
     /// Gets the plugin's ID, as defined in the plugin's BepInEx metadata.

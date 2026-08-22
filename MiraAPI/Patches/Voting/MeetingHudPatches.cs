@@ -10,6 +10,7 @@ using MiraAPI.Events.Vanilla.Meeting.Voting;
 using MiraAPI.MeetingAbilities;
 using MiraAPI.Modifiers;
 using MiraAPI.Utilities;
+using MiraAPI.Utilities.Components;
 using MiraAPI.Voting;
 using UnityEngine;
 
@@ -35,19 +36,6 @@ internal static class MeetingHudPatches
         MiraEventManager.InvokeEvent(afterVoteEvent);
 
         return true;
-    }
-
-    [HarmonyPrefix]
-    [HarmonyPatch(typeof(PlayerVoteArea), nameof(PlayerVoteArea.Start))]
-    public static void VoteAreaStartPostfix(PlayerVoteArea __instance)
-    {
-        foreach (var targetedMeetingAbility in TargetedMeetingButtonManager.Buttons)
-        {
-            var btn = targetedMeetingAbility.CreateButton(__instance);
-            btn.transform.SetParent(__instance.Buttons.transform);
-            btn.gameObject.SetActive(targetedMeetingAbility.Enabled(PlayerControl.LocalPlayer.Data.Role) && targetedMeetingAbility.IsTargetValid(__instance));
-        }
-        __instance.CancelButton.transform.SetAsFirstSibling();
     }
 
     [HarmonyPrefix]
@@ -89,6 +77,7 @@ internal static class MeetingHudPatches
     [HarmonyPatch(nameof(MeetingHud.Start))]
     public static void MeetingHudStartPatch(MeetingHud __instance)
     {
+        MeetingButtonManager.OnMeetingStart(__instance);
         foreach (var plr in PlayerControl.AllPlayerControls)
         {
             var voteData = plr.GetVoteData();
@@ -106,11 +95,6 @@ internal static class MeetingHudPatches
             }
         }
 
-        foreach (var ability in TargetedMeetingButtonManager.Buttons)
-        {
-            if (ability.ButtonUsesMode == MeetingButtonUsesMode.PerMeeting) ability.UsesRemaining = ability.MaxUses;
-            if (ability is MultiTargetMeetingButton multiAbility) multiAbility.Targets = new();
-        }
         var @event = new StartMeetingEvent(__instance);
         MiraEventManager.InvokeEvent(@event);
     }
@@ -134,9 +118,14 @@ internal static class MeetingHudPatches
     [HarmonyPatch(nameof(MeetingHud.Update))]
     public static void ForceSkipPatch(MeetingHud __instance)
     {
-        foreach (var targetedMeetingAbility in TargetedMeetingButtonManager.Buttons.Where(x => x.Enabled(PlayerControl.LocalPlayer.Data.Role)))
+        foreach (var targetedMeetingAbility in MeetingButtonManager.TargetedButtons.Where(x => x.Enabled(PlayerControl.LocalPlayer.Data.Role)))
         {
             targetedMeetingAbility.UpdateHandler();
+        }
+
+        foreach (var meetingAbility in MeetingButtonManager.UntargetedButtons.Where(x => x.Enabled(PlayerControl.LocalPlayer.Data.Role)))
+        {
+            meetingAbility.UpdateHandler(__instance);
         }
 
         if (__instance.state is not (MeetingHud.MeetingStates.NotVoted or MeetingHud.MeetingStates.Voted))

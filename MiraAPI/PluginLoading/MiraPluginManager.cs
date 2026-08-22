@@ -118,8 +118,13 @@ public sealed class MiraPluginManager
                 {
                     continue;
                 }
-                
+
                 if (RegisterMeetingAbility(type, info))
+                {
+                    continue;
+                }
+
+                if (RegisterTargetedMeetingAbility(type, info))
                 {
                     continue;
                 }
@@ -454,11 +459,23 @@ public sealed class MiraPluginManager
     {
         try
         {
-            return TargetedMeetingButtonManager.RegisterMeetingAbility(type, info);
+            return MeetingButtonManager.RegisterMeetingButton(type, info);
         }
         catch (Exception e)
         {
             Error($"Failed to register meeting ability {type.Name}: {e}");
+            return false;
+        }
+    }
+    private static bool RegisterTargetedMeetingAbility(Type type, MiraPluginInfo info)
+    {
+        try
+        {
+            return MeetingButtonManager.RegisterTargetedMeetingButton(type, info);
+        }
+        catch (Exception e)
+        {
+            Error($"Failed to register targeted meeting ability {type.Name}: {e}");
             return false;
         }
     }

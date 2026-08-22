@@ -24,7 +24,7 @@ public abstract class TargetedMeetingButton
     /// <summary>
     /// Gets or sets the amount of uses left for this button.
     /// </summary>
-    public int UsesRemaining { get; set; }
+    public int UsesLeft { get; set; }
 
     /// <summary>
     /// Gets a value indicating whether the <see cref="TargetedMeetingButton"/> has limited uses.
@@ -65,7 +65,7 @@ public abstract class TargetedMeetingButton
     /// <summary>
     /// Gets the <see cref="MeetingButtonUsesMode"/> for this button.
     /// </summary>
-    public virtual MeetingButtonUsesMode ButtonUsesMode { get; } = MeetingButtonUsesMode.PerGame;
+    public virtual MeetingButtonUsesMode UsesMode { get; } = MeetingButtonUsesMode.PerGame;
 
     /// <summary>
     /// Determines if the button is enabled.
@@ -135,10 +135,10 @@ public abstract class TargetedMeetingButton
     /// <param name="playerVoteArea">The target <see cref="PlayerVoteArea"/>.</param>
     public virtual void ClickHandler(MeetingAbilityBehaviour button, PlayerVoteArea playerVoteArea)
     {
-        if (UsesRemaining <= 0 && LimitedUses) return;
+        if (UsesLeft <= 0 && LimitedUses) return;
         if (Timer > 0) return;
         Timer = Cooldown;
-        UsesRemaining--;
+        UsesLeft--;
         playerVoteArea.Cancel();
         OnClick(playerVoteArea);
     }

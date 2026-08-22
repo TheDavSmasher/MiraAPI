@@ -96,7 +96,7 @@ public class MeetingAbilityBehaviour : MonoBehaviour
         {
             Renderer.material.SetFloat("_Desat", 0.0f);
             CooldownText.text = string.Empty;
-            UsesText.text = _button.LimitedUses ? _button.UsesRemaining.ToString(CultureInfo.InvariantCulture) : string.Empty;
+            UsesText.text = _button.LimitedUses ? _button.UsesLeft.ToString(CultureInfo.InvariantCulture) : string.Empty;
         }
         else
         {

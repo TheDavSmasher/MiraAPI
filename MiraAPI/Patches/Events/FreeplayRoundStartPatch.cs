@@ -20,10 +20,7 @@ public static class FreeplayRoundStartPatch
     {
         if (!__result)
         {
-            foreach (var ability in TargetedMeetingButtonManager.Buttons.Where(x => x.ButtonUsesMode == MeetingButtonUsesMode.PerGame))
-            {
-                ability.UsesRemaining = ability.MaxUses;
-            }
+            MeetingButtonManager.OnGameStart();
             MiraEventManager.InvokeEvent(new RoundStartEvent(true));
         }
     }

@@ -125,15 +125,11 @@ public static class IntroCutscenePatches
 
             Info("IntroCutscene ended");
 
+            MeetingButtonManager.OnGameStart();
             MiraEventManager.InvokeEvent(new IntroEndEvent(introCutscene));
 
             var @event = new BeforeRoundStartEvent(true);
             MiraEventManager.InvokeEvent(@event);
-
-            foreach (var ability in TargetedMeetingButtonManager.Buttons.Where(x => x.ButtonUsesMode == MeetingButtonUsesMode.PerGame))
-            {
-                ability.UsesRemaining = ability.MaxUses;
-            }
 
             if (@event.IsCancelled) return;
             MiraEventManager.InvokeEvent(new RoundStartEvent(true));
