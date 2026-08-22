@@ -6,11 +6,22 @@ using UnityEngine;
 
 namespace MiraAPI.Utilities.Components;
 
+/// <summary>
+/// Utility component for arranging objects in a centered layout, similar to <see cref="GridArrange"/>.
+/// </summary>
+/// <param name="ptr"></param>
 [RegisterInIl2Cpp]
 public class CenteredGridArrange(IntPtr ptr) : MonoBehaviour(ptr)
 {
+    /// <summary>
+    /// Gets or sets the cell size, which is used for spacing.
+    /// </summary>
     public Vector2 CellSize;
-    public int MaxColumns = 3;
+
+    /// <summary>
+    /// Gets or sets the maximum amount of columns.
+    /// </summary>
+    public int MaxColumns = 6;
 
     private List<Transform> cells;
     private static List<Transform> currentChildren = new List<Transform>();
