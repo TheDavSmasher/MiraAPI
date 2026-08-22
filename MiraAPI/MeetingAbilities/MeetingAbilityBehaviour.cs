@@ -84,9 +84,13 @@ public class MeetingAbilityBehaviour : MonoBehaviour
         if (!_init) return;
         Button.enabled = true;
         Renderer.enabled = true;
+        UsesText.enabled = true;
+        CooldownText.enabled = true;
         if (_button.Enabled(PlayerControl.LocalPlayer.Data.Role) && _button.IsTargetValid(VoteArea)) return;
         Button.enabled = false;
         Renderer.enabled = false;
+        UsesText.enabled = false;
+        CooldownText.enabled = false;
     }
 
     private void Update()
