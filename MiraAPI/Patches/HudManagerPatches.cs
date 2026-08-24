@@ -112,17 +112,6 @@ public static class HudManagerPatches
         }
     }
 
-    /*
-    /// <summary>
-    /// Trigger hudstart on current custom gamemode
-    /// </summary>
-    [HarmonyPostfix]
-    [HarmonyPatch(nameof(HudManager.OnGameStart))]
-    public static void GameStartPatch(HudManager __instance)
-    {
-        CustomGameModeManager.ActiveMode?.HudStart(__instance);
-    }*/
-
     /// <summary>
     /// Create custom buttons and arrange them on the hud.
     /// </summary>
