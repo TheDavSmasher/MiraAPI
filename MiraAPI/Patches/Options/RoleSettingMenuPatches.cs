@@ -476,6 +476,10 @@ public static class RoleSettingMenuPatches
             if (role.Configuration.CanModifyChance)
             {
                 role.SetChance(roleSetting.RoleChance);
+                if (roleSetting.RoleChance == 0 && role.Configuration.MaxRoleCount != 0)
+                {
+                    role.SetCount(0);
+                }
             }
         }
         catch (Exception e)
