@@ -1,6 +1,7 @@
 ﻿global using static Reactor.Utilities.Logger<MiraAPI.MiraApiPlugin>;
 using System;
 using BepInEx;
+using BepInEx.Configuration;
 using BepInEx.Unity.IL2CPP;
 using HarmonyLib;
 using MiraAPI.PluginLoading;
@@ -20,8 +21,20 @@ namespace MiraAPI;
 [BepInProcess("Among Us.exe")]
 [BepInDependency(ReactorPlugin.Id)]
 [ReactorModFlags(ModFlags.RequireOnAllClients)]
-public partial class MiraApiPlugin : BasePlugin
+public partial class MiraApiPlugin : BasePlugin, IMiraPlugin
 {
+    /// <inheritdoc />
+    public ConfigFile GetConfigFile()
+    {
+        return Config;
+    }
+
+    /// <inheritdoc />
+    public string OptionsTitleText => "MiraAPI";
+
+    /// <inheritdoc />
+    public bool DisplayOnOptionsMenu => false;
+
     /// <summary>
     /// Gets a value indicating whether the current device is running Starlight (on mobile).
     /// </summary>
@@ -54,7 +67,7 @@ public partial class MiraApiPlugin : BasePlugin
         ReactorCredits.Register("Mira API", Version, IsDevBuild, ReactorCredits.AlwaysShow);
 
         PluginManager = new MiraPluginManager();
-        PluginManager.Initialize();
+        PluginManager.Initialize(this, this);
 
         IL2CPPChainloader.Instance.Finished +=
             ModCompatibility

@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Linq;
 using BepInEx.Configuration;
+using MiraAPI.PluginLoading;
 using UnityEngine;
 
 namespace MiraAPI.LocalSettings.SettingTypes;
 
 /// <inheritdoc />
+[MiraIgnore]
 public abstract class LocalSettingBase<T> : ILocalSetting
 {
     /// <inheritdoc />

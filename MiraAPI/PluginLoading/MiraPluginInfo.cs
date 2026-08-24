@@ -45,6 +45,15 @@ public class MiraPluginInfo
     public ReadOnlyDictionary<ushort, RoleBehaviour> Roles { get; private set; } = null!;
 
     /// <summary>
+    /// Gets a read only dictionary of Game Mode IDs and the AbstractGameMode object they are associated with.
+    /// </summary>
+    /// <returns>Read only dictionary of IDs and Game Modes.</returns>
+    public ReadOnlyDictionary<uint, AbstractGameMode> GetModes()
+    {
+        return new ReadOnlyDictionary<uint, AbstractGameMode>(GameModes);
+    }
+
+    /// <summary>
     /// Gets a <see cref="IReadOnlyCollection{T}"/> of this <see cref="IMiraPlugin"/>'s <see cref="CustomActionButton"/>.
     /// </summary>
     public IReadOnlyCollection<CustomActionButton> Buttons { get; private set; } = null!;
@@ -72,9 +81,8 @@ public class MiraPluginInfo
 
     internal List<BaseModifier> InternalModifiers { get; } = [];
 
+    internal Dictionary<uint, AbstractGameMode> GameModes { get; } = [];
     internal Dictionary<ushort, RoleBehaviour> InternalRoles { get; } = [];
-
-    internal Dictionary<int, CustomGameMode> InternalGameModes { get; } = [];
 
     internal List<CustomActionButton> InternalButtons { get; } = [];
 

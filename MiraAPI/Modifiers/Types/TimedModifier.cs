@@ -1,4 +1,6 @@
 ﻿using System;
+using MiraAPI.PluginLoading;
+using Reactor.Utilities;
 using UnityEngine;
 
 namespace MiraAPI.Modifiers.Types;
@@ -6,6 +8,7 @@ namespace MiraAPI.Modifiers.Types;
 /// <summary>
 /// The base class for all timed modifiers. Timed modifiers have a duration and can be started and stopped.
 /// </summary>
+[MiraIgnore]
 public abstract class TimedModifier : BaseModifier
 {
     /// <summary>
