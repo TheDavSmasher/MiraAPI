@@ -1,4 +1,6 @@
-﻿using System.Diagnostics.CodeAnalysis;
+﻿using System;
+using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using HarmonyLib;
 using Il2CppInterop.Runtime.InteropTypes.Arrays;
@@ -6,9 +8,12 @@ using InnerNet;
 using MiraAPI.Events;
 using MiraAPI.Events.Vanilla.Meeting;
 using MiraAPI.Events.Vanilla.Meeting.Voting;
+using MiraAPI.MeetingAbilities;
 using MiraAPI.Modifiers;
 using MiraAPI.Utilities;
+using MiraAPI.Utilities.Components;
 using MiraAPI.Voting;
+using UnityEngine;
 
 namespace MiraAPI.Patches.Voting;
 
@@ -34,10 +39,46 @@ internal static class MeetingHudPatches
         return true;
     }
 
+    [HarmonyPrefix]
+    [HarmonyPatch(typeof(PlayerVoteArea), nameof(PlayerVoteArea.Select))]
+    public static bool VoteAreaSelectPatch(PlayerVoteArea __instance)
+    {
+        if (PlayerControl.LocalPlayer.Data.IsDead || __instance.AmDead || !(bool) (UnityEngine.Object) __instance.Parent)
+            return false;
+        JudgeRole? judgeRole = PlayerControl.LocalPlayer.Data.Role.TryCast<JudgeRole>();
+        bool flag = judgeRole && PlayerControl.LocalPlayer.PlayerId != __instance.PlayerId;
+        __instance.JudgeOverruleButton?.gameObject.SetActive(flag);
+        if (__instance.VoteComplete || !__instance.Parent.Select((byte) __instance.PlayerId))
+            return false;
+        __instance.Buttons.SetActive(true);
+
+        float startPos = __instance.AnimateButtonsFromLeft ? 0.2f : 1.95f;
+
+        Il2CppSystem.Collections.Generic.List<UiElement> selectableElements = new Il2CppSystem.Collections.Generic.List<UiElement>();
+        foreach (var btn in __instance.Buttons.GetComponentsInChildren<PassiveButton>())
+        {
+            selectableElements.Add(btn);
+        }
+
+        for (int i = 0; i < selectableElements.Count; i++)
+        {
+            var button = selectableElements[i];
+            float endPos = 1.3f - 0.65f * i;
+            float duration = 0.25f + 0.1f * i;
+            __instance.StartCoroutine(Effects.All(Effects.Lerp(duration, (Action<float>) (t =>
+                button.transform.localPosition = Vector2.Lerp(Vector2.right * startPos, Vector2.right * endPos, Effects.ExpOut(t))))));
+        }
+
+        ControllerManager.Instance.OpenOverlayMenu(__instance.name, __instance.CancelButton, selectableElements[1], selectableElements);
+
+        return false;
+    }
+
     [HarmonyPostfix]
     [HarmonyPatch(nameof(MeetingHud.Start))]
     public static void MeetingHudStartPatch(MeetingHud __instance)
     {
+        MeetingButtonManager.OnMeetingStart(__instance);
         foreach (var plr in PlayerControl.AllPlayerControls)
         {
             var voteData = plr.GetVoteData();
@@ -78,6 +119,16 @@ internal static class MeetingHudPatches
     [HarmonyPatch(nameof(MeetingHud.Update))]
     public static void ForceSkipPatch(MeetingHud __instance)
     {
+        foreach (var targetedMeetingAbility in MeetingButtonManager.TargetedButtons.Where(x => x.Enabled(PlayerControl.LocalPlayer.Data.Role)))
+        {
+            targetedMeetingAbility.UpdateHandler();
+        }
+
+        foreach (var meetingAbility in MeetingButtonManager.UntargetedButtons.Where(x => x.Enabled(PlayerControl.LocalPlayer.Data.Role)))
+        {
+            meetingAbility.UpdateHandler(__instance);
+        }
+
         if (__instance.state is not (MeetingHud.MeetingStates.NotVoted or MeetingHud.MeetingStates.Voted))
         {
             return;
@@ -106,7 +157,7 @@ internal static class MeetingHudPatches
 
     [HarmonyPrefix]
     [HarmonyPatch(nameof(MeetingHud.Select))]
-    public static bool SelectPatch(MeetingHud __instance, int suspectStateIdx)
+    public static bool MeetingHudSelectPatch(MeetingHud __instance, int suspectStateIdx)
     {
         var voteData = PlayerControl.LocalPlayer.GetVoteData();
 
