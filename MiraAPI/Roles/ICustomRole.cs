@@ -22,12 +22,12 @@ public interface ICustomRole : IOptionable
     /// <summary>
     /// Gets the name of the role.
     /// </summary>
-    string RoleName => TranslationManager.BuildTranslationId(IdPart, "name");
+    string RoleName => MiraLocaleManager.BuildTranslationId(IdPart, "name");
 
     /// <summary>
     /// Gets the description of the role. Used in the Intro Cutscene.
     /// </summary>
-    string RoleDescription => TranslationManager.BuildTranslationId(IdPart, "description");
+    string RoleDescription => MiraLocaleManager.BuildTranslationId(IdPart, "description");
 
     /// <summary>
     /// Gets the medium description of the role. Used in the role guide.
@@ -37,7 +37,7 @@ public interface ICustomRole : IOptionable
     /// <summary>
     /// Gets the long description of the role. Used in the Role Tab and Role Options.
     /// </summary>
-    string RoleLongDescription => TranslationManager.BuildTranslationId(IdPart, "description");
+    string RoleLongDescription => MiraLocaleManager.BuildTranslationId(IdPart, "description");
 
     /// <summary>
     /// Gets the faction / alignment of the role. Used in the role guide.

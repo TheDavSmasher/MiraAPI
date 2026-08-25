@@ -10,6 +10,6 @@ public static class TranslationExtensions
     /// </summary>
     public static string Translate(this string key)
     {
-        return TranslationManager.Translate(key);
+        return MiraLocaleManager.Get(key);
     }
 }
