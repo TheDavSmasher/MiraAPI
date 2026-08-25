@@ -5,6 +5,8 @@ using System.Linq;
 using System.Text;
 using AmongUs.GameOptions;
 using MiraAPI.Translation;
+using MiraAPI.GameModes;
+using MiraAPI.Utilities;
 using MiraAPI.Utilities.Assets;
 using UnityEngine;
 
@@ -24,14 +26,14 @@ public static class CustomRoleUtils
     {
         if (role is ICustomRole custom)
         {
-            return custom.CanSpawnOnCurrentMode();
+            return custom.CanSpawnOnCurrentMode() && custom.Configuration.AssociatedGameMode.IsInstanceOfType(CustomGameModeManager.ActiveMode);
         }
 
-        if (GameManager.Instance.IsHideAndSeek())
+        if (CustomGameModeManager.ActiveMode is HideAndSeekMode)
         {
             return role.Role is RoleTypes.Engineer || role.Role is RoleTypes.Impostor;
         }
-        return true;
+        return !Helpers.IsRoleBlacklisted(role);
     }
 
     public static List<(ushort RoleType, int Chance)> GetPossibleRoles(

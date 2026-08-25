@@ -30,9 +30,25 @@ public interface ICustomRole : IOptionable
     string RoleDescription => TranslationManager.BuildTranslationId(IdPart, "description");
 
     /// <summary>
+    /// Gets the medium description of the role. Used in the role guide.
+    /// </summary>
+    string RoleMedDescription => RoleDescription;
+
+    /// <summary>
     /// Gets the long description of the role. Used in the Role Tab and Role Options.
     /// </summary>
     string RoleLongDescription => TranslationManager.BuildTranslationId(IdPart, "description");
+
+    /// <summary>
+    /// Gets the faction / alignment of the role. Used in the role guide.
+    /// </summary>
+    string RoleFactionTitle => Team switch
+    {
+        ModdedRoleTeams.Crewmate => TranslationController.Instance.GetString(StringNames.Crewmate),
+        ModdedRoleTeams.Impostor => TranslationController.Instance.GetString(StringNames.Impostor),
+        ModdedRoleTeams.Custom => "Neutral",
+        _ => "Other",
+    };
 
     /// <summary>
     /// Gets the <see cref="Color"/> of the role.
@@ -118,6 +134,10 @@ public interface ICustomRole : IOptionable
         if (presetConfig.TryGetEntry(ChanceConfigDefinition, out ConfigEntry<int> chanceEntry))
         {
             SetChance(chanceEntry.Value);
+            if (chanceEntry.Value == 0)
+            {
+                SetCount(0);
+            }
         }
     }
 
@@ -146,6 +166,10 @@ public interface ICustomRole : IOptionable
     /// <returns>The role count option.</returns>
     public virtual int? GetCount()
     {
+        if (ParentMod.PluginConfig.TryGetEntry(ChanceConfigDefinition, out ConfigEntry<int> entry2) && entry2.Value == 0)
+        {
+            return 0;
+        }
         if (ParentMod.PluginConfig.TryGetEntry(NumConfigDefinition, out ConfigEntry<int> entry))
         {
             return Mathf.Clamp(entry.Value, 0, Configuration.MaxRoleCount);

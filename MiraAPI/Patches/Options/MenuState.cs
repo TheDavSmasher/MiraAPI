@@ -1,11 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using Il2CppInterop.Runtime.Attributes;
+using MiraAPI.GameModes;
 using MiraAPI.GameOptions;
 using MiraAPI.Modifiers;
 using MiraAPI.PluginLoading;
 using MiraAPI.Presets;
 using MiraAPI.Translation;
+using MiraAPI.Roles;
 using MiraAPI.Utilities.Assets;
 using Reactor.Utilities.Attributes;
 using Reactor.Utilities.Extensions;
@@ -61,6 +64,8 @@ public class MenuState(IntPtr cppPtr) : MonoBehaviour(cppPtr)
 
     [HideFromIl2Cpp]
     internal Dictionary<int, bool> FinishedRoleMenus { get; } = [];
+    [HideFromIl2Cpp]
+    internal Dictionary<int, bool> QueuedRoleMenuRefresh { get; } = [];
 
     public void Awake()
     {
@@ -405,14 +410,16 @@ public class MenuState(IntPtr cppPtr) : MonoBehaviour(cppPtr)
         if (CurrentModIdx == 0)
         {
             Gsm.GameSettingsButton.gameObject.SetActive(true);
-            Gsm.RoleSettingsButton.gameObject.SetActive(true);
+            Gsm.RoleSettingsButton.gameObject.SetActive(
+                CustomGameModeManager.ActiveMode != null && CustomGameModeManager.ActiveMode.ShowNormalRoleSettings);
         }
         else
         {
             var hasOptions =
                 CurrentMod.InternalOptionGroups.Exists(g =>
                     g.OptionableType == null && g.ParentMenu == MenuCategory.Game);
-            var hasRoles = CurrentMod.InternalRoles.Count > 0;
+            var customRoles = CurrentMod.InternalRoles.Values.OfType<ICustomRole>();
+            var hasRoles = customRoles.Any(x => x.VisibleInSettings.Invoke());
             var hasModifiers = CurrentMod.InternalOptionGroups.Exists(g =>
                 g.OptionableType?.IsAssignableTo(typeof(BaseModifier)) == true
                 || g.ParentMenu == MenuCategory.Modifiers);

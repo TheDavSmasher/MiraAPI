@@ -5,6 +5,7 @@ using System.Linq;
 using AmongUs.GameOptions;
 using BepInEx.Unity.IL2CPP.Utils.Collections;
 using HarmonyLib;
+using MiraAPI.GameModes;
 using MiraAPI.GameOptions;
 using MiraAPI.Networking;
 using MiraAPI.Roles;
@@ -75,7 +76,24 @@ public static class RoleSettingMenuPatches
             dividerImage.gameObject.SetActive(false);
         }
 
-        if (MenuState.Instance.FinishedRoleMenus.TryGetValue(MenuState.Instance.CurrentModIdx, out var finished) && finished)
+        var queuedRefresh = false;
+        if (MenuState.Instance.QueuedRoleMenuRefresh.TryGetValue(MenuState.Instance.CurrentModIdx, out var queued) && queued)
+        {
+            queuedRefresh = true;
+            var roleOptionSettings = roleMenu.scrollBar.Inner.GetComponentsInChildren<RoleOptionSetting>(true);
+            var headers = roleMenu.scrollBar.Inner.GetComponentsInChildren<CategoryHeaderMasked>(true);
+            foreach (var child in roleOptionSettings)
+            {
+                Object.Destroy(child.gameObject);
+            }
+            foreach (var child in headers)
+            {
+                Object.Destroy(child.gameObject);
+            }
+            yield return new WaitForEndOfFrame();
+            MenuState.Instance.QueuedRoleMenuRefresh[MenuState.Instance.CurrentModIdx] = false;
+        }
+        if (!queuedRefresh && MenuState.Instance.FinishedRoleMenus.TryGetValue(MenuState.Instance.CurrentModIdx, out var finished) && finished)
         {
             var roleOptionSettings = roleMenu.scrollBar.Inner.GetComponentsInChildren<RoleOptionSetting>(true);
             foreach (var r in roleOptionSettings)
@@ -154,6 +172,17 @@ public static class RoleSettingMenuPatches
                 ScrollerNum = 0.522f;
 
                 var num4 = 0;
+                var roleOptionSettings = roleMenu.scrollBar.Inner.GetComponentsInChildren<RoleOptionSetting>(false);
+                var headers = roleMenu.scrollBar.Inner.GetComponentsInChildren<CategoryHeaderMasked>(false);
+                foreach (var child in roleOptionSettings)
+                {
+                    Object.Destroy(child.gameObject);
+                }
+                foreach (var child in headers)
+                {
+                    Object.Destroy(child.gameObject);
+                }
+                yield return new WaitForEndOfFrame();
 
                 var roleGroups = MenuState.Instance.CurrentMod.InternalRoles.Values.OfType<ICustomRole>()
                     .ToLookup(x => x.RoleOptionsGroup);
@@ -177,7 +206,7 @@ public static class RoleSettingMenuPatches
                     foreach (var grouping in sortedRoleGroups)
                     {
                         if (!grouping.Any() ||
-                            grouping.All(x => x.Configuration.HideSettings || !x.VisibleInSettings()))
+                            grouping.All(x=> x.Configuration.HideSettings || !x.VisibleInSettings() || !x.Configuration.AssociatedGameMode.IsInstanceOfType(CustomGameModeManager.ActiveMode)))
                         {
                             continue;
                         }
@@ -309,6 +338,7 @@ public static class RoleSettingMenuPatches
                                     RoleGroupHidden[group] = !groupHidden;
                                 }
 
+                                MenuState.Instance.QueuedRoleMenuRefresh[MenuState.Instance.CurrentModIdx] = false;
                                 MenuState.Instance.FinishedRoleMenus[MenuState.Instance.CurrentModIdx] = false;
 
                                 foreach (var child in roleMenu.RoleChancesSettings.transform)
@@ -328,6 +358,7 @@ public static class RoleSettingMenuPatches
                     }
                 }
             }
+            MenuState.Instance.QueuedRoleMenuRefresh[MenuState.Instance.CurrentModIdx] = false;
             MenuState.Instance.FinishedRoleMenus[MenuState.Instance.CurrentModIdx] = true;
         }
 
@@ -447,6 +478,10 @@ public static class RoleSettingMenuPatches
             if (role.Configuration.CanModifyChance)
             {
                 role.SetChance(roleSetting.RoleChance);
+                if (roleSetting.RoleChance == 0 && role.Configuration.MaxRoleCount != 0)
+                {
+                    role.SetCount(0);
+                }
             }
         }
         catch (Exception e)
@@ -518,6 +553,26 @@ public static class RoleSettingMenuPatches
         CurrentRoleOptions = filteredOptions;
     }
 
+    [HarmonyPrefix]
+    [HarmonyPatch(nameof(RolesSettingsMenu.ChangeTab))]
+    public static void ChangeTabPatch(RolesSettingsMenu __instance)
+    {
+        var categoryHeaderMasked = __instance.AdvancedRolesSettings.transform.Find("CategoryHeaderMasked").GetComponent<CategoryHeaderMasked>();
+        categoryHeaderMasked.Title.text = TranslationController.Instance.GetString(StringNames.RoleSettingsLabel);
+        var labelBg = __instance.AdvancedRolesSettings.transform.FindChild("InfoLabelBackground");
+        var imgBg = __instance.AdvancedRolesSettings.transform.FindChild("Imagebackground");
+        imgBg.gameObject.SetActive(true);
+        __instance.roleScreenshot.gameObject.SetActive(true);
+        __instance.roleDescriptionText.transform.parent.localPosition = new Vector3(2.5176f, -0.2731f, -1f);
+        __instance.roleDescriptionText.transform.parent.localScale = new Vector3(0.0675f, 0.1494f, 0.5687f);
+        labelBg.transform.localPosition = new Vector3(1.082f, 0.1054f, -2.5f);
+        __instance.roleScreenshot.drawMode = SpriteDrawMode.Simple;
+        foreach (var optBehaviour in __instance.AdvancedRolesSettings.GetComponentsInChildren<OptionBehaviour>())
+        {
+            optBehaviour.gameObject.Destroy();
+        }
+    }
+
     private static void ChangeTab(RoleBehaviour role, RolesSettingsMenu __instance)
     {
         if (role is not ICustomRole customRole)
@@ -547,12 +602,8 @@ public static class RoleSettingMenuPatches
             __instance.roleDescriptionText.transform.parent.localScale = new Vector3(0.0675f, 0.1494f, 0.5687f);
             labelBg.transform.localPosition = new Vector3(1.082f, 0.1054f, -2.5f);
 
-            __instance.roleScreenshot.sprite = Sprite.Create(
-                role.RoleScreenshot.texture,
-                new Rect(0, 0, 370, 230),
-                Vector2.one / 2,
-                100);
-            __instance.roleScreenshot.drawMode = SpriteDrawMode.Sliced;
+            __instance.roleScreenshot.sprite = role.RoleScreenshot;
+            __instance.roleScreenshot.drawMode = SpriteDrawMode.Simple;
         }
 
         __instance.roleHeaderSprite.color = customRole.OptionsMenuColor;
