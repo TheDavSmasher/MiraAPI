@@ -17,10 +17,10 @@
     <string name="miraApi.customCategory2">Custom Category 2</string>
     <string name="miraApi.modifierMenuDescription">Configure modifiers and their settings here!</string>
     <string name="miraApi.customOptionMenuDescription">Apply game settings for this mod!</string>
-    <string name="gamemode.classic.name">Classic</string>
+    <string name="gamemode.classic">Classic</string>
     <string name="gamemode.classic.description">The classic Among Us experience!
 Find the Impostors or deceive the Crew.</string>
-    <string name="gamemode.hidenseek.name">Hide n Seek</string>
+    <string name="gamemode.hidenseek">Hide n Seek</string>
     <string name="gamemode.hidenseek.description">You can run, but you can't hide!
 Outlive the timer or eliminate the crew.</string>
     <string name="gamesetting.global.clicktoclose">Click to close</string>

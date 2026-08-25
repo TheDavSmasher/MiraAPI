@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using AmongUs.GameOptions;
 using MiraAPI.GameOptions;
 using MiraAPI.PluginLoading;
+using MiraAPI.Translation;
 using MiraAPI.Utilities.Assets;
 using Reactor.Utilities.Extensions;
 using TMPro;
@@ -49,7 +50,7 @@ public abstract class AbstractGameMode : IOptionable
     /// <summary>
     /// Gets the colored game mode name, using the color and name properties.
     /// </summary>
-    public string ColoredName => $"<color=#{this.Color.ToHtmlStringRGBA()}>{this.Name}</color>";
+    public string ColoredName => $"<color=#{this.Color.ToHtmlStringRGBA()}>{MiraLocaleManager.Get(Name)}</color>";
 
     /// <summary>
     /// Gets the game mode id.

@@ -13,7 +13,7 @@ public class MiraLocalizationProvider : LocalizationProvider
 
     public override bool TryGetText(StringNames stringName, out string? result)
     {
-        if ((int)stringName < 0 && _reactorProvider!.TryGetText(stringName, out var reactorText))
+        if (_reactorProvider != null && (int)stringName < 0 && _reactorProvider.TryGetText(stringName, out var reactorText))
         {
             if (reactorText.IsNullOrWhiteSpace())
             {
@@ -21,7 +21,7 @@ public class MiraLocalizationProvider : LocalizationProvider
                 return true;
             }
             var localeText = MiraLocaleManager.Get(reactorText!);
-            if (!localeText.Contains("STRMISS"))
+            if (localeText != reactorText)
             {
                 result = localeText;
                 return true;

@@ -11,7 +11,7 @@ namespace MiraAPI.GameModes;
 public class ClassicMode : AbstractGameMode
 {
     /// <inheritdoc/>
-    public override string Name => "gamemode.classic.name";
+    public override string Name => "gamemode.classic";
 
     /// <inheritdoc/>
     public override string Description => "gamemode.classic.description";

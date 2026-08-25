@@ -114,7 +114,7 @@ internal static class GameOptionsMenuPatch
             _modIcon.gameObject.SetActive(false);
         }
 
-        _gamemodeDescription.text = gameMode.Description;
+        _gamemodeDescription.text = MiraLocaleManager.Get(gameMode.Description);
         if (gameMode.ShowNormalGameSettings)
         {
             foreach (var opt in _vanillaHeaders)

@@ -151,7 +151,7 @@ public sealed class MiraPluginManager
 
         IL2CPPChainloader.Instance.PluginLoad += (pluginInfo, assembly, plugin) =>
         {
-            if (plugin is not IMiraPlugin miraPlugin)
+            if (plugin is not IMiraPlugin miraPlugin || pluginInfo.Metadata.GUID == MiraApiPlugin.Id)
             {
                 return;
             }
@@ -272,21 +272,6 @@ public sealed class MiraPluginManager
             PluginsWithOptionsOrGameModes = [..RegisteredPlugins.Where(m => m.MiraPlugin.DisplayOnOptionsMenu || m.GameModes.Count > 0)];
 
             ModifierManager.Modifiers = new ReadOnlyCollection<BaseModifier>(ModifierManager.InternalModifiers);
-
-            var dict = new Dictionary<string, object>();
-            foreach (var (key, value) in CustomGameModeManager.IdToModeMap)
-            {
-                if (value is ClassicMode)
-                {
-                    continue;
-                }
-                dict.Add(value.Name, key);
-                if (((AmongUs.GameOptions.GameModes) key) == AmongUs.GameOptions.GameModes.Normal)
-                    return;
-                // 'Default' was still being registered twice and idk why
-                GameModesHelpers.ModeToName.Add((AmongUs.GameOptions.GameModes)key, CustomStringName.CreateAndRegister(value.Name));
-            }
-            EnumInjector.InjectEnumValues<AmongUs.GameOptions.GameModes>(dict);
         };
 
         RegisterKeybinds(typeof(MiraGlobalKeybinds), PluginSingleton<MiraApiPlugin>.Instance);

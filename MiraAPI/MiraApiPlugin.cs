@@ -77,8 +77,8 @@ public partial class MiraApiPlugin : BasePlugin, IMiraPlugin
         PluginManager = new MiraPluginManager();
         PluginManager.Initialize(this, this);
 
-        LocalizationManager.Register(new MiraLocalizationProvider());
         MiraLocaleManager.Register("mira.api");
+        LocalizationManager.Register(new MiraLocalizationProvider());
 
         IL2CPPChainloader.Instance.Finished +=
             ModCompatibility
