@@ -6,11 +6,17 @@ namespace MiraAPI.VanillaEvents;
 
 public static class JudgeEvents
 {
-    [RegisterEvent(100000)]
+    public static void Initialize()
+    {
+        // This is required because MiraAPI isn't an IMiraPlugin (besides in the gamemodes branch)
+        MiraEventManager.RegisterEventHandler<ProcessVotesEvent>(@event => ProcessVotesEventHandler(@event), -1000);
+    }
+
     public static void ProcessVotesEventHandler(ProcessVotesEvent @event)
     {
         if (MeetingHud.Instance.TryGetWinningOverrule(out var judgeOverrule, out var networkedPlayerInfo, out var networkedPlayerInfo2))
         {
+            Error("Judge has overruled votes!");
             @event.OverruledVote = true;
             @event.OverruledNonce = judgeOverrule.OverruleNonce;
 

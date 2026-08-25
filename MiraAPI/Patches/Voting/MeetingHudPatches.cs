@@ -4,6 +4,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using HarmonyLib;
 using Il2CppInterop.Runtime.InteropTypes.Arrays;
+using InnerNet;
 using MiraAPI.Events;
 using MiraAPI.Events.Vanilla.Meeting;
 using MiraAPI.Events.Vanilla.Meeting.Voting;
@@ -271,6 +272,16 @@ internal static class MeetingHudPatches
     public static bool CmdCastVoteOverridePatch(MeetingHud __instance, byte playerId, byte suspectIdx)
     {
         VotingUtils.RpcCastVote(PlayerControl.LocalPlayer, playerId, suspectIdx);
+        return false;
+    }
+
+    // TODO: figure out a way to do host-authorization since right now any player can send RpcQueueOverruleVotes
+    [HarmonyPrefix]
+    [HarmonyPatch(nameof(MeetingHud.CmdQueueOverruleVotes))]
+    // Although this method is inlined in MeetingHud.Confirm, the next patch fixes that.
+    public static bool CmdQueueOverruleVotesPatch(MeetingHud __instance, PlayerId judgePlayerId, PlayerId targetPlayerId, ushort overruleNonce)
+    {
+        VotingUtils.RpcQueueOverruleVotes(PlayerControl.LocalPlayer, judgePlayerId.Value, targetPlayerId.Value, overruleNonce);
         return false;
     }
 

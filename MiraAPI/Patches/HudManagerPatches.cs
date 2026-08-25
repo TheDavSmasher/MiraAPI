@@ -1,9 +1,11 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.Globalization;
 using HarmonyLib;
 using MiraAPI.Hud;
 using MiraAPI.Keybinds;
 using MiraAPI.LocalSettings;
+using MiraAPI.Roles;
 using MiraAPI.Utilities;
 using Reactor.Utilities;
 using Reactor.Utilities.Extensions;
@@ -123,6 +125,47 @@ public static class HudManagerPatches
         CustomGameModeManager.ActiveMode?.HudStart(__instance);
     }*/
 
+    [HarmonyPrefix]
+    [HarmonyPriority(Priority.First)]
+    [HarmonyPatch(typeof(FriendsListManager), nameof(FriendsListManager.SetFriendButtonColor))]
+    public static bool SetFriendButtonColor(FriendsListManager __instance, bool isGrayedOut)
+    {
+        __instance.FriendsListButton?.SetGlyphColor(isGrayedOut);
+        return false;
+    }
+
+    [HarmonyPrefix]
+    [HarmonyPriority(Priority.First)]
+    [HarmonyPatch(typeof(ChatController), nameof(ChatController.Toggle))]
+    [HarmonyPatch(typeof(ChatController), nameof(ChatController.Close))]
+    public static void TogglePrefix(ChatController __instance)
+    {
+        if (!MiraHudHelper.ClonedChatButton)
+        {
+            return;
+        }
+        __instance.chatButton.transform.localPosition = MiraHudHelper.ClonedChatButton.transform.localPosition + new Vector3(-0.3f, 0);
+    }
+
+    [HarmonyPostfix]
+    [HarmonyPriority(Priority.First)]
+    [HarmonyPatch(typeof(ChatController), nameof(ChatController.Toggle))]
+    [HarmonyPatch(typeof(ChatController), nameof(ChatController.Close))]
+    public static void TogglePostfix(ChatController __instance)
+    {
+        MiraHudHelper.UiGrid.ArrangeChilds();
+    }
+
+    [HarmonyPrefix]
+    [HarmonyPriority(Priority.First)]
+    [HarmonyPatch(typeof(ChatController), nameof(ChatController.AddChatNote))]
+    [HarmonyPatch(typeof(ChatController), nameof(ChatController.AddChat))]
+    [HarmonyPatch(typeof(ChatController), nameof(ChatController.AddChatWarning))]
+    public static void ChatBubbleUpdatePrefix(ChatController __instance)
+    {
+        __instance.chatNotifyDot.transform.localPosition = new Vector3(-0.34f, 0.373f, -1f);
+    }
+
     /// <summary>
     /// Create custom buttons and arrange them on the hud.
     /// </summary>
@@ -131,6 +174,7 @@ public static class HudManagerPatches
     [HarmonyPatch(nameof(HudManager.Start))]
     public static void StartPostfix(HudManager __instance)
     {
+        __instance.gameObject.AddComponent<MiraHudHelper>();
         if (Buttons == null)
         {
             Buttons = __instance.transform.Find("Buttons");

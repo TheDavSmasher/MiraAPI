@@ -7,6 +7,7 @@ using System.Linq;
 using System.Reflection;
 using System.Text.RegularExpressions;
 using HarmonyLib;
+using MiraAPI.GameModes;
 using MiraAPI.GameOptions;
 using MiraAPI.Networking;
 using MiraAPI.Roles;
@@ -367,6 +368,71 @@ public static class Extensions
     }
 
     /// <summary>
+    /// Gets all child objects in a parent object.
+    /// </summary>
+    /// <returns>An <see cref="IEnumerable"/> that contains <see cref="GameObject"/>s.</returns>
+    public static IEnumerable<GameObject> GetAllChildren(this GameObject go)
+    {
+        for (var i = 0; i < go.transform.childCount; i++)
+        {
+            yield return go.transform.GetChild(i).gameObject;
+        }
+    }
+
+    /// <summary>
+    /// Gets all child objects in a parent Transform.
+    /// </summary>
+    /// <returns>An <see cref="IEnumerable"/> that contains <see cref="GameObject"/>s.</returns>
+    public static IEnumerable<GameObject> GetAllChildren(this Transform go)
+    {
+        for (var i = 0; i < go.transform.childCount; i++)
+        {
+            yield return go.transform.GetChild(i).gameObject;
+        }
+    }
+
+    /// <summary>
+    /// Resizes a <see cref="SpriteRenderer"/> appropriate to the maximum pixel size without messing up ratios.
+    /// </summary>
+    /// <param name="sprite">The <see cref="SpriteRenderer"/> to adjust.</param>
+    /// <param name="pixelSize">The scale for the sprite to be adjusted to.</param>
+    public static void SetSizeLimit(this SpriteRenderer sprite, float pixelSize)
+    {
+        sprite.drawMode = SpriteDrawMode.Sliced;
+        if (!sprite.sprite)
+        {
+            return;
+        }
+
+        float spriteWidth = sprite.sprite.rect.width;
+        float spriteHeight = sprite.sprite.rect.height;
+
+        if (spriteWidth < spriteHeight)
+        {
+            sprite.size = new Vector2(pixelSize * spriteWidth / spriteHeight, pixelSize);
+        }
+        else
+        {
+            sprite.size = new Vector2(pixelSize, pixelSize * spriteHeight / spriteWidth);
+        }
+    }
+
+    /// <summary>
+    /// Resizes a <see cref="SpriteRenderer"/> appropriate to the maximum pixel size without messing up ratios.
+    /// </summary>
+    /// <param name="spriteObj">The <see cref="GameObject"/> to adjust.</param>
+    /// <param name="pixelSize">The scale for the sprite to be adjusted to.</param>
+    public static void SetSizeLimit(this GameObject spriteObj, float pixelSize)
+    {
+        if (!spriteObj.TryGetComponent<SpriteRenderer>(out var sprite))
+        {
+            return;
+        }
+
+        sprite.SetSizeLimit(pixelSize);
+    }
+
+    /// <summary>
     /// Gets a cache of <see cref="PlayerControl"/>'s <see cref="PlayerVoteData"/> to improve performance.
     /// </summary>
     public static Dictionary<PlayerControl, PlayerVoteData> VoteDataComponents { get; } = [];
@@ -611,7 +677,8 @@ public static class Extensions
     public static bool IsCustom(this OptionBehaviour optionBehaviour)
     {
         return ModdedOptionsManager.ModdedOptions.Values.Any(
-            opt => opt.OptionBehaviour && opt.OptionBehaviour == optionBehaviour);
+            opt => opt.OptionBehaviour && opt.OptionBehaviour == optionBehaviour)
+            || optionBehaviour.Equals(GameModeOption.OptionBehaviour);
     }
 
     /// <summary>

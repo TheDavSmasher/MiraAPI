@@ -5,6 +5,7 @@ using Il2CppInterop.Runtime.InteropTypes;
 using MiraAPI.Events;
 using MiraAPI.Events.Vanilla.Gameplay;
 using MiraAPI.MeetingAbilities;
+using MiraAPI.GameModes;
 using MiraAPI.Roles;
 using MiraAPI.Utilities;
 
@@ -31,6 +32,11 @@ public static class IntroCutscenePatches
     {
         var @event = new IntroBeginEvent(__instance);
         MiraEventManager.InvokeEvent(@event);
+
+        if (CustomGameModeManager.ActiveMode != null)
+        {
+            CustomGameModeManager.ActiveMode.Initialize();
+        }
     }
 
     [HarmonyPatch]
@@ -122,7 +128,6 @@ public static class IntroCutscenePatches
             {
                 introCutscene = __instance.Cast<IntroCutscene>();
             }
-
             Info("IntroCutscene ended");
 
             MeetingButtonManager.OnGameStart();

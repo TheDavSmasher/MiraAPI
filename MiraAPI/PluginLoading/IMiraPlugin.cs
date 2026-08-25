@@ -1,5 +1,7 @@
 ﻿using System.Linq;
 using BepInEx.Configuration;
+using MiraAPI.Utilities.Assets;
+using UnityEngine;
 
 namespace MiraAPI.PluginLoading;
 
@@ -17,7 +19,7 @@ public interface IMiraPlugin
     /// Gets the name to display on the options menu.
     /// </summary>
     string OptionsTitleText { get; }
-
+    
     /// <summary>
     /// Gets the abbreviated name to display for other mods to pick up.
     /// </summary>

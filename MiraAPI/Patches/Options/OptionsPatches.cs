@@ -1,8 +1,10 @@
 ﻿using HarmonyLib;
 using Il2CppSystem;
+using MiraAPI.GameModes;
 using MiraAPI.GameOptions;
 using MiraAPI.Roles;
 using MiraAPI.Utilities;
+using Reactor.Utilities.Extensions;
 using UnityEngine;
 using Object = Il2CppSystem.Object;
 
@@ -199,8 +201,8 @@ public static class OptionsPatches
         {
             return true;
         }
+        __instance.TitleText.text = TranslationController.Instance.GetString(__instance.Title);
 
-        __instance.TitleText.text = TranslationController.Instance.GetString(__instance.Title, Array.Empty<Object>());
         return false;
     }
 

@@ -5,6 +5,8 @@ using System.Linq;
 using System.Reflection;
 using BepInEx.Configuration;
 using HarmonyLib;
+using Il2CppInterop.Runtime.Injection;
+using MiraAPI.GameModes;
 using MiraAPI.GameOptions.Attributes;
 using MiraAPI.GameOptions.OptionTypes;
 using MiraAPI.Networking;
@@ -26,6 +28,8 @@ public static class ModdedOptionsManager
     private static readonly Dictionary<Type, AbstractOptionGroup> TypeToGroup = [];
 
     internal static readonly Dictionary<OptionBehaviour, ModdedPlayerOption> CreatedPlayerOptions = [];
+    internal static readonly Dictionary<OptionBehaviour, ModdedStringOption> CreatedStringOptions = [];
+    internal static readonly Dictionary<Type, List<AbstractOptionGroup>> GameModeOptionGroups = [];
     internal static readonly Dictionary<uint, IModdedOption> ModdedOptions = [];
     internal static readonly List<AbstractOptionGroup> Groups = [];
 
@@ -34,7 +38,7 @@ public static class ModdedOptionsManager
 
     public static void AddSettingsChangeMessage(NotificationPopper notif, StringNames key, string value, Color textColor, TMP_SpriteAsset? sprite, bool playSound = true)
     {
-        var item = string.Empty;
+        string item;
         var text = textColor.ToTextColor();
         if (sprite != null)
         {
@@ -62,6 +66,29 @@ public static class ModdedOptionsManager
         notif.SettingsChangeMessageLogic(key, item, playSound);
     }
 
+    internal static bool RegisterGroup(Type type)
+    {
+        if (Activator.CreateInstance(type) is not AbstractOptionGroup group)
+        {
+            return false;
+        }
+
+        if (TypeToGroup.ContainsKey(type))
+        {
+            Logger<MiraApiPlugin>.Error($"Group {type.Name} already exists.");
+            return false;
+        }
+
+        Groups.Add(group);
+        TypeToGroup.Add(type, group);
+
+        typeof(OptionGroupSingleton<>).MakeGenericType(type)
+            .GetField("_instance", BindingFlags.Static | BindingFlags.NonPublic)!
+            .SetValue(null, group);
+
+        return true;
+    }
+
     internal static bool RegisterGroup(Type type, MiraPluginInfo pluginInfo)
     {
         if (Activator.CreateInstance(type) is not AbstractOptionGroup group)
@@ -77,6 +104,17 @@ public static class ModdedOptionsManager
 
         Groups.Add(group);
         TypeToGroup.Add(type, group);
+        if (group.OptionableType?.IsAssignableTo(typeof(AbstractGameMode)) == true)
+        {
+            if (GameModeOptionGroups.TryGetValue(group.OptionableType, out var oldList))
+            {
+                oldList.Add(group);
+            }
+            else
+            {
+                GameModeOptionGroups.Add(group.OptionableType, new List<AbstractOptionGroup>() { group });
+            }
+        }
         pluginInfo.InternalOptionGroups.Add(group);
 
         typeof(OptionGroupSingleton<>).MakeGenericType(type)
