@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Globalization;
 using System.Text;
 using BepInEx.Configuration;
 using MiraAPI.GameOptions;
@@ -17,7 +18,7 @@ public interface ICustomRole : IOptionable
     /// <summary>
     /// Gets the id part used to build the role's translation keys.
     /// </summary>
-    string IdPart => GetType().Name.ToLower();
+    string IdPart => GetType().Name.ToLower(CultureInfo.InvariantCulture);
 
     /// <summary>
     /// Gets the name of the role.
@@ -44,10 +45,10 @@ public interface ICustomRole : IOptionable
     /// </summary>
     string RoleFactionTitle => Team switch
     {
-        ModdedRoleTeams.Crewmate => TranslationController.Instance.GetString(StringNames.Crewmate),
-        ModdedRoleTeams.Impostor => TranslationController.Instance.GetString(StringNames.Impostor),
-        ModdedRoleTeams.Custom => "Neutral",
-        _ => "Other",
+        ModdedRoleTeams.Crewmate => MiraLocaleManager.Get("roleTeam.crewmate"),
+        ModdedRoleTeams.Impostor => MiraLocaleManager.Get("roleTeam.impostor"),
+        ModdedRoleTeams.Custom => MiraLocaleManager.Get("roleTeam.neutral"),
+        _ => MiraLocaleManager.Get("roleTeam.other"),
     };
 
     /// <summary>
@@ -78,7 +79,7 @@ public interface ICustomRole : IOptionable
         ModdedRoleTeams.Crewmate => RoleOptionsGroup.Crewmate,
         ModdedRoleTeams.Impostor => RoleOptionsGroup.Impostor,
         ModdedRoleTeams.Custom => RoleOptionsGroup.Neutral,
-        _ => new RoleOptionsGroup(RoleName.Translate(), RoleColor),
+        _ => new RoleOptionsGroup(RoleName, RoleColor),
     };
 
     /// <summary>

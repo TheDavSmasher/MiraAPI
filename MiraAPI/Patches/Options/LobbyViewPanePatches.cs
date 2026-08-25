@@ -32,8 +32,7 @@ public static class LobbyViewPanePatches
         : Plugins[SelectedModIdx - 1];
 
     private static PassiveButton? ModifiersTabButton { get; set; }
-
-    private static StringNames ModifiersTabName { get; } = CustomStringName.CreateAndRegister("ModifiersTab");
+    internal static StringNames ModifiersTabName { get; } = MiraLocaleManager.GetOrCreateLocaleString("ModifiersTab");
 
     private static AbstractGameMode? GetCustomGamemode()
     {
@@ -455,7 +454,7 @@ public static class LobbyViewPanePatches
         // sort the groups by priority
         var sortedRoleGroups = roleGroups
             .OrderBy(x => x.Key.Priority)
-            .ThenBy(x => x.Key.Name);
+            .ThenBy(x => x.Key.Name.Translate());
 
         foreach (var grouping in sortedRoleGroups)
         {
@@ -466,13 +465,7 @@ public static class LobbyViewPanePatches
 
             var group = grouping.Key;
 
-            var translatedName = group.Name.Translate();
-            var name = translatedName switch
-            {
-                "Crewmate" => StringNames.CrewmateRolesHeader,
-                "Impostor" => StringNames.ImpostorRolesHeader,
-                _ => CustomStringName.CreateAndRegister(translatedName),
-            };
+            var name = MiraLocaleManager.GetOrCreateLocaleString(group.Name);
 
             var categoryHeaderRoleVariant = Object.Instantiate(instance.categoryHeaderRoleOrigin, instance.settingsContainer, true);
             categoryHeaderRoleVariant.SetHeader(name, 61);

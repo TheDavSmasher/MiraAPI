@@ -6,6 +6,7 @@ using MiraAPI.GameOptions;
 using MiraAPI.Networking;
 using MiraAPI.Patches.GameModes;
 using MiraAPI.Patches.Options;
+using MiraAPI.Translation;
 using MiraAPI.Utilities;
 using MiraAPI.Utilities.Assets;
 using Reactor.Localization.Utilities;
@@ -48,17 +49,17 @@ public static class GameModeOption
     internal static StringOption OptionBehaviour { get; set; } = null!;
 
     internal static int _lastValue;
-    internal static readonly StringNames GamemodeName = CustomStringName.CreateAndRegister("Gamemode");
-    internal static readonly StringNames CustomName = CustomStringName.CreateAndRegister("Custom");
+    internal static readonly StringNames GamemodeName = MiraLocaleManager.GetOrCreateLocaleString("Gamemode");
+    internal static readonly StringNames CustomName = MiraLocaleManager.GetOrCreateLocaleString("Custom");
     internal static readonly Dictionary<uint, StringNames> Values = new()
     {
-        [0] = CustomStringName.CreateAndRegister("Classic"),
+        [0] = MiraLocaleManager.GetOrCreateLocaleString("Classic"),
     };
 
     internal static void AddOption(AbstractGameMode mode)
     {
         if (!Values.ContainsKey(mode.ID))
-            Values.Add(mode.ID, CustomStringName.CreateAndRegister(mode.ColoredName));
+            Values.Add(mode.ID, MiraLocaleManager.GetOrCreateLocaleString(mode + ".colored"));
     }
     /*[HarmonyPatch(typeof(GameOptionsMenu), nameof(GameOptionsMenu.CreateSettings))]
     [HarmonyPostfix]

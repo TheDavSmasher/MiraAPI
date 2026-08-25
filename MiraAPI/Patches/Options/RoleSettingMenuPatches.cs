@@ -196,7 +196,7 @@ public static class RoleSettingMenuPatches
                     // sort the groups by priority
                     var sortedRoleGroups = roleGroups
                         .OrderBy(x => x.Key.Priority)
-                        .ThenBy(x => x.Key.Name);
+                        .ThenBy(x => x.Key.Name.Translate());
 
                     var quotaThing = roleMenu.categoryHeaderEditRoleOrigin.transform.FindChild("QuotaHeader");
                     var usingNewQuota = false;
@@ -215,13 +215,7 @@ public static class RoleSettingMenuPatches
 
                         RoleGroupHidden.TryAdd(group, false);
 
-                        var translatedName = group.Name.Translate();
-                        var name = translatedName switch
-                        {
-                            "Crewmate" => StringNames.CrewmateRolesHeader,
-                            "Impostor" => StringNames.ImpostorRolesHeader,
-                            _ => CustomStringName.CreateAndRegister(translatedName),
-                        };
+                        var name = MiraLocaleManager.GetOrCreateLocaleString(group.Name);
 
                         var categoryHeaderMasked = Object.Instantiate(
                             template,

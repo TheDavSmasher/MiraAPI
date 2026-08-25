@@ -47,7 +47,7 @@ public class LocalToggleSetting : LocalSettingBase<bool>
             toggleObject.transform.localPosition = new Vector3(order == 1 ? -1.185f : 1.185f, 1.85f - offset, -7);
         }
 
-        toggleObject.BaseText = CustomStringName.CreateAndRegister(Name.Translate());
+        toggleObject.BaseText = MiraLocaleManager.GetOrCreateLocaleString(Name);
         toggleObject.UpdateText(GetValue());
         toggleObject.name = Name.Translate();
         toggleObject.Background.color = GetValue() ? Tab!.TabAppearance.ToggleActiveColor : Tab!.TabAppearance.ToggleInactiveColor;

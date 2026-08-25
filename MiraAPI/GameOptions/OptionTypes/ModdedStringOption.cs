@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using Il2CppInterop.Runtime.InteropTypes.Arrays;
 using MiraAPI.Networking;
+using MiraAPI.Translation;
 using Reactor.Localization.Utilities;
 using UnityEngine;
 using Object = UnityEngine.Object;
@@ -56,7 +57,7 @@ public class ModdedStringOption : ModdedOption<string>
             newVals.Insert(index, value);
             Values = newVals.ToArray();
             var newStrVals = StringNameValues.ToList();
-            newStrVals.Insert(index, CustomStringName.CreateAndRegister(value));
+            newStrVals.Insert(index, MiraLocaleManager.GetOrCreateLocaleString(value));
             StringNameValues = newStrVals.ToArray();
         }
 
@@ -108,7 +109,7 @@ public class ModdedStringOption : ModdedOption<string>
 
         data.Title = StringName;
         data.Type = global::OptionTypes.String;
-        StringNameValues = values.Select(CustomStringName.CreateAndRegister).ToArray();
+        StringNameValues = values.Select(MiraLocaleManager.GetOrCreateLocaleString).ToArray();
         data.Values = StringNameValues;
 
         data.Index = GetIndex(Value, 3);

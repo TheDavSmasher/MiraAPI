@@ -132,9 +132,10 @@ public static class CustomRoleManager
         roleBehaviour.Role = (RoleTypes)roleId;
         roleBehaviour.TeamType = customRole.Team == ModdedRoleTeams.Custom ? RoleTeamTypes.Crewmate : (RoleTeamTypes)customRole.Team;
         roleBehaviour.NameColor = customRole.RoleColor;
-        roleBehaviour.StringName = CustomStringName.CreateAndRegister(customRole.RoleName.Translate());
-        roleBehaviour.BlurbName = CustomStringName.CreateAndRegister(customRole.RoleDescription.Translate());
-        roleBehaviour.BlurbNameLong = CustomStringName.CreateAndRegister(customRole.RoleLongDescription.Translate());
+        roleBehaviour.StringName = MiraLocaleManager.GetOrCreateLocaleString(customRole.RoleName);
+        roleBehaviour.BlurbName = MiraLocaleManager.GetOrCreateLocaleString(customRole.RoleDescription);
+        roleBehaviour.BlurbNameMed = MiraLocaleManager.GetOrCreateLocaleString(customRole.RoleMedDescription);
+        roleBehaviour.BlurbNameLong = MiraLocaleManager.GetOrCreateLocaleString(customRole.RoleLongDescription);
         roleBehaviour.AffectedByLightAffectors = customRole.Configuration.AffectedByLightOnAirship;
         roleBehaviour.CanBeKilled = customRole.Configuration.CanGetKilled;
         roleBehaviour.CanUseKillButton = customRole.Configuration.UseVanillaKillButton;

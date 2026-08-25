@@ -457,7 +457,7 @@ internal static class GameOptionsMenuPatch
 
         num -= 0.58f;
 
-        categoryHeaderMasked.SetHeader(CustomStringName.CreateAndRegister(group.GroupName), 20);
+        categoryHeaderMasked.SetHeader(MiraLocaleManager.GetOrCreateLocaleString(group.GroupName), 20);
         categoryHeaderMasked.Background.color = group.GroupColor;
         categoryHeaderMasked.Divider.color = group.GroupColor;
         categoryHeaderMasked.Title.color = group.GroupColor.Equals(MiraApiPlugin.DefaultHeaderColor)
@@ -697,7 +697,7 @@ internal static class GameOptionsMenuPatch
                 Quaternion.identity,
                 container);
 
-            categoryHeaderMasked.SetHeader(CustomStringName.CreateAndRegister(group.GroupName.Translate()), 20);
+            categoryHeaderMasked.SetHeader(MiraLocaleManager.GetOrCreateLocaleString(group.GroupName), 20);
             categoryHeaderMasked.Background.color = group.GroupColor;
             categoryHeaderMasked.Divider.color = group.GroupColor;
             categoryHeaderMasked.Title.color = group.GroupColor.Equals(MiraApiPlugin.DefaultHeaderColor)

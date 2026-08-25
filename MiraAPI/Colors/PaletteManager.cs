@@ -1,8 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using HarmonyLib;
-using MiraAPI.Translation;
-using Reactor.Localization.Utilities;
 
 namespace MiraAPI.Colors;
 
@@ -23,8 +21,7 @@ public static class PaletteManager
         var colors = CustomColors.Select(x => x.MainColor).ToArray();
         var shadowColors = CustomColors.Select(x => x.ShadowColor).ToArray();
         var stringNames = CustomColors.Select(x =>
-            CustomStringName.CreateAndRegister(TranslationController.Instance.GetString(x.Name).Translate())
-        ).ToArray();
+            x.Name).ToArray();
 
         Palette.PlayerColors = Palette.PlayerColors.ToArray().AddRangeToArray(colors);
         Palette.ShadowColors = Palette.ShadowColors.ToArray().AddRangeToArray(shadowColors);

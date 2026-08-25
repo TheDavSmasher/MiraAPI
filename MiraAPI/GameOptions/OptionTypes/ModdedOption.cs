@@ -82,7 +82,7 @@ public abstract class ModdedOption<T> : IModdedOption
         Title = title.Translate();
         DefaultValue = defaultValue;
         Value = defaultValue;
-        StringName = CustomStringName.CreateAndRegister(Title.Translate());
+        StringName = MiraLocaleManager.GetOrCreateLocaleString(Title);
         Visible = () => true;
         IncludeInPreset = includeInPreset;
     }

@@ -29,10 +29,14 @@ Outlive the timer or eliminate the crew.</string>
     <string name="gamesetting.preset.save">Save</string>
     <string name="gamesetting.roles">Roles</string>
     <string name="gamesetting.modifiers">Modifiers</string>
-    <string name="roleTeam.crewmate.long">Crewmate</string>
+    <string name="roleTeam.crewmate">Crewmate</string>
     <string name="roleTeam.crewmate.short">Crew</string>
-    <string name="roleTeam.impostor.long">Impostor</string>
+    <string name="roleTeam.crewmate.group">Crewmate Roles</string>
+    <string name="roleTeam.impostor">Impostor</string>
     <string name="roleTeam.impostor.short">Imp</string>
-    <string name="roleTeam.neutral.long">Neutral</string>
+    <string name="roleTeam.impostor.group">Impostor Roles</string>
+    <string name="roleTeam.neutral">Neutral</string>
     <string name="roleTeam.neutral.short">Neut</string>
+    <string name="roleTeam.neutral.group">Neutral Roles</string>
+    <string name="roleTeam.other">Other</string>
 </resources>

@@ -13,15 +13,15 @@ public record struct RoleOptionsGroup(string Name, Color Color, int Priority = 0
     /// <summary>
     /// Gets the default group for crewmates.
     /// </summary>
-    public static RoleOptionsGroup Crewmate { get; } = new("Crewmate", Palette.CrewmateBlue, -2);
+    public static RoleOptionsGroup Crewmate { get; } = new("roleTeam.crewmate.group", Palette.CrewmateBlue, -2);
 
     /// <summary>
     /// Gets the default group for impostors.
     /// </summary>
-    public static RoleOptionsGroup Impostor { get; } = new("Impostor", Palette.ImpostorRed, -1);
+    public static RoleOptionsGroup Impostor { get; } = new("roleTeam.impostor.group", Palette.ImpostorRed, -1);
 
     /// <summary>
     /// Gets the default group for neutral roles.
     /// </summary>
-    public static RoleOptionsGroup Neutral { get; } = new("Neutral Roles", Color.gray);
+    public static RoleOptionsGroup Neutral { get; } = new("roleTeam.neutral.group", Color.gray);
 }

@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Xml;
+using Reactor.Localization.Utilities;
 using UnityEngine;
 
 namespace MiraAPI.Translation;
@@ -12,7 +13,10 @@ public static class MiraLocaleManager
 {
     private const string LangDirectory = "mira_languages";
 
-    private static readonly Dictionary<string, Dictionary<MiraLanguage, Dictionary<string, string>>> Locale = [];
+    public static readonly Dictionary<string, Dictionary<MiraLanguage, Dictionary<string, string>>> Locale = [];
+
+    public static readonly Dictionary<string, StringNames> RegisteredStringNames = [];
+    internal static readonly Dictionary<StringNames, string> StringNamesLookup = [];
 
     public static Dictionary<MiraLanguage, string> LangList { get; } = new()
     {
@@ -175,6 +179,19 @@ public static class MiraLocaleManager
     private static string GetModLangDir(string modGuid)
     {
         return Path.Combine(Application.persistentDataPath, LangDirectory, modGuid);
+    }
+
+    public static StringNames GetOrCreateLocaleString(string name)
+    {
+        if (RegisteredStringNames.TryGetValue(name, out var stringName))
+        {
+            return stringName;
+        }
+
+        var newString = CustomStringName.CreateAndRegister(name);
+        RegisteredStringNames.Add(name, newString);
+        StringNamesLookup.Add(newString, name);
+        return newString;
     }
 
     private static void LoadInternalStrings(Assembly assembly, string modGuid, string dir)
