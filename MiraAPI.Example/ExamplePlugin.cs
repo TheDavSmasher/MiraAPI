@@ -4,11 +4,9 @@ using BepInEx.Unity.IL2CPP;
 using HarmonyLib;
 using MiraAPI.PluginLoading;
 using MiraAPI.Translation;
-using MiraAPI.Utilities.Assets;
 using Reactor;
 using Reactor.Networking;
 using Reactor.Networking.Attributes;
-using UnityEngine;
 
 namespace MiraAPI.Example;
 
