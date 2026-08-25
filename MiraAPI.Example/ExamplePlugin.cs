@@ -21,7 +21,7 @@ public partial class ExamplePlugin : BasePlugin, IMiraPlugin
 {
     public ExamplePlugin()
     {
-        TranslationManager.Register("mira.example");
+        MiraLocaleManager.Register("mira.example");
     }
     public Harmony Harmony { get; } = new(Id);
     public string OptionsTitleText => "Mira API\nExample Mod";
