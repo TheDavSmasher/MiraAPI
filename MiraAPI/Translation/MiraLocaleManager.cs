@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using System.Xml.Linq;
+using System.Xml;
 using UnityEngine;
 
 namespace MiraAPI.Translation;
@@ -180,12 +180,18 @@ public static class MiraLocaleManager
     private static void LoadInternalStrings(Assembly assembly, string modGuid, string dir)
     {
         Directory.CreateDirectory(dir);
+
+        if (!Locale.ContainsKey(modGuid))
+        {
+            Locale[modGuid] = [];
+        }
+
         var resourcePrefix = $"{assembly.GetName().Name}.Resources.Locale.";
 
         foreach (var locale in LangList)
         {
             using var resourceStream =
-                assembly.GetManifestResourceStream(resourcePrefix + locale.Value);
+                assembly.GetManifestResourceStream(resourcePrefix + locale.Value + ".xml");
             if (resourceStream == null)
             {
                 // Silently skipped
@@ -202,7 +208,7 @@ public static class MiraLocaleManager
             }
             catch (Exception e)
             {
-                Error($"Failed to load translation {resourcePrefix}.{locale.Value}: {e.Message}");
+                Error($"Failed to load translation {resourcePrefix}{locale.Value}: {e.Message}");
             }
         }
 
@@ -233,33 +239,46 @@ public static class MiraLocaleManager
         }
     }
 
-    private static Dictionary<string, string> ParseXmlFile(string filePath)
+    private static Dictionary<string, string> ParseXmlFile(string xmlContent)
     {
         var dict = new Dictionary<string, string>();
-        var doc = XDocument.Load(filePath);
-
-        if (doc.Root == null) return dict;
-
-        foreach (var element in doc.Root.Elements("string"))
+        XmlDocument xmlDoc = new();
+        try
         {
-            var name = element.Attribute("name")?.Value;
-            var value = element.Value;
+            xmlDoc.LoadXml(xmlContent);
+            XmlNodeList? stringNodes = xmlDoc.SelectNodes("/resources/string");
 
-            if (string.IsNullOrEmpty(name)) continue;
-
-            if (value.Contains('['))
+            if (stringNodes != null)
             {
-                value = value.Replace("[", "<");
+                foreach (XmlNode node in stringNodes)
+                {
+                    if (node.Attributes?["name"] != null)
+                    {
+                        string name = node.Attributes["name"]!.Value;
+                        string value = node.InnerText;
+
+                        if (string.IsNullOrEmpty(name)) continue;
+
+                        if (value.Contains('['))
+                        {
+                            value = value.Replace("[", "<");
+                        }
+
+                        if (value.Contains(']'))
+                        {
+                            value = value.Replace("]", ">");
+                        }
+
+                        value = value.Replace("<nl>", "\n").Replace("<and>", "&");
+
+                        dict[name] = value;
+                    }
+                }
             }
-
-            if (value.Contains(']'))
-            {
-                value = value.Replace("]", ">");
-            }
-
-            value = value.Replace("<nl>", "\n").Replace("<and>", "&");
-
-            dict[name] = value;
+        }
+        catch (XmlException ex)
+        {
+            Error($"XML parsing error: {ex.Message}");
         }
 
         return dict;
