@@ -575,7 +575,7 @@ public static class RoleSettingMenuPatches
             return;
         }
 
-        __instance.roleDescriptionText.text = customRole.RoleLongDescription.Translate();
+        __instance.roleDescriptionText.text = customRole.RoleMedDescription;
         __instance.roleTitleText.text = role.GetRoleName();
 
         var imgBg = __instance.AdvancedRolesSettings.transform.FindChild("Imagebackground");

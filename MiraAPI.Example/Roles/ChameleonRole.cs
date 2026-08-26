@@ -10,7 +10,7 @@ namespace MiraAPI.Example.Roles;
 
 public class ChameloenRole : CrewmateRole, ICustomRole
 {
-    public string IdPart => "chamelon";
+    public string IdPart => "ApiExample.Role.Chamelon";
     public Color RoleColor => Palette.AcceptedGreen;
     public ModdedRoleTeams Team => ModdedRoleTeams.Crewmate;
 

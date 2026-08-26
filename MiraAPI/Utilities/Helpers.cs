@@ -537,7 +537,7 @@ public static class Helpers
     {
         if (role is ICustomRole custom)
         {
-            return custom.RoleName.Translate();
+            return custom.RoleName;
         }
         return role.NiceName;
     }

@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Globalization;
 using System.Text;
 using BepInEx.Configuration;
 using MiraAPI.GameOptions;
@@ -18,27 +17,57 @@ public interface ICustomRole : IOptionable
     /// <summary>
     /// Gets the id part used to build the role's translation keys.
     /// </summary>
-    string IdPart => GetType().Name.ToLower(CultureInfo.InvariantCulture);
+    string IdPart => GetType().Name;
 
     /// <summary>
     /// Gets the name of the role.
     /// </summary>
-    string RoleName => MiraLocaleManager.BuildTranslationId(IdPart, "name");
+    string RoleName => MiraLocaleManager.Get(RoleNameLocale);
+
+    /// <summary>
+    /// Gets the role's name id for localization.
+    /// </summary>
+    string RoleNameLocale => IdPart;
 
     /// <summary>
     /// Gets the description of the role. Used in the Intro Cutscene.
     /// </summary>
-    string RoleDescription => MiraLocaleManager.BuildTranslationId(IdPart, "description");
+    string RoleDescription => MiraLocaleManager.Get(RoleDescriptionLocale);
 
     /// <summary>
-    /// Gets the medium description of the role. Used in the role guide.
+    /// Gets the role's intro blurb id for localization.
     /// </summary>
-    string RoleMedDescription => RoleDescription;
+    string RoleDescriptionLocale => MiraLocaleManager.BuildTranslationId(IdPart, "IntroBlurb");
 
     /// <summary>
-    /// Gets the long description of the role. Used in the Role Tab and Role Options.
+    /// Gets the medium description of the role. Used in the role guide and options menu.
     /// </summary>
-    string RoleLongDescription => MiraLocaleManager.BuildTranslationId(IdPart, "description");
+    string RoleMedDescription => MiraLocaleManager.Get(RoleMedDescriptionLocale);
+
+    /// <summary>
+    /// Gets the role's medium description id for localization.
+    /// </summary>
+    string RoleMedDescriptionLocale => MiraLocaleManager.BuildTranslationId(IdPart, "MedDescription");
+
+    /// <summary>
+    /// Gets the long description of the role. Used in the Role Tab.
+    /// </summary>
+    string RoleLongDescription => MiraLocaleManager.Get(RoleLongDescriptionLocale);
+
+    /// <summary>
+    /// Gets the role's long description id for localization.
+    /// </summary>
+    string RoleLongDescriptionLocale => MiraLocaleManager.BuildTranslationId(IdPart, "TabDescription");
+
+    /// <summary>
+    /// Gets the wiki description of the role. Used in the wiki, but not currently required.
+    /// </summary>
+    string RoleWikiDescription => MiraLocaleManager.Get(RoleLongDescriptionLocale);
+
+    /// <summary>
+    /// Gets the role's wiki description id for localization.
+    /// </summary>
+    string RoleWikiDescriptionLocale => MiraLocaleManager.BuildTranslationId(IdPart, "WikiDescription");
 
     /// <summary>
     /// Gets the faction / alignment of the role. Used in the role guide.
@@ -187,7 +216,7 @@ public interface ICustomRole : IOptionable
     {
         if (!Configuration.CanModifyChance)
         {
-            Error($"Cannot modify chance for role: {RoleName.Translate()}");
+            Error($"Cannot modify chance for role: {RoleName}");
             return;
         }
 
@@ -197,7 +226,7 @@ public interface ICustomRole : IOptionable
             return;
         }
 
-        Error($"Error getting chance configuration for role: {RoleName.Translate()}");
+        Error($"Error getting chance configuration for role: {RoleName}");
     }
 
     /// <summary>
@@ -212,7 +241,7 @@ public interface ICustomRole : IOptionable
             return;
         }
 
-        Error($"Error getting count configuration for role: {RoleName.Translate()}");
+        Error($"Error getting count configuration for role: {RoleName}");
     }
 
     /// <summary>
@@ -252,7 +281,7 @@ public interface ICustomRole : IOptionable
     /// <returns>A string with a custom ejection message or <see langword="null"/>.</returns>
     string? GetCustomEjectionMessage(NetworkedPlayerInfo player)
     {
-        return Team == ModdedRoleTeams.Impostor ? $"{player.PlayerName} was The {RoleName.Translate()}" : null;
+        return Team == ModdedRoleTeams.Impostor ? $"{player.PlayerName} was The {RoleName}" : null;
     }
 
     /// <summary>
