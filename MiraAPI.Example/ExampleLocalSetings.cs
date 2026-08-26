@@ -8,7 +8,7 @@ namespace MiraAPI.Example;
 
 public class ExampleLocalSettings(ConfigFile config) : LocalSettingsTab(config)
 {
-    public override string TabName => "settings.miraExample.name";
+    public override string TabName => "settings.miraExample";
     protected override bool ShouldCreateLabels => false;
 
     public override LocalSettingTabAppearance TabAppearance => new()

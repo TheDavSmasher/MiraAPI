@@ -9,7 +9,7 @@ namespace MiraAPI.Example.Buttons;
 
 public class MeetingButton : CustomActionButton
 {
-    public override string Name => "button.callMeeting.name";
+    public override string Name => "button.callMeeting";
 
     public override float Cooldown => 15;
 

@@ -10,7 +10,7 @@ namespace MiraAPI.Example.Modifiers;
 
 public class CaptainModifier : GameModifier
 {
-    public override string ModifierName => "modifier.captain.name";
+    public override string ModifierName => "modifier.captain";
     public override LoadableAsset<Sprite>? ModifierIcon => ExampleAssets.CallMeetingButton;
 
     public override void OnDeath(DeathReason reason)

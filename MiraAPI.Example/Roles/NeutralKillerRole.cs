@@ -19,7 +19,7 @@ public class NeutralKillerRole : ImpostorRole, ICustomRole
         CanUseVent = true,
     };
 
-    public RoleOptionsGroup RoleOptionsGroup { get; } = new("outcast.name", Color.gray);
+    public RoleOptionsGroup RoleOptionsGroup { get; } = new("outcast", Color.gray);
 
     [HideFromIl2Cpp]
     public TeamIntroConfiguration? IntroConfiguration { get; } = new(

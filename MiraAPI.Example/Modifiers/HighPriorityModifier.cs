@@ -4,7 +4,7 @@ namespace MiraAPI.Example.Modifiers;
 
 public class HighPriorityModifier : GameModifier
 {
-    public override string ModifierName => "modifier.highPriority.name";
+    public override string ModifierName => "modifier.highPriority";
 
     public override string GetDescription()
     {

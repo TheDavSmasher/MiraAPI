@@ -5,7 +5,7 @@ namespace MiraAPI.Example.Options.Modifiers;
 
 public class GeneralModifierOptions : AbstractOptionGroup
 {
-    public override string GroupName => "options.generalModifier.name";
+    public override string GroupName => "options.generalModifier";
 
     public override uint GroupPriority => 0;
 

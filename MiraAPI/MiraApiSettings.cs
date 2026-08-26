@@ -17,7 +17,7 @@ namespace MiraAPI;
 public class MiraApiSettings(ConfigFile config) : LocalSettingsTab(config)
 {
     /// <inheritdoc />
-    public override string TabName => "miraApi.name".Translate();
+    public override string TabName => "miraApi";
 
     /// <inheritdoc />
     public override LocalSettingTabAppearance TabAppearance => new()
@@ -206,57 +206,57 @@ public class MiraApiSettings(ConfigFile config) : LocalSettingsTab(config)
     }
 
     /// <summary>
-    /// Gets whether the modifiers hud should be on the left side of the screen (under roles/task tab). Recommended for streamers.
-    /// </summary>
-    [LocalToggleSetting]
-    public ConfigEntry<bool> ModifiersHudLeftSide { get; private set; } = config.Bind("Visuals/UI", "Show Modifiers HUD on Left Side", false);
-
-    /// <summary>
-    /// Gets whether to show keybinds on buttons.
-    /// </summary>
-    [LocalToggleSetting]
-    public ConfigEntry<bool> ShowKeybinds { get; private set; } = config.Bind("Visuals/UI", "Show Keybinds on Buttons", true);
-
-    /// <summary>
     /// Gets the scale of the ability buttons.
     /// </summary>
     [LocalSliderSetting(min: 0.5f, max: 1.5f, suffixType: MiraNumberSuffixes.Multiplier, formatString: "0.00", displayValue: true)]
     public ConfigEntry<float> ButtonUIFactorSlider { get; private set; } =
-        config.Bind("Visuals/UI", "Button Scale Factor", 0.75f);
+        config.Bind("miraApi.visualsUi", "miraApi.buttonScaleFactor", 0.75f);
 
     /// <summary>
     /// Gets the scale of the UI buttons.
     /// </summary>
     [LocalSliderSetting(min: 0.3f, max: 2f, suffixType: MiraNumberSuffixes.Multiplier, formatString: "0.00", displayValue: true)]
     public ConfigEntry<float> TopRightButtonsFactorSlider { get; private set; } =
-        config.Bind("Visuals/UI", "Top-Right UI Scale Factor", 1f);
+        config.Bind("miraApi.visualsUi", "miraApi.topRightButtonScaleFactor", 1f);
 
     /// <summary>
     /// Gets the fps specified by the player.
     /// </summary>
     [LocalSliderSetting(min: 60f, max: 240f, suffixType: MiraNumberSuffixes.None, formatString: "0", displayValue: true, roundValue: true)]
     public ConfigEntry<float> SetFpsSlider { get; private set; } =
-        config.Bind("Visuals/UI", "Max FPS", 120f);
+        config.Bind("miraApi.visualsUi", "Max FPS", 120f);
+
+    /// <summary>
+    /// Gets whether the modifiers hud should be on the left side of the screen (under roles/task tab). Recommended for streamers.
+    /// </summary>
+    [LocalToggleSetting]
+    public ConfigEntry<bool> ModifiersHudLeftSide { get; private set; } = config.Bind("miraApi.visualsUi", "miraApi.showModifiersHudOnLeftSide", false);
+
+    /// <summary>
+    /// Gets whether to show keybinds on buttons.
+    /// </summary>
+    [LocalToggleSetting]
+    public ConfigEntry<bool> ShowKeybinds { get; private set; } = config.Bind("miraApi.visualsUi", "miraApi.showKeybindsOnButtons", true);
 
     [LocalToggleSetting]
     public ConfigEntry<bool> WikiOnBottomRow { get; private set; } =
-        config.Bind("Visuals/UI", "Display Wiki on Bottom Row", true);
+        config.Bind("miraApi.visualsUi", "miraApi.wikiOnBottomRow", true);
 
     /// <summary>
     /// Gets whether to apply cosmetic changes to the TaskAdder.
     /// </summary>
     [LocalToggleSetting]
-    public ConfigEntry<bool> PrettyTaskAdder { get; private set; } = config.Bind("Freeplay", "Pretty Task Laptop", true);
+    public ConfigEntry<bool> PrettyTaskAdder { get; private set; } = config.Bind("miraApi.freeplay", "miraApi.prettyTaskLaptop", true);
 
     /// <summary>
     /// Gets whether to show the red flash from sabotages.
     /// </summary>
     [LocalToggleSetting]
-    public ConfigEntry<bool> EnableSabotageFlashes { get; private set; } = config.Bind("Accessibility", "Enable Sabotage Flashes", true);
+    public ConfigEntry<bool> EnableSabotageFlashes { get; private set; } = config.Bind("miraApi.accessibility", "miraApi.enableSabotageFlashes", true);
 
     /// <summary>
     /// Gets whether to enable the sabotage sound effects or not.
     /// </summary>
     [LocalToggleSetting]
-    public ConfigEntry<bool> EnableSabotageBlares { get; private set; } = config.Bind("Accessibility", "Enable Sabotage Blare", true);
+    public ConfigEntry<bool> EnableSabotageBlares { get; private set; } = config.Bind("miraApi.accessibility", "miraApi.enableSabotageBlare", true);
 }

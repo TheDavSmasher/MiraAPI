@@ -53,13 +53,13 @@ public static class GameModeOption
     internal static readonly StringNames CustomName = MiraLocaleManager.GetOrCreateLocaleString("Custom");
     internal static readonly Dictionary<uint, StringNames> Values = new()
     {
-        [0] = MiraLocaleManager.GetOrCreateLocaleString("Classic"),
+        [0] = MiraLocaleManager.GetOrCreateLocaleString("gamemode.classic"),
     };
 
     internal static void AddOption(AbstractGameMode mode)
     {
         if (!Values.ContainsKey(mode.ID))
-            Values.Add(mode.ID, MiraLocaleManager.GetOrCreateLocaleString(mode + ".colored"));
+            Values.Add(mode.ID, MiraLocaleManager.GetOrCreateLocaleString(mode.Name));
     }
     /*[HarmonyPatch(typeof(GameOptionsMenu), nameof(GameOptionsMenu.CreateSettings))]
     [HarmonyPostfix]

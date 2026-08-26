@@ -151,7 +151,7 @@ public static class LobbyViewPanePatches
             var cgm = GetCustomGamemode();
             ModifiersTabButton?.gameObject.SetActive(false);
             menu.rolesTabButton.gameObject.SetActive(cgm is null or { ShowNormalRoleSettings: true });
-            menu.gameModeText.text = cgm is null ? "Main" : cgm.ColoredName;
+            menu.gameModeText.text = cgm is null ? MiraLocaleManager.Get("gamemode.classic") : cgm.ColoredName;
         }
         else
         {

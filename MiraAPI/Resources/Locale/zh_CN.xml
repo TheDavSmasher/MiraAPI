@@ -1,6 +1,6 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <resources>
-  <string name="miraApi.name">Mira API</string>
+  <string name="miraApi">Mira API</string>
   <string name="miraApi.visualsUi">界面/视觉</string>
   <string name="miraApi.freeplay">自由模式</string>
   <string name="miraApi.accessibility">无障碍</string>
@@ -17,7 +17,7 @@
   <string name="miraApi.customCategory2">自定义类别 2</string>
   <string name="miraApi.modifierMenuDescription">在此配置附加职业及其设置！</string>
   <string name="miraApi.customOptionMenuDescription">为此模组应用游戏设置！</string>
-  <string name="gamemode.default.name">默认</string>
+  <string name="gamemode.default">默认</string>
   <string name="gamemode.default.description">默认原版游戏模式</string>
   <string name="gamesetting.global.clicktoclose">点击关闭</string>
   <string name="gamesetting.preset.hint">为本游戏选择或创建一个预设</string>

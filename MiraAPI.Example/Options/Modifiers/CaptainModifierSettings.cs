@@ -6,7 +6,7 @@ namespace MiraAPI.Example.Options.Modifiers;
 
 public class CaptainModifierSettings : AbstractOptionGroup<CaptainModifier>
 {
-    public override string GroupName => "options.captainSettings.name";
+    public override string GroupName => "options.captainSettings";
 
     [ModdedNumberOption("options.captainSettings.amount", 0, 5)]
     public float Amount { get; set; } = 1;

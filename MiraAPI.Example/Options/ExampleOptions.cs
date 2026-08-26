@@ -7,7 +7,7 @@ namespace MiraAPI.Example.Options;
 
 public class ExampleOptions : AbstractOptionGroup
 {
-    public override string GroupName => "options.exampleOptions1.name";
+    public override string GroupName => "options.exampleOptions1";
     public override Color GroupColor => Color.green;
 
     [ModdedToggleOption("options.exampleOptions1.toggleOpt1")]
