@@ -716,7 +716,7 @@ internal static class GameOptionsMenuPatch
             categoryHeaderMasked.gameObject.SetActive(false);
 
             var newText = Object.Instantiate(categoryHeaderMasked.Title, categoryHeaderMasked.transform);
-            newText.text = $"<size=70%>({"gamesetting.global.clicktoclose".Translate()})</size>";
+            newText.text = $"<size=70%>({"MiraApi.GameSetting.Global.ClickToClose".Translate()})</size>";
             newText.transform.localPosition = new Vector3(2.6249f, -0.165f, 0f);
             newText.gameObject.GetComponent<TextTranslatorTMP>().Destroy();
 
@@ -733,8 +733,8 @@ internal static class GameOptionsMenuPatch
                 {
                     group.AllOptionsHidden = !group.AllOptionsHidden;
                     newText.text = group.AllOptionsHidden
-                        ? $"<size=70%>({"gamesetting.global.clicktoopen".Translate()})</size>"
-                        : $"<size=70%>({"gamesetting.global.clicktoclose".Translate()})</size>";
+                        ? $"<size=70%>({"MiraApi.GameSetting.Global.ClickToOpen".Translate()})</size>"
+                        : $"<size=70%>({"MiraApi.GameSetting.Global.ClickToClose".Translate()})</size>";
                 }));
             headerBtn.SetButtonEnableState(true);
 

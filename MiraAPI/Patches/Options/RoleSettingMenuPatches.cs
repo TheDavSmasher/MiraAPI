@@ -289,8 +289,8 @@ public static class RoleSettingMenuPatches
                         quotaInst.gameObject.SetActive(!RoleGroupHidden[group]);
 
                         var label = RoleGroupHidden[group]
-                            ? $"({"gamesetting.global.clicktoopen".Translate()})"
-                            : $"({"gamesetting.global.clicktoclose".Translate()})";
+                            ? $"({"MiraApi.GameSetting.Global.ClickToOpen".Translate()})"
+                            : $"({"MiraApi.GameSetting.Global.ClickToClose".Translate()})";
                         var newText = Object.Instantiate(categoryHeaderMasked.Title, categoryHeaderMasked.transform);
                         newText.text = $"<size=70%>{label}</size>";
                         newText.transform.localPosition = new Vector3(2.6249f, -0.165f, 0f);
@@ -610,7 +610,7 @@ public static class RoleSettingMenuPatches
             comp.Destroy();
         }
 
-        categoryHeaderMasked.Title.text = "miraApi.returnToRoleSettings".Translate();
+        categoryHeaderMasked.Title.text = "MiraApi.ReturnToRoleSettings".Translate();
 
         if (!categoryHeaderMasked.gameObject.TryGetComponent<PassiveButton>(out _))
         {

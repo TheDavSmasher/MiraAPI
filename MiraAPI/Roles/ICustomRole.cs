@@ -74,10 +74,10 @@ public interface ICustomRole : IOptionable
     /// </summary>
     string RoleFactionTitle => Team switch
     {
-        ModdedRoleTeams.Crewmate => MiraLocaleManager.Get("roleTeam.crewmate"),
-        ModdedRoleTeams.Impostor => MiraLocaleManager.Get("roleTeam.impostor"),
-        ModdedRoleTeams.Custom => MiraLocaleManager.Get("roleTeam.neutral"),
-        _ => MiraLocaleManager.Get("roleTeam.other"),
+        ModdedRoleTeams.Crewmate => MiraLocaleManager.Get("MiraApi.RoleTeam.Crewmate"),
+        ModdedRoleTeams.Impostor => MiraLocaleManager.Get("MiraApi.RoleTeam.Impostor"),
+        ModdedRoleTeams.Custom => MiraLocaleManager.Get("MiraApi.RoleTeam.Neutral"),
+        _ => MiraLocaleManager.Get("MiraApi.RoleTeam.Other"),
     };
 
     /// <summary>

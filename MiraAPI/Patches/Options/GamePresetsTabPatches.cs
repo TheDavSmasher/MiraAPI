@@ -46,7 +46,7 @@ internal static class GamePresetsTabPatches
 
             if (MenuState.Instance.CurrentModIdx != 0)
             {
-                __instance.PresetDescriptionText.text = "gamesetting.preset.hint".Translate();
+                __instance.PresetDescriptionText.text = "MiraApi.GameSetting.Preset.Hint".Translate();
             }
             else
             {
@@ -185,7 +185,7 @@ internal static class GamePresetsTabPatches
 
             // set the button text and alignment
             var saveText = saveButton.buttonText;
-            saveText.text = "gamesetting.preset.save".Translate();
+            saveText.text = "MiraApi.GameSetting.Preset.Save".Translate();
             saveText.GetComponent<TextTranslatorTMP>().Destroy();
             saveText.alignment = TextAlignmentOptions.Center;
             saveText.transform.parent.localPosition = new Vector3(

@@ -53,7 +53,7 @@ public static class GameModeOption
     internal static readonly StringNames CustomName = MiraLocaleManager.GetOrCreateLocaleString("Custom");
     internal static readonly Dictionary<uint, StringNames> Values = new()
     {
-        [0] = MiraLocaleManager.GetOrCreateLocaleString("gamemode.classic"),
+        [0] = MiraLocaleManager.GetOrCreateLocaleString("MiraApi.Gamemode.Classic"),
     };
 
     internal static void AddOption(AbstractGameMode mode)

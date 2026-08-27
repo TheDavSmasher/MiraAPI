@@ -150,7 +150,7 @@ public class MenuState(IntPtr cppPtr) : MonoBehaviour(cppPtr)
         _largeButtons[MenuButton.Modifiers] = mBtn;
         mBtn.name = "ModifiersButton";
         mBtn.buttonText.gameObject.GetComponent<TextTranslatorTMP>().Destroy();
-        mBtn.buttonText.text = "gamesetting.modifiers".Translate();
+        mBtn.buttonText.text = "MiraApi.GameSetting.Modifiers".Translate();
         mBtn.OnClick = new Button.ButtonClickedEvent();
         mBtn.OnClick.AddListener(
             (UnityAction)(() =>
@@ -219,7 +219,7 @@ public class MenuState(IntPtr cppPtr) : MonoBehaviour(cppPtr)
             }));
 
         var roleText = smRolesBtn.buttonText;
-        roleText.text = "gamesetting.roles".Translate();
+        roleText.text = "MiraApi.GameSetting.Roles".Translate();
         roleText.GetComponent<TextTranslatorTMP>().Destroy();
         roleText.alignment = TextAlignmentOptions.Center;
         roleText.transform.parent.localPosition = new Vector3(
@@ -244,7 +244,7 @@ public class MenuState(IntPtr cppPtr) : MonoBehaviour(cppPtr)
         var smModBtn = Instantiate(smRolesBtn, smRolesBtn.transform.parent);
         _smallButtons[MenuButton.Modifiers] = smModBtn;
         smModBtn.name = "SmallModifiersButton";
-        smModBtn.buttonText.text = "gamesetting.modifiers".Translate();
+        smModBtn.buttonText.text = "MiraApi.GameSetting.Modifiers".Translate();
         smModBtn.OnClick = new Button.ButtonClickedEvent();
         smModBtn.OnClick.AddListener(
             (UnityAction)(() =>

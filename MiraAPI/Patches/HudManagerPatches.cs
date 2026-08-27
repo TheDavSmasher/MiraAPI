@@ -42,12 +42,16 @@ public static class HudManagerPatches
         ResizeUI(LocalSettingsTabSingleton<MiraApiSettings>.Instance.ButtonUIFactorSlider.Value);
     }
 
+    private static Transform _storedButtonsParent;
     public static void ResizeUI(float scaleFactor)
     {
-        var baseButtons = HudManager.Instance.transform.FindChild("Buttons");
-        if (baseButtons != null)
+        if (!_storedButtonsParent)
         {
-            foreach (var aspect in baseButtons.GetComponentsInChildren<AspectPosition>(true))
+            _storedButtonsParent = HudManager.Instance.transform.FindChild("Buttons");
+        }
+        if (_storedButtonsParent)
+        {
+            foreach (var aspect in _storedButtonsParent.GetComponentsInChildren<AspectPosition>(true))
             {
                 if (!aspect.gameObject)
                 {
@@ -82,9 +86,9 @@ public static class HudManagerPatches
             button.gameObject.SetActive(!button.isActiveAndEnabled);
         }
 
-        if (baseButtons != null)
+        if (_storedButtonsParent)
         {
-            foreach (var arrange in baseButtons.GetComponentsInChildren<GridArrange>(true))
+            foreach (var arrange in _storedButtonsParent.GetComponentsInChildren<GridArrange>(true))
             {
                 if (!arrange.gameObject || !arrange.transform)
                 {
@@ -281,6 +285,8 @@ public static class HudManagerPatches
         }
         MiraApiSettings.OldButtonScaleFactor =
             LocalSettingsTabSingleton<MiraApiSettings>.Instance.ButtonUIFactorSlider.Value;
+        MiraApiSettings.OldUiButtonScaleFactor =
+            LocalSettingsTabSingleton<MiraApiSettings>.Instance.TopRightButtonsFactorSlider.Value;
         Coroutines.Start(CoResizeUI());
     }
 

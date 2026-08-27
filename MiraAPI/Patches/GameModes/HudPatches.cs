@@ -50,7 +50,7 @@ internal static class HudPatches
         gmText.SetActive(false);
         modelText.SetActive(false);
         _text = gmTextClone.GetComponent<TextMeshPro>();
-        _text.text = CustomGameModeManager.ActiveMode != null ? CustomGameModeManager.ActiveMode.ColoredName : MiraLocaleManager.Get("gamemode.classic");
+        _text.text = CustomGameModeManager.ActiveMode != null ? CustomGameModeManager.ActiveMode.ColoredName : MiraLocaleManager.Get("MiraApi.Gamemode.Classic");
         CustomGameModeManager.ActiveMode?.HudStart(instance);
     }
 
