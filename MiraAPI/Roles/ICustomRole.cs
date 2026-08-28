@@ -164,10 +164,6 @@ public interface ICustomRole : IOptionable
         if (presetConfig.TryGetEntry(ChanceConfigDefinition, out ConfigEntry<int> chanceEntry))
         {
             SetChance(chanceEntry.Value);
-            if (chanceEntry.Value == 0)
-            {
-                SetCount(0);
-            }
         }
     }
 
@@ -196,10 +192,6 @@ public interface ICustomRole : IOptionable
     /// <returns>The role count option.</returns>
     public virtual int? GetCount()
     {
-        if (ParentMod.PluginConfig.TryGetEntry(ChanceConfigDefinition, out ConfigEntry<int> entry2) && entry2.Value == 0)
-        {
-            return 0;
-        }
         if (ParentMod.PluginConfig.TryGetEntry(NumConfigDefinition, out ConfigEntry<int> entry))
         {
             return Mathf.Clamp(entry.Value, 0, Configuration.MaxRoleCount);
