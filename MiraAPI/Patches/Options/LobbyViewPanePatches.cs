@@ -83,7 +83,7 @@ public static class LobbyViewPanePatches
         var pos = ModifiersTabButton.transform.localPosition;
         pos.x = 2.1f;
         ModifiersTabButton.transform.localPosition = pos;
-        ModifiersTabButton.buttonText.text = "MiraApi.GameSetting.Modifiers".Translate();
+        ModifiersTabButton.buttonText.text = "Modifiers".Translate();
         ModifiersTabButton.OnClick = new Button.ButtonClickedEvent();
         ModifiersTabButton.OnClick.AddListener(
             (UnityAction)(() =>

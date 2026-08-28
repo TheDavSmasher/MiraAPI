@@ -20,6 +20,13 @@
   <string name="MiraApi.GameSetting.Global.ClickToClose">点击关闭</string>
   <string name="MiraApi.GameSetting.Preset.Hint">为本游戏选择或创建一个预设</string>
   <string name="MiraApi.GameSetting.Preset.Save">保存</string>
-  <string name="MiraApi.GameSetting.Roles">职业</string>
-  <string name="MiraApi.GameSetting.Modifiers">附加职业</string>
+  <string name="Roles">职业</string>
+  <string name="Modifiers">附加职业</string>
+    <string name="Modifier">附加属性</string>
+    <string name="MiraApi.RoleTeam.Crewmate">船员</string>
+    <string name="MiraApi.RoleTeam.Crewmate.Short">船员</string>
+    <string name="MiraApi.RoleTeam.Impostor">伪装者</string>
+    <string name="MiraApi.RoleTeam.Impostor.Short">伪装者</string>
+    <string name="MiraApi.RoleTeam.Neutral">中立</string>
+    <string name="MiraApi.RoleTeam.Neutral.Short">中立</string>
 </resources>

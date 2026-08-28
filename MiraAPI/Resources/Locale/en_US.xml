@@ -27,8 +27,9 @@ Outlive the timer or eliminate the crew.</string>
     <string name="MiraApi.GameSetting.Global.ClickToOpen">Click to open</string>
     <string name="MiraApi.GameSetting.Preset.Hint">Select or create a options preset for this game</string>
     <string name="MiraApi.GameSetting.Preset.Save">Save</string>
-    <string name="MiraApi.GameSetting.Roles">Roles</string>
-    <string name="MiraApi.GameSetting.Modifiers">Modifiers</string>
+    <string name="Roles">Roles</string>
+    <string name="Modifiers">Modifiers</string>
+    <string name="Modifier">Modifier</string>
     <string name="MiraApi.RoleTeam.Crewmate">Crewmate</string>
     <string name="MiraApi.RoleTeam.Crewmate.Short">Crew</string>
     <string name="MiraApi.RoleTeam.Crewmate.Group">Crewmate Roles</string>
