@@ -29,6 +29,9 @@ public class ShootButton : TargetedMeetingButton
     {
         playerVoteArea.SetDisabled();
         var player = playerVoteArea.GetPlayer();
-        PlayerControl.LocalPlayer.RpcCustomMurder(player);
+        if (player != null)
+        {
+            PlayerControl.LocalPlayer.RpcCustomMurder(player);
+        }
     }
 }

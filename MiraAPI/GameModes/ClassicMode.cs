@@ -11,10 +11,10 @@ namespace MiraAPI.GameModes;
 public class ClassicMode : AbstractGameMode
 {
     /// <inheritdoc/>
-    public override string Name => "Classic";
+    public override string Name => "MiraApi.Gamemode.Classic";
 
     /// <inheritdoc/>
-    public override string Description => "The classic Among Us experience!\nFind the Impostors or deceive the Crew.";
+    public override string Description => "MiraApi.Gamemode.Classic.Description";
 
     public override LoadableAsset<Sprite>? Icon => MiraAssets.ClassicGamemodeIcon;
 }

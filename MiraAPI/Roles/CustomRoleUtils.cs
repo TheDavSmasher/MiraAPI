@@ -4,6 +4,7 @@ using System.Globalization;
 using System.Linq;
 using System.Text;
 using AmongUs.GameOptions;
+using MiraAPI.Translation;
 using MiraAPI.GameModes;
 using MiraAPI.Utilities;
 using MiraAPI.Utilities.Assets;

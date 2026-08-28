@@ -9,9 +9,9 @@ namespace MiraAPI.Utilities.Components;
 /// <summary>
 /// Utility component for arranging objects in a centered layout, similar to <see cref="GridArrange"/>.
 /// </summary>
-/// <param name="ptr"></param>
+/// <param name="iPtr">The <see cref="IntPtr"/> for the component.</param>
 [RegisterInIl2Cpp]
-public class CenteredGridArrange(IntPtr ptr) : MonoBehaviour(ptr)
+public class CenteredGridArrange(IntPtr iPtr) : MonoBehaviour(iPtr)
 {
     /// <summary>
     /// Gets or sets the cell size, which is used for spacing.

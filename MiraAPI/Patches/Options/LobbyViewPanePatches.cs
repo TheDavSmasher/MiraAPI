@@ -8,6 +8,7 @@ using MiraAPI.GameOptions;
 using MiraAPI.Modifiers;
 using MiraAPI.PluginLoading;
 using MiraAPI.Roles;
+using MiraAPI.Translation;
 using MiraAPI.Utilities;
 using MiraAPI.Utilities.Assets;
 using Reactor.Localization.Utilities;
@@ -31,8 +32,7 @@ public static class LobbyViewPanePatches
         : Plugins[SelectedModIdx - 1];
 
     private static PassiveButton? ModifiersTabButton { get; set; }
-
-    private static StringNames ModifiersTabName { get; } = CustomStringName.CreateAndRegister("ModifiersTab");
+    internal static StringNames ModifiersTabName { get; } = MiraLocaleManager.GetOrCreateLocaleString("ModifiersTab");
 
     private static AbstractGameMode? GetCustomGamemode()
     {
@@ -83,7 +83,7 @@ public static class LobbyViewPanePatches
         var pos = ModifiersTabButton.transform.localPosition;
         pos.x = 2.1f;
         ModifiersTabButton.transform.localPosition = pos;
-        ModifiersTabButton.buttonText.text = "Modifiers";
+        ModifiersTabButton.buttonText.text = "MiraApi.GameSetting.Modifiers".Translate();
         ModifiersTabButton.OnClick = new Button.ButtonClickedEvent();
         ModifiersTabButton.OnClick.AddListener(
             (UnityAction)(() =>
@@ -151,7 +151,7 @@ public static class LobbyViewPanePatches
             var cgm = GetCustomGamemode();
             ModifiersTabButton?.gameObject.SetActive(false);
             menu.rolesTabButton.gameObject.SetActive(cgm is null or { ShowNormalRoleSettings: true });
-            menu.gameModeText.text = cgm is null ? "Main" : cgm.ColoredName;
+            menu.gameModeText.text = cgm is null ? MiraLocaleManager.Get("MiraApi.Gamemode.Classic") : cgm.ColoredName;
         }
         else
         {
@@ -362,7 +362,7 @@ public static class LobbyViewPanePatches
                 true);
 
             categoryHeaderMasked.SetHeader(StringNames.Name, 61);
-            categoryHeaderMasked.Title.text = group.GroupName;
+            categoryHeaderMasked.Title.text = group.GroupName.Translate();
             categoryHeaderMasked.transform.localScale = Vector3.one;
             categoryHeaderMasked.transform.localPosition = new Vector3(-9.77f, num, -2f);
             menu.settingsInfo.Add(categoryHeaderMasked.gameObject);
@@ -454,7 +454,7 @@ public static class LobbyViewPanePatches
         // sort the groups by priority
         var sortedRoleGroups = roleGroups
             .OrderBy(x => x.Key.Priority)
-            .ThenBy(x => x.Key.Name);
+            .ThenBy(x => x.Key.Name.Translate());
 
         foreach (var grouping in sortedRoleGroups)
         {
@@ -465,12 +465,7 @@ public static class LobbyViewPanePatches
 
             var group = grouping.Key;
 
-            var name = group.Name switch
-            {
-                "Crewmate" => StringNames.CrewmateRolesHeader,
-                "Impostor" => StringNames.ImpostorRolesHeader,
-                _ => CustomStringName.CreateAndRegister(group.Name),
-            };
+            var name = MiraLocaleManager.GetOrCreateLocaleString(group.Name);
 
             var categoryHeaderRoleVariant = Object.Instantiate(instance.categoryHeaderRoleOrigin, instance.settingsContainer, true);
             categoryHeaderRoleVariant.SetHeader(name, 61);

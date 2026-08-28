@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using AmongUs.GameOptions;
 using MiraAPI.GameOptions;
 using MiraAPI.PluginLoading;
+using MiraAPI.Translation;
 using MiraAPI.Utilities.Assets;
 using Reactor.Utilities.Extensions;
 using TMPro;
@@ -32,7 +33,7 @@ public abstract class AbstractGameMode : IOptionable
     public abstract string Description { get; }
 
     /// <summary>
-    /// Gets the game mode description.
+    /// Gets the game mode color to display on the lobby pane.
     /// </summary>
     public virtual Color Color { get; } = Color.white;
 
@@ -42,14 +43,14 @@ public abstract class AbstractGameMode : IOptionable
     public virtual LoadableAsset<Sprite>? Icon => null;
 
     /// <summary>
-    /// Gets the icon of the gamemode for use on the options pop-up.
+    /// Gets or sets the icon of the gamemode for use on the options pop-up.
     /// </summary>
     public TMP_SpriteAsset TmpIcon { get; set; } = null!;
 
     /// <summary>
     /// Gets the colored game mode name, using the color and name properties.
     /// </summary>
-    public string ColoredName => $"<color=#{this.Color.ToHtmlStringRGBA()}>{this.Name}</color>";
+    public string ColoredName => $"<color=#{Color.ToHtmlStringRGBA()}>{MiraLocaleManager.Get(Name)}</color>";
 
     /// <summary>
     /// Gets the game mode id.

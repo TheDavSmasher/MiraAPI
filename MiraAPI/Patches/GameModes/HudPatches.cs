@@ -2,6 +2,7 @@ using System.Collections;
 using HarmonyLib;
 using Il2CppSystem;
 using MiraAPI.GameModes;
+using MiraAPI.Translation;
 using Reactor.Utilities;
 using Reactor.Utilities.Extensions;
 using TMPro;
@@ -49,7 +50,7 @@ internal static class HudPatches
         gmText.SetActive(false);
         modelText.SetActive(false);
         _text = gmTextClone.GetComponent<TextMeshPro>();
-        _text.text = CustomGameModeManager.ActiveMode != null ? $"<color=#{CustomGameModeManager.ActiveMode.Color.ToHtmlStringRGBA()}>{CustomGameModeManager.ActiveMode.Name}</color>" : "Classic";
+        _text.text = CustomGameModeManager.ActiveMode != null ? CustomGameModeManager.ActiveMode.ColoredName : MiraLocaleManager.Get("MiraApi.Gamemode.Classic");
         CustomGameModeManager.ActiveMode?.HudStart(instance);
     }
 

@@ -1,7 +1,6 @@
-﻿using System.Linq;
+﻿using System.Globalization;
+using System.Linq;
 using BepInEx.Configuration;
-using MiraAPI.Utilities.Assets;
-using UnityEngine;
 
 namespace MiraAPI.PluginLoading;
 
@@ -16,10 +15,15 @@ public interface IMiraPlugin
     public virtual bool DisplayOnOptionsMenu => true;
 
     /// <summary>
+    /// Gets or sets a value for the localization id to use for anything registered under this mod.
+    /// </summary>
+    public virtual string ParentLocaleId => GetType().Name.ToLower(CultureInfo.InvariantCulture);
+
+    /// <summary>
     /// Gets the name to display on the options menu.
     /// </summary>
     string OptionsTitleText { get; }
-    
+
     /// <summary>
     /// Gets the abbreviated name to display for other mods to pick up.
     /// </summary>

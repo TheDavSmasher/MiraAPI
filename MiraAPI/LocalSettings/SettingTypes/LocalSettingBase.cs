@@ -54,6 +54,9 @@ public abstract class LocalSettingBase<T> : ILocalSetting
     /// <returns>The created setting.</returns>
     public abstract GameObject CreateOption(ToggleButtonBehaviour toggle, SlideBar slider, Transform parent, ref float offset, ref int order, bool last);
 
+    /// <inheritdoc/>
+    public abstract void RefreshOption();
+
     /// <summary>
     /// Returns the formated string to use in the text of the setting.
     /// </summary>

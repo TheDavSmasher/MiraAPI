@@ -1,4 +1,3 @@
-using System;
 using MiraAPI.MeetingAbilities;
 using MiraAPI.Networking;
 using MiraAPI.Utilities;
@@ -28,6 +27,7 @@ public class ShotgunButton : MultiTargetMeetingButton
 
     protected override void OnClick(PlayerVoteArea playerVoteArea)
     {
+        // Emptu because it only triggers the actual kills once all meeting abilities have been used.
     }
 
     public override LoadableAsset<Sprite> SpriteActive => ExampleAssets.CallMeetingButton;
@@ -45,7 +45,10 @@ public class ShotgunButton : MultiTargetMeetingButton
         {
             playerVoteArea.SetDisabled();
             var player = playerVoteArea.GetPlayer();
-            PlayerControl.LocalPlayer.RpcCustomMurder(player);
+            if (player != null)
+            {
+                PlayerControl.LocalPlayer.RpcCustomMurder(player);
+            }
         }
     }
 }

@@ -1,12 +1,15 @@
 ﻿global using static Reactor.Utilities.Logger<MiraAPI.MiraApiPlugin>;
 using System;
+using System.Globalization;
 using BepInEx;
 using BepInEx.Configuration;
 using BepInEx.Unity.IL2CPP;
 using HarmonyLib;
 using MiraAPI.PluginLoading;
+using MiraAPI.Translation;
 using MiraAPI.VanillaEvents;
 using Reactor;
+using Reactor.Localization;
 using Reactor.Networking;
 using Reactor.Networking.Attributes;
 using Reactor.Utilities;
@@ -28,6 +31,11 @@ public partial class MiraApiPlugin : BasePlugin, IMiraPlugin
     {
         return Config;
     }
+
+    /// <summary>
+    ///     Gets the specified Culture for string manipulations.
+    /// </summary>
+    public static CultureInfo Culture { get; internal set; } = new("en-US");
 
     /// <inheritdoc />
     public string OptionsTitleText => "MiraAPI";
@@ -68,6 +76,9 @@ public partial class MiraApiPlugin : BasePlugin, IMiraPlugin
 
         PluginManager = new MiraPluginManager();
         PluginManager.Initialize(this, this);
+
+        MiraLocaleManager.Register("mira.api");
+        LocalizationManager.Register(new MiraLocalizationProvider());
 
         IL2CPPChainloader.Instance.Finished +=
             ModCompatibility

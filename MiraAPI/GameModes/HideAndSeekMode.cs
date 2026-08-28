@@ -25,10 +25,10 @@ namespace MiraAPI.GameModes;
 public class HideAndSeekMode : AbstractGameMode
 {
     /// <inheritdoc/>
-    public override string Name => "Hide n Seek";
+    public override string Name => "MiraApi.Gamemode.HideAndSeek";
 
     /// <inheritdoc/>
-    public override string Description => "You can run, but you can't hide!\nOutlive the timer or eliminate the crew.";
+    public override string Description => "MiraApi.Gamemode.HideAndSeek.Description";
 
     // TODO: Once the Hide n Seek port is ready for release, we will remove this.
     public override bool HideMode => !MiraApiPlugin.IsDevBuild;

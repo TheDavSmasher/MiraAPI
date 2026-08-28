@@ -9,6 +9,7 @@ using MiraAPI.GameModes;
 using MiraAPI.GameOptions;
 using MiraAPI.Networking;
 using MiraAPI.Roles;
+using MiraAPI.Translation;
 using MiraAPI.Utilities;
 using MiraAPI.Utilities.Assets;
 using Reactor.Localization.Utilities;
@@ -195,7 +196,7 @@ public static class RoleSettingMenuPatches
                     // sort the groups by priority
                     var sortedRoleGroups = roleGroups
                         .OrderBy(x => x.Key.Priority)
-                        .ThenBy(x => x.Key.Name);
+                        .ThenBy(x => x.Key.Name.Translate());
 
                     var quotaThing = roleMenu.categoryHeaderEditRoleOrigin.transform.FindChild("QuotaHeader");
                     var usingNewQuota = false;
@@ -214,12 +215,7 @@ public static class RoleSettingMenuPatches
 
                         RoleGroupHidden.TryAdd(group, false);
 
-                        var name = group.Name switch
-                        {
-                            "Crewmate" => StringNames.CrewmateRolesHeader,
-                            "Impostor" => StringNames.ImpostorRolesHeader,
-                            _ => CustomStringName.CreateAndRegister(group.Name),
-                        };
+                        var name = MiraLocaleManager.GetOrCreateLocaleString(group.Name);
 
                         var categoryHeaderMasked = Object.Instantiate(
                             template,
@@ -293,8 +289,8 @@ public static class RoleSettingMenuPatches
                         quotaInst.gameObject.SetActive(!RoleGroupHidden[group]);
 
                         var label = RoleGroupHidden[group]
-                            ? "(Click to open)"
-                            : "(Click to close)";
+                            ? $"({"MiraApi.GameSetting.Global.ClickToOpen".Translate()})"
+                            : $"({"MiraApi.GameSetting.Global.ClickToClose".Translate()})";
                         var newText = Object.Instantiate(categoryHeaderMasked.Title, categoryHeaderMasked.transform);
                         newText.text = $"<size=70%>{label}</size>";
                         newText.transform.localPosition = new Vector3(2.6249f, -0.165f, 0f);
@@ -579,7 +575,7 @@ public static class RoleSettingMenuPatches
             return;
         }
 
-        __instance.roleDescriptionText.text = customRole.RoleLongDescription;
+        __instance.roleDescriptionText.text = customRole.RoleMedDescription;
         __instance.roleTitleText.text = role.GetRoleName();
 
         var imgBg = __instance.AdvancedRolesSettings.transform.FindChild("Imagebackground");
@@ -614,7 +610,7 @@ public static class RoleSettingMenuPatches
             comp.Destroy();
         }
 
-        categoryHeaderMasked.Title.text = "RETURN TO ROLE SETTINGS";
+        categoryHeaderMasked.Title.text = "MiraApi.ReturnToRoleSettings".Translate();
 
         if (!categoryHeaderMasked.gameObject.TryGetComponent<PassiveButton>(out _))
         {

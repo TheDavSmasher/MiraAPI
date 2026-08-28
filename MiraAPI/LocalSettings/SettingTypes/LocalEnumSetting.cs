@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using BepInEx.Configuration;
+using MiraAPI.Translation;
 using MiraAPI.Utilities;
 using Reactor.Utilities.Extensions;
 using TMPro;
@@ -24,6 +25,10 @@ public class LocalEnumSetting : LocalSettingBase<int>
     /// Gets the <see langword="enum"/> values.
     /// </summary>
     public string[] Values { get; }
+
+    private SpriteRenderer _highlight { get; set; }
+
+    private TextMeshPro _btnText { get; set; }
 
     /// <summary>
     /// Initializes a new instance of the <see cref="LocalEnumSetting"/> class.
@@ -53,6 +58,7 @@ public class LocalEnumSetting : LocalSettingBase<int>
     {
         var button = Object.Instantiate(toggle, parent).GetComponent<PassiveButton>();
         var tmp = button.transform.FindChild("Text_TMP").GetComponent<TextMeshPro>();
+        _btnText = tmp;
         var rollover = button.GetComponent<ButtonRolloverHandler>();
         tmp.GetComponent<TextTranslatorTMP>().Destroy();
         button.gameObject.SetActive(true);
@@ -62,6 +68,7 @@ public class LocalEnumSetting : LocalSettingBase<int>
         var highlight = button.transform.FindChild("ButtonHighlight")?.GetComponent<SpriteRenderer>();
         if (highlight != null)
         {
+            _highlight = highlight;
             highlight.color = Tab!.TabAppearance.EnumHoverColor;
             highlight.gameObject.SetActive(false);
         }
@@ -125,8 +132,18 @@ public class LocalEnumSetting : LocalSettingBase<int>
     }
 
     /// <inheritdoc/>
+    public override void RefreshOption()
+    {
+        _btnText.text = GetValueText();
+        if (_highlight)
+        {
+            _highlight.gameObject.SetActive(false);
+        }
+    }
+
+    /// <inheritdoc/>
     protected override string GetValueText()
     {
-        return $"<font=\"LiberationSans SDF\" material=\"LiberationSans SDF - Chat Message Masked\">{Name}: <b>{Values[GetValue()]}</font></b>";
+        return $"<font=\"LiberationSans SDF\" material=\"LiberationSans SDF - Chat Message Masked\">{Name.Translate()}: <b>{Values[GetValue()].Translate()}</font></b>";
     }
 }

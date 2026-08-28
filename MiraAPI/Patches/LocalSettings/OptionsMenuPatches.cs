@@ -69,6 +69,7 @@ public static class OptionsMenuPatches
         int i = 0;
         int tabIdx = 0;
         int page = 1;
+        LocalSettingsTab.TabGroups.Clear();
         foreach (var settings in LocalSettingsManager.AvailableTabs)
         {
             var tab = settings.CreateTab(__instance);
@@ -213,6 +214,8 @@ public static class OptionsMenuPatches
 
         if (background != null)
             background.color = tab.TabAppearance.TabColor;
+
+        tab.Open();
     }
     private static void CustomClose(LocalSettingsTab tab)
     {

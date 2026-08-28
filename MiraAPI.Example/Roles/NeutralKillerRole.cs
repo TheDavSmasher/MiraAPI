@@ -8,9 +8,7 @@ namespace MiraAPI.Example.Roles;
 
 public class NeutralKillerRole : ImpostorRole, ICustomRole
 {
-    public string RoleName => "Outcast Killer";
-    public string RoleDescription => "Outcast who can kill.";
-    public string RoleLongDescription => RoleDescription;
+    public string IdPart => "ApiExample.Role.OutcastKiller";
     public Color RoleColor => Color.magenta;
     public ModdedRoleTeams Team => ModdedRoleTeams.Custom;
 
@@ -21,13 +19,13 @@ public class NeutralKillerRole : ImpostorRole, ICustomRole
         CanUseVent = true,
     };
 
-    public RoleOptionsGroup RoleOptionsGroup { get; } = new("Outcast", Color.gray);
+    public RoleOptionsGroup RoleOptionsGroup { get; } = new("outcast", Color.gray);
 
     [HideFromIl2Cpp]
     public TeamIntroConfiguration? IntroConfiguration { get; } = new(
         Color.gray,
-        "OUTCAST",
-        "You are an Outcast. You do not have a team.");
+        "outcast.roleTitle",
+        "outcast.teamIntroDescription");
 
     public override void SpawnTaskHeader(PlayerControl playerControl)
     {

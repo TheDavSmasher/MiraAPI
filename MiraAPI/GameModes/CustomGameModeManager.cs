@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using MiraAPI.Translation;
 using MiraAPI.PluginLoading;
 using Reactor.Utilities;
 
@@ -58,7 +59,7 @@ public static class CustomGameModeManager
     /// <summary>
     /// Checks to see if the current game mode is an instance of the HNS mode.
     /// </summary>
-    /// <returns>True if the Hide & Seek mode is the current one.</returns>
+    /// <returns>True if the Hide n Seek mode is the current one.</returns>
     public static bool IsHideNSeek() => ActiveMode != null && ActiveMode.GetType().IsAssignableTo(typeof(HideAndSeekMode));
 
     /// <summary>
