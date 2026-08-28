@@ -6,14 +6,15 @@ namespace MiraAPI.Example.Roles;
 
 public class FreezerRole : ImpostorRole, ICustomRole
 {
-    public string IdPart => "ApiExample.Role.Freezer";
+    public string IdPart => "Freezer";
+    public string IdPrefix => "ApiExample.Role.Impostor";
     public Color RoleColor => Palette.Blue;
     public ModdedRoleTeams Team => ModdedRoleTeams.Impostor;
 
     public CustomRoleConfiguration Configuration => new CustomRoleConfiguration(this)
     {
         Icon = MiraAssets.ImpostorFile,
-        IconTmp = TmpSpriteUtils.CreateSpriteAsset(MiraAssets.ImpostorFile.LoadAsset(), "ApiExample.Role.Impostor.FreezerRole"),
+        IconTmp = TmpSpriteUtils.CreateSpriteAsset(MiraAssets.ImpostorFile.LoadAsset(), "ApiExample.Role.Impostor.Freezer"),
         OptionsScreenshot = ExampleAssets.Banner,
         MaxRoleCount = 2,
     };

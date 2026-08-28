@@ -187,9 +187,14 @@ public static class MiraLocaleManager
         return fallback != string.Empty ? fallback : key;
     }
 
-    public static string BuildTranslationId(string idPart, string suffix)
+    public static string BuildTranslationId(string modId, string idPart, string suffix)
     {
-        return idPart.StartsWith('#') ? idPart[1..] : $"{idPart}.{suffix}";
+        return idPart.StartsWith('#') ? idPart[1..] : $"{modId}.{idPart}.{suffix}";
+    }
+
+    public static string BuildTranslationId(string modId, string idPart)
+    {
+        return idPart.StartsWith('#') ? idPart[1..] : $"{modId}.{idPart}";
     }
 
     private static string GetModLangDir(string modGuid)

@@ -5,7 +5,8 @@ namespace MiraAPI.Example.Roles;
 
 public class TeleporterRole : CrewmateRole, ICustomRole
 {
-    public string IdPart => "ApiExample.Role.Teleporter";
+    public string IdPart => "Teleporter";
+    public string IdPrefix => "ApiExample.Role.Crewmate";
     public Color RoleColor => new Color32(221, 176, 152, 255);
     public ModdedRoleTeams Team => ModdedRoleTeams.Crewmate;
 

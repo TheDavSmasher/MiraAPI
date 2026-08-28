@@ -51,8 +51,8 @@ public class ModifierUiComponent(nint cppPtr) : MonoBehaviour(cppPtr)
             return;
         }
 
-        nameText.text = Modifier.ModifierName.Translate();
-        desc.text = Modifier.GetDescription().Translate();
+        nameText.text = Modifier.ModifierName;
+        desc.text = Modifier.GetDescription();
         modBg.gameObject.SetActive(true);
 
         icon.gameObject.SetActive(Modifier.ModifierIcon != null);

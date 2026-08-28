@@ -8,7 +8,8 @@ namespace MiraAPI.Example.Roles;
 
 public class NeutralKillerRole : ImpostorRole, ICustomRole
 {
-    public string IdPart => "ApiExample.Role.OutcastKiller";
+    public string IdPart => "OutcastKiller";
+    public string IdPrefix => "ApiExample.Role.Outcast";
     public Color RoleColor => Color.magenta;
     public ModdedRoleTeams Team => ModdedRoleTeams.Custom;
 
@@ -19,7 +20,7 @@ public class NeutralKillerRole : ImpostorRole, ICustomRole
         CanUseVent = true,
     };
 
-    public RoleOptionsGroup RoleOptionsGroup { get; } = new("outcast", Color.gray);
+    public RoleOptionsGroup RoleOptionsGroup { get; } = new("outcast.group", Color.gray);
 
     [HideFromIl2Cpp]
     public TeamIntroConfiguration? IntroConfiguration { get; } = new(
