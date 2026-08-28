@@ -89,6 +89,10 @@ public abstract class LocalSettingsTab(ConfigFile config)
         {
             setting.RefreshOption();
         }
+        foreach (var button in Buttons)
+        {
+            button.RefreshButton();
+        }
 
         foreach (var label in Labels)
         {
