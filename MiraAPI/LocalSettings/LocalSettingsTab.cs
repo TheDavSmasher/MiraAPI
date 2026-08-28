@@ -50,6 +50,11 @@ public abstract class LocalSettingsTab(ConfigFile config)
     public TabGroup? TabButton { get; internal set; }
 
     /// <summary>
+    /// Gets a collection of <see cref="TextMeshPro"/>s alongside the locale keys for them.
+    /// </summary>
+    public static Dictionary<TextMeshPro, string> TabGroups { get; } = [];
+
+    /// <summary>
     /// Gets the list of <see cref="ILocalSetting"/>s.
     /// </summary>
     public List<ILocalSetting> Settings { get; } = [];
@@ -237,6 +242,7 @@ public abstract class LocalSettingsTab(ConfigFile config)
         tabButtonText.transform.localScale = new Vector3(0.9f, 0.9f);
         tabButtonText.alignment = TextAlignmentOptions.Right;
         tabButtonText.text = $"<b>{GetShortName(TabName.Translate())}</b>";
+        TabGroups.Add(tabButtonText, TabName);
 
         var tabButton = tabButtonObject.GetComponent<PassiveButton>();
         var rollover = tabButtonObject.Rollover;
@@ -311,7 +317,7 @@ public abstract class LocalSettingsTab(ConfigFile config)
         offset += 0.5f;
     }
 
-    private static string GetShortName(string name)
+    internal static string GetShortName(string name)
     {
         var shortName = string.Empty;
         name.Split(' ').Do(x => shortName += x[0]);

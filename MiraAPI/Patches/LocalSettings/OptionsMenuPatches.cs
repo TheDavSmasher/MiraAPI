@@ -69,6 +69,7 @@ public static class OptionsMenuPatches
         int i = 0;
         int tabIdx = 0;
         int page = 1;
+        LocalSettingsTab.TabGroups.Clear();
         foreach (var settings in LocalSettingsManager.AvailableTabs)
         {
             var tab = settings.CreateTab(__instance);

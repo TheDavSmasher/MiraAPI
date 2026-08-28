@@ -1,5 +1,6 @@
 using System.Linq;
 using Il2CppInterop.Runtime.InteropTypes.Arrays;
+using MiraAPI.LocalSettings;
 using Reactor.Localization;
 using Reactor.Localization.Providers;
 using Reactor.Utilities;
@@ -37,6 +38,16 @@ public class MiraLocalizationProvider : LocalizationProvider
         if (MiraLocaleManager.LangCultureList.TryGetValue((MiraLanguage)newLanguage, out var culture))
         {
             MiraApiPlugin.Culture = new(culture);
+        }
+
+        foreach (var tab in LocalSettingsTab.TabGroups)
+        {
+            if (tab.Key == null)
+            {
+                break;
+            }
+
+            tab.Key.text = $"<b>{LocalSettingsTab.GetShortName(tab.Value.Translate())}</b>";
         }
         /*Warning($"<?xml version='1.0' encoding='UTF-8'?>");
         Warning($"<resources>");
