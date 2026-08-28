@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Xml;
+using MiraAPI.Utilities;
 using Reactor.Localization.Utilities;
 using UnityEngine;
 
@@ -97,7 +98,22 @@ public static class MiraLocaleManager
         var callingAssembly = Assembly.GetCallingAssembly();
         var dir = GetModLangDir(modGuid);
 
-        LoadInternalStrings(callingAssembly, modGuid, dir);
+        LoadInternalStrings(callingAssembly, callingAssembly.GetName().Name!, modGuid, dir);
+    }
+
+    /// <summary>
+    /// Registers translations for a mod. Copies embedded XML to mira_languages/{modGuid}/ on first run,
+    /// then loads all XML files from that directory into memory.
+    /// Call once per mod during plugin Load().
+    /// </summary>
+    /// <param name="modGuid">The mod GUID (e.g., "mira.example").</param>
+    /// <param name="internalName">The mod's root namespace (e.g., "mira.api").</param>
+    public static void Register(string modGuid, string internalName)
+    {
+        var callingAssembly = Assembly.GetCallingAssembly();
+        var dir = GetModLangDir(modGuid);
+
+        LoadInternalStrings(callingAssembly, internalName, modGuid, dir);
     }
 
     /// <summary>
@@ -194,7 +210,7 @@ public static class MiraLocaleManager
         return newString;
     }
 
-    private static void LoadInternalStrings(Assembly assembly, string modGuid, string dir)
+    private static void LoadInternalStrings(Assembly assembly, string internalName, string modGuid, string dir)
     {
         Directory.CreateDirectory(dir);
 
@@ -203,8 +219,9 @@ public static class MiraLocaleManager
             Locale[modGuid] = [];
         }
 
-        var resourcePrefix = $"{assembly.GetName().Name}.Resources.Locale.";
+        var resourcePrefix = $"{internalName}.Resources.Locale.";
 
+        var atLeastOneLoaded = false;
         foreach (var locale in LangList)
         {
             using var resourceStream =
@@ -221,12 +238,18 @@ public static class MiraLocaleManager
             {
                 var dict = ParseXmlFile(xmlContent);
                 Locale[modGuid][locale.Key] = dict;
-                Info($"Loaded {locale.Key} translation for mod {modGuid} ({dict.Count} keys)");
+                Info($"Loaded {locale.Key.ToDisplayString()} translation for mod {modGuid} ({dict.Count} keys)");
+                atLeastOneLoaded = true;
             }
             catch (Exception e)
             {
                 Error($"Failed to load translation {resourcePrefix}{locale.Value}: {e.Message}");
             }
+        }
+
+        if (!atLeastOneLoaded)
+        {
+            Error($"No internal strings were found for {internalName}!");
         }
 
         if (!Locale.TryGetValue(modGuid, out _))
@@ -247,11 +270,11 @@ public static class MiraLocaleManager
             {
                 var dict = ParseXmlFile(filePath);
                 Locale[modGuid][lang] = dict;
-                Info($"Loaded {lang} translation for mod {modGuid} ({dict.Count} keys)");
+                Info($"Loaded external {lang.ToDisplayString()} translation for mod {modGuid} ({dict.Count} keys)");
             }
             catch (Exception e)
             {
-                Error($"Failed to load translation {filePath}: {e.Message}");
+                Error($"Failed to load external translation {filePath}: {e.Message}");
             }
         }
     }

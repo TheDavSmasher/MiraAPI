@@ -35,6 +35,10 @@ public class LocalNumberSetting : LocalSettingBase<float>
     /// </summary>
     public MiraNumberSuffixes SuffixType { get; }
 
+    private SpriteRenderer _highlight { get; set; }
+
+    private TextMeshPro _btnText { get; set; }
+
     /// <summary>
     /// Initializes a new instance of the <see cref="LocalNumberSetting"/> class.
     /// </summary>
@@ -65,6 +69,7 @@ public class LocalNumberSetting : LocalSettingBase<float>
     {
         var button = Object.Instantiate(toggle, parent).GetComponent<PassiveButton>();
         var tmp = button.transform.FindChild("Text_TMP").GetComponent<TextMeshPro>();
+        _btnText = tmp;
         var rollover = button.GetComponent<ButtonRolloverHandler>();
         tmp.GetComponent<TextTranslatorTMP>().Destroy();
         button.gameObject.SetActive(true);
@@ -74,6 +79,7 @@ public class LocalNumberSetting : LocalSettingBase<float>
         var highlight = button.transform.FindChild("ButtonHighlight")?.GetComponent<SpriteRenderer>();
         if (highlight != null)
         {
+            _highlight = highlight;
             highlight.color = Tab!.TabAppearance.NumberHoverColor;
             highlight.gameObject.SetActive(false);
         }
@@ -134,6 +140,16 @@ public class LocalNumberSetting : LocalSettingBase<float>
             offset += 0.6f;
 
         return button.gameObject;
+    }
+
+    /// <inheritdoc/>
+    public override void RefreshOption()
+    {
+        _btnText.text = GetValueText();
+        if (_highlight)
+        {
+            _highlight.gameObject.SetActive(false);
+        }
     }
 
     /// <inheritdoc/>

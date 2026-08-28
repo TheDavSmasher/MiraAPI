@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using BepInEx.Configuration;
 using HarmonyLib;
+using MiraAPI.LocalSettings.SettingTypes;
 using MiraAPI.Patches.LocalSettings;
 using MiraAPI.Translation;
 using MiraAPI.Utilities;
@@ -54,6 +55,11 @@ public abstract class LocalSettingsTab(ConfigFile config)
     public List<ILocalSetting> Settings { get; } = [];
 
     /// <summary>
+    /// Gets a collection of <see cref="TextMeshPro"/>s alongside the locale keys for them.
+    /// </summary>
+    public Dictionary<TextMeshPro, string> Labels { get; } = [];
+
+    /// <summary>
     /// Gets the list of <see cref="LocalSettingsButton"/>s.
     /// </summary>
     public List<LocalSettingsButton> Buttons { get; } = [];
@@ -74,12 +80,21 @@ public abstract class LocalSettingsTab(ConfigFile config)
     }
 
     /// <summary>
-    /// Attempts to open the tab.
+    /// Refreshes setting names upon opening the tab.
     /// Override for custom behavior.
     /// </summary>
     public virtual void Open()
     {
-        OptionsMenuPatches.Instance?.OpenTabGroup(TabIndex);
+        foreach (var setting in Settings)
+        {
+            setting.RefreshOption();
+        }
+
+        foreach (var label in Labels)
+        {
+            label.Key.text =
+                $"<font=\"LiberationSans SDF\" material=\"LiberationSans SDF - Chat Message Masked\"><b>{label.Value.Translate()}</b></font>";
+        }
     }
 
     /// <summary>
@@ -273,7 +288,7 @@ public abstract class LocalSettingsTab(ConfigFile config)
         return tabButtonObject.gameObject;
     }
 
-    private static void CreateLabel(GameObject template, Transform parent, string text, ref float offset)
+    private void CreateLabel(GameObject template, Transform parent, string text, ref float offset)
     {
         var label = Object.Instantiate(template, parent);
         label.transform.localPosition = new Vector3(0, 1.85f - offset);
@@ -281,6 +296,7 @@ public abstract class LocalSettingsTab(ConfigFile config)
         label.name = text;
 
         var tmp = label.GetComponent<TextMeshPro>();
+        Labels.Add(tmp, text);
         tmp.text = $"<font=\"LiberationSans SDF\" material=\"LiberationSans SDF - Chat Message Masked\"><b>{text.Translate()}</b></font>";
         tmp.alignment = TextAlignmentOptions.Center;
 

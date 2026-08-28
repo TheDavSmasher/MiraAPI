@@ -213,6 +213,8 @@ public static class OptionsMenuPatches
 
         if (background != null)
             background.color = tab.TabAppearance.TabColor;
+
+        tab.Open();
     }
     private static void CustomClose(LocalSettingsTab tab)
     {
