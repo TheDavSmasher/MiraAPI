@@ -27,4 +27,6 @@
   <string name="MiraApi.Gamemode.Classic.Description">Klasyczna rozgrywka w Among Us!
 Znajdź Intruzów, bądź oszukaj Załogę.</string>
   <string name="MiraApi.Gamemode.HideAndSeek">Chowany</string>
+  <string name="MiraApi.Gamemode.HideAndSeek.Description">Możesz uciekać, ale nie możesz się schować!
+Przeżyj przez wymagany czas, albo zabij chowających.</string>
 </resources>
