@@ -1,5 +1,7 @@
-﻿using System.Globalization;
+﻿using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
+using AmongUs.GameOptions;
 using HarmonyLib;
 using Innersloth.Assets;
 using MiraAPI.Roles;
@@ -77,7 +79,11 @@ public static class RoleGuidePatches
             {
                 __instance.numOfTabs = 3;
                 __instance.TabButtons[0].SelectButton(true);
-                __instance.CreateNormalModeSettings();
+                DisplayNormalRoleSettings(__instance, true);
+            }
+            else
+            {
+                DisplayNormalRoleSettings(__instance, false);
             }
         }
         else if (__instance.HnSModeSettings.Count == 0)
@@ -98,6 +104,64 @@ public static class RoleGuidePatches
         __instance.SetActiveTab(0);
         return false;
     }
+
+    private static Dictionary<RoleBehaviour, MatchInfoRolePanel> _rolePanels = [];
+    public static void DisplayNormalRoleSettings(MatchInfoGuide instance, bool reset)
+    {
+        if (reset)
+        {
+            _rolePanels.Clear();
+            instance.CreateSettingsEntry(StringNames.GameNumImpostors, GameManager.Instance.AllGameSettingData[StringNames.GameNumImpostors].GetValueString(GameManager.Instance.LogicOptions.NumImpostors));
+            instance.CreateSettingsEntry(StringNames.GameKillCooldown, GameManager.Instance.AllGameSettingData[StringNames.GameKillCooldown].GetValueString(GameManager.Instance.LogicOptions.GetKillCooldown()));
+            instance.CreateSettingsEntry(StringNames.GameEmergencyCooldown, GameManager.Instance.AllGameSettingData[StringNames.GameEmergencyCooldown].GetValueString((float)GameManager.Instance.LogicOptions.GetEmergencyCooldown()));
+            instance.CreateSettingsEntry(StringNames.GameVisualTasks, instance.GetBoolString(GameManager.Instance.LogicOptions.GetVisualTasks()));
+            instance.CreateSettingsEntry(StringNames.GameAnonymousVotes, instance.GetBoolString(GameManager.Instance.LogicOptions.GetAnonymousVotes()));
+            instance.CreateSettingsEntry(StringNames.GameConfirmImpostor, instance.GetBoolString(GameManager.Instance.LogicOptions.GetConfirmImpostor()));
+            instance.CreateSettingsEntry(StringNames.GameTaskBarMode, GameManager.Instance.LogicOptions.GetTaskBarMode().ToString());
+            foreach (RoleBehaviour roleBehaviour in RoleManager.Instance.AllRoles)
+            {
+                if (roleBehaviour.Role != RoleTypes.Crewmate && roleBehaviour.Role != RoleTypes.Impostor && roleBehaviour.Role is not RoleTypes.CrewmateGhost && roleBehaviour.Role is not RoleTypes.ImpostorGhost)
+                {
+                    var panel = Object.Instantiate(
+                        instance.MatchInfoRolePanelPrefab,
+                        instance.settingsTabs[2].GetComponent<Scroller>().Inner);
+                    _rolePanels.Add(roleBehaviour, panel);
+                }
+            }
+        }
+
+        int num = 0;
+        foreach (var pair in _rolePanels)
+        {
+            var role = pair.Key;
+            var panel = pair.Value;
+            var amount = GameOptionsManager.Instance.CurrentGameOptions.RoleOptions.GetNumPerGame(role.Role);
+            var chance = GameOptionsManager.Instance.CurrentGameOptions.RoleOptions.GetChancePerGame(role.Role);
+            if (amount == 0 || chance == 0)
+            {
+                panel.gameObject.SetActive(false);
+                continue;
+            }
+            panel.gameObject.SetActive(true);
+            panel.SetPanel(
+                role,
+                amount,
+                chance);
+            num++;
+        }
+        if (num == 0)
+        {
+            instance.rolesEnabledMessage.SetActive(true);
+        }
+        instance.MatchInfoRoleScroller.SetYBoundsMax(Mathf.Clamp(Mathf.Ceil((float)num / 2f) + instance.RoleEntryBoundsModifier, 0f, 999f));
+        instance.MatchInfoRoleMaskArea.material.SetInt(PlayerMaterial.MaskLayer, 50);
+        instance.matchInfoSettingsMaskArea.material.SetInt(PlayerMaterial.MaskLayer, 50);
+        if (reset)
+        {
+            instance.CreatePlayerEntries();
+        }
+    }
+
     [HarmonyPrefix]
     [HarmonyPriority(Priority.First)]
     [HarmonyPatch(typeof(MatchInfoGuide), nameof(MatchInfoGuide.CreatePlayerEntries))]
