@@ -80,6 +80,24 @@ public static class RoleGuidePatches
                 __instance.numOfTabs = 3;
                 __instance.TabButtons[0].SelectButton(true);
                 DisplayNormalRoleSettings(__instance, true);
+                __instance.MatchInfoRoleMaskArea.transform.localPosition = new Vector3(-0.0184f, 0.15f, -0.1f);
+
+                __instance.matchInfoPlayersMaskArea.transform.localPosition =
+                    __instance.matchInfoSettingsMaskArea.transform.localPosition = new Vector3(1.22f, -0.335f, -0.1f);
+
+                __instance.matchInfoPlayersMaskArea.size =
+                    __instance.matchInfoSettingsMaskArea.size =
+                        __instance.MatchInfoRoleMaskArea.size = new Vector2(-6, 1.8f);
+
+                __instance.matchInfoPlayersMaskArea.transform.parent.GetAllChildren().First(x => x.name.Contains("BG_Gradient"))
+                        .GetComponent<SpriteRenderer>()
+                        .maskInteraction =
+                    __instance.matchInfoSettingsMaskArea.transform.parent.GetAllChildren()
+                            .First(x => x.name.Contains("BG_Gradient")).GetComponent<SpriteRenderer>()
+                            .maskInteraction =
+                        __instance.MatchInfoRoleMaskArea.transform.parent.GetAllChildren()
+                            .First(x => x.name.Contains("BG_Gradient")).GetComponent<SpriteRenderer>()
+                            .maskInteraction = SpriteMaskInteraction.VisibleInsideMask;
             }
             else
             {
@@ -153,7 +171,7 @@ public static class RoleGuidePatches
         {
             instance.rolesEnabledMessage.SetActive(true);
         }
-        instance.MatchInfoRoleScroller.SetYBoundsMax(Mathf.Clamp(Mathf.Ceil((float)num / 2f) + instance.RoleEntryBoundsModifier, 0f, 999f));
+        instance.MatchInfoRoleScroller.SetYBoundsMax(Mathf.Clamp(Mathf.Ceil((float)num / 2f) * 1.3f - 1.5f, 0f, 999f));
         instance.MatchInfoRoleMaskArea.material.SetInt(PlayerMaterial.MaskLayer, 50);
         instance.matchInfoSettingsMaskArea.material.SetInt(PlayerMaterial.MaskLayer, 50);
         if (reset)
