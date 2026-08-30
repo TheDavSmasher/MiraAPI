@@ -22,7 +22,7 @@ public interface ICustomRole : IOptionable
     /// <summary>
     /// Gets the id part used to build the role's translation keys. It is recommended to call it ModGuid.Role.Faction
     /// </summary>
-    string IdPrefix => MiraLocaleManager.BuildTranslationId(GetType().Namespace!, "Role", Team.ToString());
+    string IdPrefix => GetType().Namespace!;
 
     /// <summary>
     /// Gets the name of the role.
