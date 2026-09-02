@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using AmongUs.GameOptions;
@@ -7,6 +8,7 @@ using Innersloth.Assets;
 using MiraAPI.Roles;
 using MiraAPI.Utilities;
 using UnityEngine;
+using Object = UnityEngine.Object;
 
 namespace MiraAPI.Patches;
 
@@ -124,21 +126,41 @@ public static class RoleGuidePatches
     }
 
     private static Dictionary<RoleBehaviour, MatchInfoRolePanel> _rolePanels = [];
+
     public static void DisplayNormalRoleSettings(MatchInfoGuide instance, bool reset)
     {
         if (reset)
         {
             _rolePanels.Clear();
-            instance.CreateSettingsEntry(StringNames.GameNumImpostors, GameManager.Instance.AllGameSettingData[StringNames.GameNumImpostors].GetValueString(GameManager.Instance.LogicOptions.NumImpostors));
-            instance.CreateSettingsEntry(StringNames.GameKillCooldown, GameManager.Instance.AllGameSettingData[StringNames.GameKillCooldown].GetValueString(GameManager.Instance.LogicOptions.GetKillCooldown()));
-            instance.CreateSettingsEntry(StringNames.GameEmergencyCooldown, GameManager.Instance.AllGameSettingData[StringNames.GameEmergencyCooldown].GetValueString((float)GameManager.Instance.LogicOptions.GetEmergencyCooldown()));
-            instance.CreateSettingsEntry(StringNames.GameVisualTasks, instance.GetBoolString(GameManager.Instance.LogicOptions.GetVisualTasks()));
-            instance.CreateSettingsEntry(StringNames.GameAnonymousVotes, instance.GetBoolString(GameManager.Instance.LogicOptions.GetAnonymousVotes()));
-            instance.CreateSettingsEntry(StringNames.GameConfirmImpostor, instance.GetBoolString(GameManager.Instance.LogicOptions.GetConfirmImpostor()));
-            instance.CreateSettingsEntry(StringNames.GameTaskBarMode, GameManager.Instance.LogicOptions.GetTaskBarMode().ToString());
+            instance.CreateSettingsEntry(
+                StringNames.GameNumImpostors,
+                GameManager.Instance.AllGameSettingData[StringNames.GameNumImpostors]
+                    .GetValueString(GameManager.Instance.LogicOptions.NumImpostors));
+            instance.CreateSettingsEntry(
+                StringNames.GameKillCooldown,
+                GameManager.Instance.AllGameSettingData[StringNames.GameKillCooldown]
+                    .GetValueString(GameManager.Instance.LogicOptions.GetKillCooldown()));
+            instance.CreateSettingsEntry(
+                StringNames.GameEmergencyCooldown,
+                GameManager.Instance.AllGameSettingData[StringNames.GameEmergencyCooldown]
+                    .GetValueString((float)GameManager.Instance.LogicOptions.GetEmergencyCooldown()));
+            instance.CreateSettingsEntry(
+                StringNames.GameVisualTasks,
+                instance.GetBoolString(GameManager.Instance.LogicOptions.GetVisualTasks()));
+            instance.CreateSettingsEntry(
+                StringNames.GameAnonymousVotes,
+                instance.GetBoolString(GameManager.Instance.LogicOptions.GetAnonymousVotes()));
+            instance.CreateSettingsEntry(
+                StringNames.GameConfirmImpostor,
+                instance.GetBoolString(GameManager.Instance.LogicOptions.GetConfirmImpostor()));
+            instance.CreateSettingsEntry(
+                StringNames.GameTaskBarMode,
+                GameManager.Instance.LogicOptions.GetTaskBarMode().ToString());
             foreach (RoleBehaviour roleBehaviour in RoleManager.Instance.AllRoles)
             {
-                if (roleBehaviour.Role != RoleTypes.Crewmate && roleBehaviour.Role != RoleTypes.Impostor && roleBehaviour.Role is not RoleTypes.CrewmateGhost && roleBehaviour.Role is not RoleTypes.ImpostorGhost)
+                if (roleBehaviour.Role != RoleTypes.Crewmate && roleBehaviour.Role != RoleTypes.Impostor &&
+                    roleBehaviour.Role is not RoleTypes.CrewmateGhost &&
+                    roleBehaviour.Role is not RoleTypes.ImpostorGhost)
                 {
                     var panel = Object.Instantiate(
                         instance.MatchInfoRolePanelPrefab,
@@ -155,11 +177,15 @@ public static class RoleGuidePatches
             var panel = pair.Value;
             var amount = GameOptionsManager.Instance.CurrentGameOptions.RoleOptions.GetNumPerGame(role.Role);
             var chance = GameOptionsManager.Instance.CurrentGameOptions.RoleOptions.GetChancePerGame(role.Role);
-            if (amount == 0 || chance == 0)
+            var forciblyShow = role is ICustomRole custom ? custom.ForceShowRoleOnWiki : null;
+            if (amount == 0 || chance == 0 || (Enum.IsDefined(role.Role) && role.IsRoleBlacklisted()) ||
+                (role is ICustomRole custom2 && ((!custom2.CanSpawnOnCurrentMode() && forciblyShow == null) ||
+                                                 (forciblyShow.HasValue && !forciblyShow.Value))))
             {
                 panel.gameObject.SetActive(false);
                 continue;
             }
+
             panel.gameObject.SetActive(true);
             panel.SetPanel(
                 role,
@@ -167,10 +193,12 @@ public static class RoleGuidePatches
                 chance);
             num++;
         }
+
         if (num == 0)
         {
             instance.rolesEnabledMessage.SetActive(true);
         }
+
         instance.MatchInfoRoleScroller.SetYBoundsMax(Mathf.Clamp(Mathf.Ceil((float)num / 2f) * 1.3f - 1.5f, 0f, 999f));
         instance.MatchInfoRoleMaskArea.material.SetInt(PlayerMaterial.MaskLayer, 50);
         instance.matchInfoSettingsMaskArea.material.SetInt(PlayerMaterial.MaskLayer, 50);

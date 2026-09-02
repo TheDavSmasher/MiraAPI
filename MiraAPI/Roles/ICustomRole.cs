@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Text;
 using BepInEx.Configuration;
+using MiraAPI.GameModes;
 using MiraAPI.GameOptions;
 using MiraAPI.Modifiers;
 using MiraAPI.PluginLoading;
@@ -301,7 +302,13 @@ public interface ICustomRole : IOptionable
     /// Determines whether the role can spawn in general, accounting for gamemodes and everything else.
     /// </summary>
     /// <returns><see langword="true"/> if the role is able to spawn, otherwise <see langword="false"/>.</returns>
-    public virtual bool CanSpawnOnCurrentMode() => !GameManager.Instance.IsHideAndSeek();
+    public virtual bool CanSpawnOnCurrentMode() => Configuration.AssociatedGameMode.IsInstanceOfType(CustomGameModeManager.ActiveMode);
+
+    /// <summary>
+    /// Determines whether the role is forcibly shown or disabled in the wiki screen.
+    /// </summary>
+    /// <returns><see langword="true"/> if the role is always displayed, otherwise <see langword="false"/> if it is never displayable, or <see langword="null"/> if it is dictated by amount and chance.</returns>
+    public virtual bool? ForceShowRoleOnWiki => null;
 
     /// <summary>
     /// Gets the function that determines whether the role should be toggled on or off in the game settings.
