@@ -1,5 +1,7 @@
 ﻿using System.Collections;
 using BepInEx.Configuration;
+using MiraAPI.Events;
+using MiraAPI.Events.Mira;
 using MiraAPI.Hud;
 using MiraAPI.LocalSettings;
 using MiraAPI.LocalSettings.Attributes;
@@ -80,51 +82,15 @@ public class MiraApiSettings(ConfigFile config) : LocalSettingsTab(config)
     {
         var topUi = MiraHudHelper.UiTopRight;
         var extraTopUi = MiraHudHelper.ExtraUiTopRight;
-        var wikiButton = MiraHudHelper.VanillaMatchInfoButton;
-        var subButton = MiraHudHelper.SubmergedFloorButton;
-        var modDisplay = MiraHudHelper.ModifierDisplayOnRight ? MiraHudHelper.ModifierDisplayObject : null!;
-        ResetButtonPositions();
         if (topUi && extraTopUi)
         {
-            var opts = LocalSettingsTabSingleton<MiraApiSettings>.Instance;
-            if (wikiButton)
-            {
-                wikiButton.transform.SetParent(opts.WikiOnBottomRow.Value ? extraTopUi.transform : topUi.transform);
-            }
-            if (subButton)
-            {
-                subButton.transform.SetParent(extraTopUi.transform);
-            }
-            if (modDisplay)
-            {
-                modDisplay.transform.SetParent(extraTopUi.transform);
-            }
+            var genericEvent = new UiButtonResetEvent();
+            MiraEventManager.InvokeEvent(genericEvent);
+
+            var genericEvent2 = new UiButtonPostResetEvent(topUi, extraTopUi);
+            MiraEventManager.InvokeEvent(genericEvent2);
             MiraHudHelper.UiGrid.ArrangeChilds();
             MiraHudHelper.ExtraUiGrid.ArrangeChilds();
-        }
-    }
-
-    public static void ResetButtonPositions()
-    {
-        var topUi = MiraHudHelper.UiTopRight;
-        var extraTopUi = MiraHudHelper.ExtraUiTopRight;
-        var subButton = MiraHudHelper.SubmergedFloorButton;
-        var modDisplay = MiraHudHelper.ModifierDisplayOnRight ? MiraHudHelper.ModifierDisplayObject : null!;
-        if (topUi && extraTopUi)
-        {
-            var wikiButton = MiraHudHelper.VanillaMatchInfoButton;
-            if (wikiButton)
-            {
-                wikiButton.transform.SetParent(null);
-            }
-            if (subButton)
-            {
-                subButton.transform.SetParent(null);
-            }
-            if (modDisplay)
-            {
-                modDisplay.transform.SetParent(null);
-            }
         }
     }
 
