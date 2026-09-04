@@ -3,6 +3,7 @@ using AmongUs.GameOptions;
 using HarmonyLib;
 using System.Linq;
 using InnerNet;
+using MiraAPI.GameModes;
 using MiraAPI.Roles;
 
 namespace MiraAPI.Patches.Roles;
@@ -15,6 +16,21 @@ public static class SelectRolesPatch
     [HarmonyPatch(nameof(RoleManager.SelectRoles))]
     public static bool SelectRoles()
     {
+        var roleSelection = GameManager.Instance.LogicRoleSelection.Cast<LogicRoleSelectionNormal>();
+        if (!AmongUsClient.Instance.AmHost || roleSelection == null)
+        {
+            return true;
+        }
+
+        if (CustomGameModeManager.ActiveMode != null)
+        {
+            CustomGameModeManager.ActiveMode.AssignRoles(out var runOriginal, roleSelection);
+
+            if (!runOriginal)
+            {
+                return false;
+            }
+        }
         if (!ApiHandlesRoleSelect)
         {
             return true;

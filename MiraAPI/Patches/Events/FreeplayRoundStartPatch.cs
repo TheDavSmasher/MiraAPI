@@ -1,7 +1,9 @@
-﻿using System.Reflection;
+﻿using System.Linq;
+using System.Reflection;
 using HarmonyLib;
 using MiraAPI.Events;
 using MiraAPI.Events.Vanilla.Gameplay;
+using MiraAPI.MeetingAbilities;
 using MiraAPI.Utilities;
 
 namespace MiraAPI.Patches.Events;
@@ -18,6 +20,7 @@ public static class FreeplayRoundStartPatch
     {
         if (!__result)
         {
+            MeetingButtonManager.OnGameStart();
             MiraEventManager.InvokeEvent(new RoundStartEvent(true));
         }
     }

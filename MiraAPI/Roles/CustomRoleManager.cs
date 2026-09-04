@@ -7,6 +7,7 @@ using Il2CppInterop.Runtime.Injection;
 using Il2CppInterop.Runtime.InteropTypes.Arrays;
 using MiraAPI.Networking;
 using MiraAPI.PluginLoading;
+using MiraAPI.Translation;
 using MiraAPI.Utilities;
 using MiraAPI.Utilities.Assets;
 using Reactor.Localization.Utilities;
@@ -131,9 +132,10 @@ public static class CustomRoleManager
         roleBehaviour.Role = (RoleTypes)roleId;
         roleBehaviour.TeamType = customRole.Team == ModdedRoleTeams.Custom ? RoleTeamTypes.Crewmate : (RoleTeamTypes)customRole.Team;
         roleBehaviour.NameColor = customRole.RoleColor;
-        roleBehaviour.StringName = CustomStringName.CreateAndRegister(customRole.RoleName);
-        roleBehaviour.BlurbName = CustomStringName.CreateAndRegister(customRole.RoleDescription);
-        roleBehaviour.BlurbNameLong = CustomStringName.CreateAndRegister(customRole.RoleLongDescription);
+        roleBehaviour.StringName = MiraLocaleManager.GetOrCreateLocaleString(customRole.RoleNameLocale);
+        roleBehaviour.BlurbName = MiraLocaleManager.GetOrCreateLocaleString(customRole.RoleDescriptionLocale);
+        roleBehaviour.BlurbNameMed = MiraLocaleManager.GetOrCreateLocaleString(customRole.RoleMedDescriptionLocale);
+        roleBehaviour.BlurbNameLong = MiraLocaleManager.GetOrCreateLocaleString(customRole.RoleLongDescriptionLocale);
         roleBehaviour.AffectedByLightAffectors = customRole.Configuration.AffectedByLightOnAirship;
         roleBehaviour.CanBeKilled = customRole.Configuration.CanGetKilled;
         roleBehaviour.CanUseKillButton = customRole.Configuration.UseVanillaKillButton;
@@ -141,11 +143,18 @@ public static class CustomRoleManager
         roleBehaviour.CanVent = customRole.Configuration.CanUseVent || customRole.Configuration.GetsVentData;
         roleBehaviour.DefaultGhostRole = customRole.Configuration.GhostRole;
         roleBehaviour.MaxCount = customRole.Configuration.MaxRoleCount;
-        roleBehaviour.RoleScreenshot = Sprite.Create(
-            customRole.Configuration.OptionsScreenshot?.LoadAsset().texture,
-            new Rect(0, 0, 370, 230),
-            Vector2.one / 2,
-            100);
+        if (customRole.Configuration.OptionsScreenshot != null)
+        {
+            roleBehaviour.RoleScreenshot = customRole.Configuration.OptionsScreenshot.LoadAsset();
+        }
+        else
+        {
+            roleBehaviour.RoleScreenshot = Sprite.Create(
+                null,
+                new Rect(0, 0, 370, 230),
+                Vector2.one / 2,
+                100);
+        }
 
         _emptySettings ??= new(0);
         _emptyKillAnimations ??= new(0);

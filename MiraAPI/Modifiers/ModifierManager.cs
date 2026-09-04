@@ -4,6 +4,7 @@ using System.Linq;
 using System.Runtime.Serialization;
 using MiraAPI.Modifiers.Types;
 using MiraAPI.PluginLoading;
+using MiraAPI.Translation;
 using MiraAPI.Roles;
 using MiraAPI.Utilities;
 using Reactor.Utilities.Extensions;
@@ -136,7 +137,10 @@ public static class ModifierManager
             var validPlayers = plrs.Where(x => IsGameModifierValid(x, modifier, modifier.TypeId)).ToList();
             if (validPlayers.Count == 0)
             {
-                Warning($"No valid players for modifier {modifier.ModifierName}");
+                if (MiraApiPlugin.IsDevBuild)
+                {
+                    Warning($"No valid players for modifier {modifier.ModifierName.Translate()}");
+                }
                 continue;
             }
 
@@ -157,15 +161,23 @@ public static class ModifierManager
 
                 if (candidates.Count == 0)
                 {
-                    Warning(
-                        $"No available players for modifier {modifier.ModifierName} at assignment {i + 1}");
+                    if (MiraApiPlugin.IsDevBuild)
+                    {
+                        Warning(
+                            $"No available players for modifier {modifier.ModifierName.Translate()} at assignment {i + 1}");
+                    }
+
                     break;
                 }
 
                 var plr = candidates.Random();
                 if (plr == null)
                 {
-                    Warning($"Valid player for modifier {modifier.ModifierName} disappeared");
+                    if (MiraApiPlugin.IsDevBuild)
+                    {
+                        Warning($"Valid player for modifier {modifier.ModifierName.Translate()} disappeared");
+                    }
+
                     continue;
                 }
 

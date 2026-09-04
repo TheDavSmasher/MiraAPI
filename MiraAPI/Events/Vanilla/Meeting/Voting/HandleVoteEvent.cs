@@ -25,14 +25,19 @@ public class HandleVoteEvent : MiraCancelableEvent
     public byte TargetId { get; }
 
     /// <summary>
-    /// Gets a value indicating whether to prevent the vote from commencing.
+    /// Gets or sets a value indicating whether to prevent the vote from commencing.
     /// </summary>
-    public bool PreventVote { get; }
+    public bool PreventVote { get; set; }
 
     /// <summary>
     /// Gets the <see cref="NetworkedPlayerInfo"/> of the target.
     /// </summary>
     public NetworkedPlayerInfo TargetPlayerInfo { get; }
+
+    /// <summary>
+    /// Gets or sets a value indicating whether the vote event is an Overrule caused by a Judge.
+    /// </summary>
+    public bool IsOverruling { get; set; }
 
     /// <summary>
     /// Initializes a new instance of the <see cref="HandleVoteEvent"/> class.
@@ -45,6 +50,22 @@ public class HandleVoteEvent : MiraCancelableEvent
         Player = playerVoteData.Owner;
         TargetId = targetId;
         PreventVote = false;
+        TargetPlayerInfo = GameData.Instance.GetPlayerById(targetId);
+    }
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="HandleVoteEvent"/> class.
+    /// </summary>
+    /// <param name="playerVoteData">The voter's <see cref="PlayerVoteData"/>.</param>
+    /// <param name="targetId">The target's playerId.</param>
+    /// <param name="isOverruling">Whether the vote is actually for a Judge.</param>
+    public HandleVoteEvent(PlayerVoteData playerVoteData, byte targetId, bool isOverruling)
+    {
+        VoteData = playerVoteData;
+        Player = playerVoteData.Owner;
+        TargetId = targetId;
+        PreventVote = false;
+        IsOverruling = isOverruling;
         TargetPlayerInfo = GameData.Instance.GetPlayerById(targetId);
     }
 }

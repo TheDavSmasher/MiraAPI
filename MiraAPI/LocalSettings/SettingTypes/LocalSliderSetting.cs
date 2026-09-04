@@ -1,5 +1,6 @@
 ﻿using System;
 using BepInEx.Configuration;
+using MiraAPI.Translation;
 using MiraAPI.Utilities;
 using Reactor.Utilities.Extensions;
 using TMPro;
@@ -39,6 +40,8 @@ public class LocalSliderSetting : LocalSettingBase<float>
     /// </summary>
     public MiraNumberSuffixes SuffixType { get; }
 
+    private SlideBar _slider { get; set; }
+
     /// <summary>
     /// Initializes a new instance of the <see cref="LocalSliderSetting"/> class.
     /// </summary>
@@ -70,6 +73,7 @@ public class LocalSliderSetting : LocalSettingBase<float>
     public override GameObject CreateOption(ToggleButtonBehaviour toggle, SlideBar slider, Transform parent, ref float offset, ref int order, bool last)
     {
         var newSlider = Object.Instantiate(slider, parent).GetComponent<SlideBar>();
+        _slider = newSlider;
         var rollover = newSlider.GetComponent<ButtonRolloverHandler>();
         newSlider.Title = newSlider.transform.FindChild("Text_TMP").GetComponent<TextMeshPro>(); // Why the hell slider has a title property that is not even assigned???
         newSlider.Title.GetComponent<TextTranslatorTMP>().Destroy();
@@ -105,6 +109,12 @@ public class LocalSliderSetting : LocalSettingBase<float>
     }
 
     /// <inheritdoc/>
+    public override void RefreshOption()
+    {
+        _slider.Title.text = GetValueText();
+    }
+
+    /// <inheritdoc/>
     protected override string GetValueText()
     {
         if (DisplayValue)
@@ -112,9 +122,9 @@ public class LocalSliderSetting : LocalSettingBase<float>
             var value = GetValue();
             var formated = Helpers.FormatValue(value, SuffixType, FormatString);
             var maxFormated = Helpers.FormatValue(SliderRange.max, SuffixType, FormatString);
-            return $"<font=\"LiberationSans SDF\" material=\"LiberationSans SDF - Chat Message Masked\">{Name}: <b>{formated} / {maxFormated}</font></b>";
+            return $"<font=\"LiberationSans SDF\" material=\"LiberationSans SDF - Chat Message Masked\">{Name.Translate()}: <b>{formated} / {maxFormated}</font></b>";
         }
 
-        return $"<font=\"LiberationSans SDF\" material=\"LiberationSans SDF - Chat Message Masked\">{Name}</font></b>";
+        return $"<font=\"LiberationSans SDF\" material=\"LiberationSans SDF - Chat Message Masked\">{Name.Translate()}</font></b>";
     }
 }

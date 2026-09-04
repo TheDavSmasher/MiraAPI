@@ -41,6 +41,26 @@ public enum MiraRpc : uint
     ConfirmCustomMurder,
 
     /// <summary>
+    /// Advanced Custom Murder RPC.
+    /// </summary>
+    AdvancedCustomMurder,
+
+    /// <summary>
+    /// Advanced Custom Murder RPC Confirmation.
+    /// </summary>
+    ConfirmAdvancedCustomMurder,
+
+    /// <summary>
+    /// Framed Custom Murder RPC.
+    /// </summary>
+    FramedCustomMurder,
+
+    /// <summary>
+    /// Framed Custom Murder RPC Confirmation.
+    /// </summary>
+    ConfirmFramedCustomMurder,
+
+    /// <summary>
     /// Custom Game Over RPC.
     /// </summary>
     CustomGameOver,
@@ -54,4 +74,14 @@ public enum MiraRpc : uint
     /// Custom RPC to replace Among Us CastVote.
     /// </summary>
     CastVote,
+
+    /// <summary>
+    /// Custom RPC to replace Among Us QueueOverruleVotes.
+    /// </summary>
+    QueueOverruleVotes,
+
+    /// <summary>
+    /// Custom RPC to sync the Gamemode option.
+    /// </summary>
+    SyncGamemodeOption,
 }

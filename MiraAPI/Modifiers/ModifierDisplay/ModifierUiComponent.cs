@@ -1,4 +1,5 @@
 ﻿using Il2CppInterop.Runtime.Attributes;
+using MiraAPI.Translation;
 using Reactor.Utilities.Attributes;
 using TMPro;
 using UnityEngine;

@@ -1,10 +1,15 @@
 ﻿global using static Reactor.Utilities.Logger<MiraAPI.MiraApiPlugin>;
 using System;
+using System.Globalization;
 using BepInEx;
+using BepInEx.Configuration;
 using BepInEx.Unity.IL2CPP;
 using HarmonyLib;
 using MiraAPI.PluginLoading;
+using MiraAPI.Translation;
+using MiraAPI.VanillaEvents;
 using Reactor;
+using Reactor.Localization;
 using Reactor.Networking;
 using Reactor.Networking.Attributes;
 using Reactor.Utilities;
@@ -18,10 +23,26 @@ namespace MiraAPI;
 [BepInAutoPlugin("mira.api", "MiraAPI")]
 [BepInProcess("Among Us.exe")]
 [BepInDependency(ReactorPlugin.Id)]
-[BepInDependency(ModCompatibility.SubmergedId, BepInDependency.DependencyFlags.SoftDependency)]
 [ReactorModFlags(ModFlags.RequireOnAllClients)]
-public partial class MiraApiPlugin : BasePlugin
+public partial class MiraApiPlugin : BasePlugin, IMiraPlugin
 {
+    /// <inheritdoc />
+    public ConfigFile GetConfigFile()
+    {
+        return Config;
+    }
+
+    /// <summary>
+    ///     Gets the specified Culture for string manipulations.
+    /// </summary>
+    public static CultureInfo Culture { get; internal set; } = new("en-US");
+
+    /// <inheritdoc />
+    public string OptionsTitleText => "MiraAPI";
+
+    /// <inheritdoc />
+    public bool DisplayOnOptionsMenu => false;
+
     /// <summary>
     /// Gets a value indicating whether the current device is running Starlight (on mobile).
     /// </summary>
@@ -49,10 +70,19 @@ public partial class MiraApiPlugin : BasePlugin
     public override void Load()
     {
         Harmony.PatchAll();
+        UiResetEvents.Initialize();
+        JudgeEvents.Initialize();
 
         ReactorCredits.Register("Mira API", Version, IsDevBuild, ReactorCredits.AlwaysShow);
 
         PluginManager = new MiraPluginManager();
-        PluginManager.Initialize();
+        PluginManager.Initialize(this, this);
+
+        MiraLocaleManager.Register("mira.api");
+        LocalizationManager.Register(new MiraLocalizationProvider());
+
+        IL2CPPChainloader.Instance.Finished +=
+            ModCompatibility
+                .Initialize; // Initialise AFTER the mods are loaded to ensure maximum parity (no need for the soft dependency either then)
     }
 }
