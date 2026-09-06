@@ -1,8 +1,12 @@
-﻿namespace MiraAPI.Modifiers.Types;
+﻿using MiraAPI.GameModes;
+using MiraAPI.PluginLoading;
+
+namespace MiraAPI.Modifiers.Types;
 
 /// <summary>
 /// The base class for a game modifier. Game modifiers are applied at the start of the game on top of the player's role.
 /// </summary>
+[MiraIgnore]
 public abstract class GameModifier : BaseModifier
 {
     /// <inheritdoc />
@@ -51,5 +55,5 @@ public abstract class GameModifier : BaseModifier
     /// Determines whether the modifier can spawn in general, accounting for gamemodes and everything else.
     /// </summary>
     /// <returns><see langword="true"/> if the modifier is able to spawn, otherwise <see langword="false"/>.</returns>
-    public virtual bool CanSpawnOnCurrentMode() => !GameManager.Instance.IsHideAndSeek();
+    public virtual bool CanSpawnOnCurrentMode() => CustomGameModeManager.IsClassic() && !GameManager.Instance.IsHideAndSeek();
 }
