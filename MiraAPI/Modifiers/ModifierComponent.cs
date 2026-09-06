@@ -8,6 +8,8 @@ using MiraAPI.LocalSettings;
 using MiraAPI.Modifiers.ModifierDisplay;
 using MiraAPI.Modifiers.Types;
 using MiraAPI.Patches.Roles;
+using MiraAPI.Translation;
+using Reactor.Utilities;
 using Reactor.Utilities.Attributes;
 using UnityEngine;
 

@@ -1,8 +1,11 @@
 ﻿using HarmonyLib;
 using Il2CppSystem;
+using MiraAPI.GameModes;
 using MiraAPI.GameOptions;
 using MiraAPI.Roles;
+using MiraAPI.Translation;
 using MiraAPI.Utilities;
+using Reactor.Utilities.Extensions;
 using UnityEngine;
 using Object = Il2CppSystem.Object;
 
@@ -162,7 +165,7 @@ public static class OptionsPatches
             return true;
         }
 
-        __instance.TitleText.text = TranslationController.Instance.GetString(__instance.Title, Array.Empty<Object>());
+        __instance.TitleText.text = TranslationController.Instance.GetString(__instance.Title, Array.Empty<Object>()).Translate();
 
         return false;
     }
@@ -199,8 +202,7 @@ public static class OptionsPatches
         {
             return true;
         }
-
-        __instance.TitleText.text = TranslationController.Instance.GetString(__instance.Title, Array.Empty<Object>());
+        __instance.TitleText.text = TranslationController.Instance.GetString(__instance.Title).Translate();
         return false;
     }
 
@@ -307,7 +309,7 @@ public static class OptionsPatches
             return true;
         }
 
-        __instance.TitleText.text = TranslationController.Instance.GetString(__instance.Title, Array.Empty<Object>());
+        __instance.TitleText.text = TranslationController.Instance.GetString(__instance.Title, Array.Empty<Object>()).Translate();
         __instance.ValueText.text = TranslationController.Instance.GetString(__instance.Values[__instance.Value], Array.Empty<Object>());
 
         return false;

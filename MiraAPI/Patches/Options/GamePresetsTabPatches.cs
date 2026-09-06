@@ -7,6 +7,7 @@ using MiraAPI.GameOptions;
 using MiraAPI.PluginLoading;
 using MiraAPI.Presets;
 using MiraAPI.Roles;
+using MiraAPI.Translation;
 using MiraAPI.Utilities;
 using MiraAPI.Utilities.Assets;
 using Reactor.Utilities.Extensions;
@@ -45,7 +46,7 @@ internal static class GamePresetsTabPatches
 
             if (MenuState.Instance.CurrentModIdx != 0)
             {
-                __instance.PresetDescriptionText.text = "Select or create an options preset for this mod";
+                __instance.PresetDescriptionText.text = "MiraApi.GameSetting.Preset.Hint".Translate();
             }
             else
             {
@@ -184,7 +185,7 @@ internal static class GamePresetsTabPatches
 
             // set the button text and alignment
             var saveText = saveButton.buttonText;
-            saveText.text = "Save";
+            saveText.text = "MiraApi.GameSetting.Preset.Save".Translate();
             saveText.GetComponent<TextTranslatorTMP>().Destroy();
             saveText.alignment = TextAlignmentOptions.Center;
             saveText.transform.parent.localPosition = new Vector3(

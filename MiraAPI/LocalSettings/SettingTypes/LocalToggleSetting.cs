@@ -1,5 +1,6 @@
 ﻿using System;
 using BepInEx.Configuration;
+using MiraAPI.Translation;
 using MiraAPI.Utilities;
 using Reactor.Localization.Utilities;
 using TMPro;
@@ -14,6 +15,8 @@ namespace MiraAPI.LocalSettings.SettingTypes;
 /// </summary>
 public class LocalToggleSetting : LocalSettingBase<bool>
 {
+    private ToggleButtonBehaviour _toggle { get; set; }
+
     /// <summary>
     /// Initializes a new instance of the <see cref="LocalToggleSetting"/> class.
     /// </summary>
@@ -31,6 +34,7 @@ public class LocalToggleSetting : LocalSettingBase<bool>
     public override GameObject CreateOption(ToggleButtonBehaviour toggle, SlideBar slider, Transform parent, ref float offset, ref int order, bool last)
     {
         var toggleObject = Object.Instantiate(toggle, parent).GetComponent<ToggleButtonBehaviour>();
+        _toggle = toggleObject;
         var tmp = toggleObject.transform.FindChild("Text_TMP").GetComponent<TextMeshPro>();
         var passiveButton = toggleObject.GetComponent<PassiveButton>();
         var rollover = toggleObject.GetComponent<ButtonRolloverHandler>();
@@ -46,9 +50,9 @@ public class LocalToggleSetting : LocalSettingBase<bool>
             toggleObject.transform.localPosition = new Vector3(order == 1 ? -1.185f : 1.185f, 1.85f - offset, -7);
         }
 
-        toggleObject.BaseText = CustomStringName.CreateAndRegister(Name);
+        toggleObject.BaseText = MiraLocaleManager.GetOrCreateLocaleString(Name);
         toggleObject.UpdateText(GetValue());
-        toggleObject.name = Name;
+        toggleObject.name = Name.Translate();
         toggleObject.Background.color = GetValue() ? Tab!.TabAppearance.ToggleActiveColor : Tab!.TabAppearance.ToggleInactiveColor;
         passiveButton.OnClick = new UnityEngine.UI.Button.ButtonClickedEvent();
         rollover.OverColor = Tab!.TabAppearance.ToggleHoverColor;
@@ -84,5 +88,12 @@ public class LocalToggleSetting : LocalSettingBase<bool>
             offset += 0.6f;
 
         return toggleObject.gameObject;
+    }
+
+    /// <inheritdoc/>
+    public override void RefreshOption()
+    {
+        _toggle.UpdateText(GetValue());
+        _toggle.Background.color = GetValue() ? Tab!.TabAppearance.ToggleActiveColor : Tab!.TabAppearance.ToggleInactiveColor;
     }
 }
